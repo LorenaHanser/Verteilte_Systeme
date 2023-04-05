@@ -30,16 +30,30 @@ public class WriteThread extends Thread {
 
     public void run() {
 
-        Console console = System.console();
+        //Console console = System.console();
+        //überarbeitet von Daniel S.
+        BufferedReader userIn = new BufferedReader(new InputStreamReader(System.in));
 
-        String userName = console.readLine("\nEnter your name: ");
+        String userName = null;
+        try {
+            userName = userIn.readLine();
+        } catch (IOException e) {
+            System.out.println("!!!!!!!!!!!!!!!!!! Fehler 1 in WriteThread!!!!!!!!!!!!!!!!!!!!!!!");
+            throw new RuntimeException(e);
+
+        }
         client.setUserName(userName);
         writer.println(userName);
 
         String text;
 
         do {
-            text = console.readLine("[" + userName + "]: ");
+            try {
+                text = userIn.readLine();
+            } catch (IOException e) {
+                System.out.println("!!!!!!!!!!!!!!!!!! Fehler 2 in WriteThread!!!!!!!!!!!!!!!!!!!!!!!");
+                throw new RuntimeException(e);
+            }
             writer.println(text);
 
         } while (!text.equals("bye"));

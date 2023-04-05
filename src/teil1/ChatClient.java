@@ -26,7 +26,7 @@ public class ChatClient {
             System.out.println("Connected to the chat server");
 
             new ReadThread(socket, this).start();
-            new WriteThread(socket, this).start();
+            new WriteThread(socket, this).start(); //hier starten wir die Threads
 
         } catch (UnknownHostException ex) {
             System.out.println("Server not found: " + ex.getMessage());
@@ -46,10 +46,10 @@ public class ChatClient {
 
 
     public static void main(String[] args) {
-        if (args.length < 2) return;
+        //if (args.length < 2) return;
 
-        String hostname = args[0];
-        int port = Integer.parseInt(args[1]);
+       String hostname = "localhost";//args[0];
+        int port = 8989;//Integer.parseInt(args[1]);
 
         ChatClient client = new ChatClient(hostname, port);
         client.execute();

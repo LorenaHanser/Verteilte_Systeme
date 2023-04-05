@@ -29,6 +29,7 @@ public class UserThread extends Thread {
             writer = new PrintWriter(output, true);
 
             printUsers();
+            writer.println("Please enter your name:");
 
             String userName = reader.readLine();
             server.addUserName(userName);
