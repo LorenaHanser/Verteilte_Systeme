@@ -60,12 +60,16 @@ public class Server {
     /**
      * Delivers a message from one user to others (broadcasting)
      */
-    void broadcast(String message, ServerUserThread excludeUser) {
-        for (ServerUserThread aUser : userThreads) {
-            if (aUser != excludeUser) {
-                aUser.sendMessage(message);
-            }
-        }
+    void sendMessage(String message, ServerUserThread receiverUser) {       // receiverUser war vorher excludeUser
+
+        // UserThread wird ausglesen aus dme Namen des Users mit dem kommuniziert werden will, und wird als "receiverUser" mitgegeben
+        // Dem "receiverUser" wird dann diese Nachricht gesendet
+        //
+        // for (UserThread aUser : userThreads) {
+        //  if (aUser != receiverUser) {
+        receiverUser.sendMessage(message);
+        //    }
+        // }
     }
 
     /**
