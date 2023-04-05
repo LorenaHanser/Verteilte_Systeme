@@ -41,6 +41,8 @@ public class UserThread extends Thread {
 
             String clientMessage;
 
+            // Endlosschleife
+
             do {
                 clientMessage = reader.readLine();
                 serverMessage = "[" + userName + "]: " + clientMessage;

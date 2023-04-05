@@ -50,6 +50,8 @@ public class WriteThread extends Thread {
 
         String text;
 
+        // Endlosschleife
+
         do {
             try {
                 text = userIn.readLine();

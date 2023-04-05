@@ -24,6 +24,7 @@ public class ReadThread extends Thread {
     }
 
     public void run() {
+        // Endlosschleife
         while (true) {
             try {
                 String response = reader.readLine();

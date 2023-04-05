@@ -44,6 +44,27 @@ public class ServerOld {
                         case "GET":
                             antwort = myFile.get(stringArray);
                             break;
+                            /*
+
+                            case "@Daniel":
+                            // Server verbindet Daniel mit Lorena/David
+                            // Chatverlauf von Daniel mit Lorena/ David wird geladen
+                            antwort = myFile.get(stringArray);
+                            break;
+
+                            case "@David":
+                            // Server verbindet David mit Daniel/Lorena
+                            // Chatverlauf von David mit Daniel/ Lorena wird geladen
+                            antwort = myFile.get(stringArray);
+                            break;
+
+                            case "@Lorena":
+                            // Server verbindet Lorena mit Daniel/David
+                            // Chatverlauf von Lorena mit Daniel/ David wird geladen
+                            antwort = myFile.get(stringArray);
+                            break;
+
+                             */
                         default:
                             antwort = "Ungültige Eingabe\n";
                             System.out.println(antwort);

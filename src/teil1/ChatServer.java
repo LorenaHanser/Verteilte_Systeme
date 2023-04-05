@@ -27,6 +27,8 @@ public class ChatServer {
 
             System.out.println("Chat Server is listening on port " + port);
 
+            // Endlosschleife
+
             while (true) {
                 Socket socket = serverSocket.accept();
                 System.out.println("New user connected");
