@@ -62,7 +62,7 @@ public class ClientWriteThread extends Thread {
             }
             writer.println(text);
 
-        } while (!text.equals("bye"));
+        } while (!text.equals("bye"));  // todo: Globale String Variable mit dem Namen CLOSECONNECTION = "CLOSE"
 
         try {
             socket.close();

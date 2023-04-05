@@ -62,6 +62,8 @@ public class Server {
      */
     void sendMessage(String message, ServerUserThread receiverUser) {       // receiverUser war vorher excludeUser
 
+        // todo: Methodenaufruf von WriteInFile
+
         // UserThread wird ausglesen aus dme Namen des Users mit dem kommuniziert werden will, und wird als "receiverUser" mitgegeben
         // Dem "receiverUser" wird dann diese Nachricht gesendet
         //

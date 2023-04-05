@@ -48,7 +48,7 @@ public class ServerUserThread extends Thread {
                 serverMessage = "[" + userName + "]: " + clientMessage;
                 server.sendMessage(serverMessage, this);  //todo: this muss ausgetauscht werden zum jeweiligen Chatpartner
 
-            } while (!clientMessage.equals("bye"));
+            } while (!clientMessage.equals("bye"));     // todo: Globale String Variable mit dem Namen CLOSECONNECTION = "CLOSE"
 
             server.removeUser(userName, this);
             socket.close();
