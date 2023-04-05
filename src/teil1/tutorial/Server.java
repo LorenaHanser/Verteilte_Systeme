@@ -10,14 +10,14 @@ import java.util.*;
  *
  * @author www.codejava.net
  */
-public class ChatServer {
+public class Server {
     private int port;
     private Set<String> userNames = new HashSet<>();
-    private Set<UserThread> userThreads = new HashSet<>();
+    private Set<ServerUserThread> userThreads = new HashSet<>();
 
     // Konstruktor
 
-    public ChatServer(int port) {
+    public Server(int port) {
         this.port = port;
     }
 
@@ -33,7 +33,7 @@ public class ChatServer {
                 Socket socket = serverSocket.accept();
                 System.out.println("New user connected");
 
-                UserThread newUser = new UserThread(socket, this);
+                ServerUserThread newUser = new ServerUserThread(socket, this);
                 userThreads.add(newUser);
                 newUser.start();
 
@@ -53,15 +53,15 @@ public class ChatServer {
 
         int port = 8989;//Integer.parseInt(args[0]);
 
-        ChatServer server = new ChatServer(port);
+        Server server = new Server(port);
         server.execute();
     }
 
     /**
      * Delivers a message from one user to others (broadcasting)
      */
-    void broadcast(String message, UserThread excludeUser) {
-        for (UserThread aUser : userThreads) {
+    void broadcast(String message, ServerUserThread excludeUser) {
+        for (ServerUserThread aUser : userThreads) {
             if (aUser != excludeUser) {
                 aUser.sendMessage(message);
             }
@@ -78,7 +78,7 @@ public class ChatServer {
     /**
      * When a client is disconneted, removes the associated username and UserThread
      */
-    void removeUser(String userName, UserThread aUser) {
+    void removeUser(String userName, ServerUserThread aUser) {
         boolean removed = userNames.remove(userName);
         if (removed) {
             userThreads.remove(aUser);

@@ -10,14 +10,14 @@ import java.net.*;
  *
  * @author www.codejava.net
  */
-public class WriteThread extends Thread {
+public class ClientWriteThread extends Thread {
     private PrintWriter writer;
     private Socket socket;
-    private ChatClient client;
+    private Client client;
 
     // Konstruktor
 
-    public WriteThread(Socket socket, ChatClient client) {
+    public ClientWriteThread(Socket socket, Client client) {
         this.socket = socket;
         this.client = client;
 

@@ -9,14 +9,14 @@ import java.io.*;
  *
  * @author www.codejava.net
  */
-public class ChatClient {
+public class Client {
     private String hostname;
     private int port;
     private String userName;
 
     // Konstruktor
 
-    public ChatClient(String hostname, int port) {
+    public Client(String hostname, int port) {
         this.hostname = hostname;
         this.port = port;
     }
@@ -27,8 +27,8 @@ public class ChatClient {
 
             System.out.println("Connected to the chat server");
 
-            new ReadThread(socket, this).start();
-            new WriteThread(socket, this).start(); //hier starten wir die Threads
+            new ClientReadThread(socket, this).start();
+            new ClientWriteThread(socket, this).start(); //hier starten wir die Threads
 
         } catch (UnknownHostException ex) {
             System.out.println("Server not found: " + ex.getMessage());
@@ -53,7 +53,7 @@ public class ChatClient {
         String hostname = "localhost";//args[0];
         int port = 8989;//Integer.parseInt(args[1]);
 
-        ChatClient client = new ChatClient(hostname, port);
+        Client client = new Client(hostname, port);
         client.execute();
     }
 }

@@ -2,14 +2,14 @@ package teil1.tutorial;
 
 import java.io.*;
 import java.net.*;
-public class ReadThread extends Thread {
+public class ClientReadThread extends Thread {
     private BufferedReader reader;
     private Socket socket;
-    private ChatClient client;
+    private Client client;
 
     // Konstruktor
 
-    public ReadThread(Socket socket, ChatClient client) {
+    public ClientReadThread(Socket socket, Client client) {
         this.socket = socket;
         this.client = client;
 

@@ -9,14 +9,14 @@ import java.net.*;
  *
  * @author www.codejava.net
  */
-public class UserThread extends Thread {
+public class ServerUserThread extends Thread {
     private Socket socket;
-    private ChatServer server;
+    private Server server;
     private PrintWriter writer;
 
     // Konstruktor
 
-    public UserThread(Socket socket, ChatServer server) {
+    public ServerUserThread(Socket socket, Server server) {
         this.socket = socket;
         this.server = server;
     }
