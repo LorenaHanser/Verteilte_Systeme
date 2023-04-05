@@ -1,0 +1,4 @@
+Client meldet sich am Server an.
+Client teilt dem Server mit, in welchen Chat er möchte.
+Server verbindet den Clienten mit seinem Parnter (wenn online) und sendet ihm den Chatverlauf aus der Datei zu.
+  Wenn Chatpartner nicht online ist, kann der Server dem Clienten Schreiben, dass sein Partner nicht online ist. Chat wird trotzdem in Datei gespeichert.
