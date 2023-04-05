@@ -53,6 +53,7 @@ public class ClientWriteThread extends Thread {
         // Endlosschleife
 
         do {
+            // switch/case
             try {
                 text = userIn.readLine();
             } catch (IOException e) {
