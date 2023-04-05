@@ -1,4 +1,4 @@
-package teil1;
+package teil1.tutorial;
 
 import java.io.*;
 import java.net.*;

@@ -1,4 +1,4 @@
-package teil1;
+package teil1.advcit;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
