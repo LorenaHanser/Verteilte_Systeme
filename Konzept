@@ -4,6 +4,16 @@ Server verbindet den Clienten mit seinem Parnter (wenn online) und sendet ihm de
   Wenn Chatpartner nicht online ist, kann der Server dem Clienten Schreiben, dass sein Partner nicht online ist. Chat wird trotzdem in Datei gespeichert.
   
   Filemanagement:
-    Chatverläufe werden für jeweiligen Chaträume ( Lorena mit Daniel, Daniel mit David, Lorena mit David) anglegt -> Also eine Datei für einen Chat = 3 Chatdateien
+    Chatverläufe werden für jeweiligen Chaträume (Lorena mit Daniel, Daniel mit David, Lorena mit David) anglegt -> Also eine Datei für einen Chat = 3 Chatdateien
     
-    
+
+   
+Syntax (Naming Conventions) mit Beispiel "Daniel":
+CONNECT Daniel    // Verbindung zum Chatraum mit Daniel aufbauen
+DISCONNECT        // Verbindung zum Chatraum mit Daniel schließen
+CLOSE             // Verbindung zum Server schließen
+
+Filenames:
+DanielDavid.txt
+DanielLorena.txt
+DavidLorena.txt
