@@ -15,6 +15,8 @@ public class UserThread extends Thread {
     private ChatServer server;
     private PrintWriter writer;
 
+    // Konstruktor
+
     public UserThread(Socket socket, ChatServer server) {
         this.socket = socket;
         this.server = server;

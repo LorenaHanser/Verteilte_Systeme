@@ -14,6 +14,8 @@ public class ChatClient {
     private int port;
     private String userName;
 
+    // Konstruktor
+
     public ChatClient(String hostname, int port) {
         this.hostname = hostname;
         this.port = port;
@@ -48,7 +50,7 @@ public class ChatClient {
     public static void main(String[] args) {
         //if (args.length < 2) return;
 
-       String hostname = "localhost";//args[0];
+        String hostname = "localhost";//args[0];
         int port = 8989;//Integer.parseInt(args[1]);
 
         ChatClient client = new ChatClient(hostname, port);

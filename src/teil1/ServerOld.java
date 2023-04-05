@@ -3,7 +3,7 @@ package teil1;
 import java.io.*;
 import java.net.*;
 
-public class Server {
+public class ServerOld {
 
     public static final int PORT = 7777;
 

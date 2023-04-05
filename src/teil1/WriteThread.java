@@ -15,11 +15,14 @@ public class WriteThread extends Thread {
     private Socket socket;
     private ChatClient client;
 
+    // Konstruktor
+
     public WriteThread(Socket socket, ChatClient client) {
         this.socket = socket;
         this.client = client;
 
         try {
+            // Schreiben der Chatnachricht
             OutputStream output = socket.getOutputStream();
             writer = new PrintWriter(output, true);
         } catch (IOException ex) {

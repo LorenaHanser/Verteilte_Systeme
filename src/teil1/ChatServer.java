@@ -15,6 +15,8 @@ public class ChatServer {
     private Set<String> userNames = new HashSet<>();
     private Set<UserThread> userThreads = new HashSet<>();
 
+    // Konstruktor
+
     public ChatServer(int port) {
         this.port = port;
     }

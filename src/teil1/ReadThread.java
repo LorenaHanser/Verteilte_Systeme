@@ -7,11 +7,14 @@ public class ReadThread extends Thread {
     private Socket socket;
     private ChatClient client;
 
+    // Konstruktor
+
     public ReadThread(Socket socket, ChatClient client) {
         this.socket = socket;
         this.client = client;
 
         try {
+            // Lesen der Chatnachricht
             InputStream input = socket.getInputStream();
             reader = new BufferedReader(new InputStreamReader(input));
         } catch (IOException ex) {
