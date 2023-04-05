@@ -23,6 +23,7 @@ public class UserThread extends Thread {
 
     public void run() {
         try {
+            // Nachricht vom client empfangen
             InputStream input = socket.getInputStream();
             BufferedReader reader = new BufferedReader(new InputStreamReader(input));
 
@@ -36,7 +37,7 @@ public class UserThread extends Thread {
             server.addUserName(userName);
 
             String serverMessage = "New user connected: " + userName;
-            server.broadcast(serverMessage, this);
+            server.sendMessage(serverMessage, this);        //todo: this muss ausgetauscht werden zum jeweiligen Chatpartner
 
             String clientMessage;
 
@@ -45,7 +46,7 @@ public class UserThread extends Thread {
             do {
                 clientMessage = reader.readLine();
                 serverMessage = "[" + userName + "]: " + clientMessage;
-                server.broadcast(serverMessage, this);
+                server.sendMessage(serverMessage, this);  //todo: this muss ausgetauscht werden zum jeweiligen Chatpartner
 
             } while (!clientMessage.equals("bye"));
 
@@ -53,7 +54,7 @@ public class UserThread extends Thread {
             socket.close();
 
             serverMessage = userName + " has quitted.";
-            server.broadcast(serverMessage, this);
+            server.sendMessage(serverMessage, this);  //todo: this muss ausgetauscht werden zum jeweiligen Chatpartner
 
         } catch (IOException ex) {
             System.out.println("Error in UserThread: " + ex.getMessage());

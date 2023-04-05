@@ -46,19 +46,23 @@ public class ServerOld {
                             break;
                             /*
 
-                            case "@Daniel":
+                            case "Daniel":
                             // Server verbindet Daniel mit Lorena/David
                             // Chatverlauf von Daniel mit Lorena/ David wird geladen
                             antwort = myFile.get(stringArray);
                             break;
 
-                            case "@David":
+                            case "David":
                             // Server verbindet David mit Daniel/Lorena
+                            // If userName = Daniel
+                            {
+                            Verbinde David mit Daniel
+                            }
                             // Chatverlauf von David mit Daniel/ Lorena wird geladen
                             antwort = myFile.get(stringArray);
                             break;
 
-                            case "@Lorena":
+                            case "Lorena":
                             // Server verbindet Lorena mit Daniel/David
                             // Chatverlauf von Lorena mit Daniel/ David wird geladen
                             antwort = myFile.get(stringArray);

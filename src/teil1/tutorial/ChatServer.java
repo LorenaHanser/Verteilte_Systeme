@@ -33,6 +33,8 @@ public class ChatServer {
                 Socket socket = serverSocket.accept();
                 System.out.println("New user connected");
 
+                // UserThread wird in die Server LogIn Liste hinzugefügt
+
                 UserThread newUser = new UserThread(socket, this);
                 userThreads.add(newUser);
                 newUser.start();
@@ -60,12 +62,16 @@ public class ChatServer {
     /**
      * Delivers a message from one user to others (broadcasting)
      */
-    void broadcast(String message, UserThread excludeUser) {
-        for (UserThread aUser : userThreads) {
-            if (aUser != excludeUser) {
-                aUser.sendMessage(message);
-            }
-        }
+    void sendMessage(String message, UserThread receiverUser) {       // receiverUser war vorher excludeUser
+
+        // UserThread wird ausglesen aus dme Namen des Users mit dem kommuniziert werden will, und wird als "receiverUser" mitgegeben
+        // Dem "receiverUser" wird dann diese Nachricht gesendet
+        //
+        // for (UserThread aUser : userThreads) {
+          //  if (aUser != receiverUser) {
+                receiverUser.sendMessage(message);
+        //    }
+       // }
     }
 
     /**
