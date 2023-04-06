@@ -13,6 +13,12 @@ import java.util.*;
 public class Server {
     private int port;
     private Set<String> userNames = new HashSet<>();
+
+    private String[] userNameRegister = {"David","Daniel","Lorena"};
+
+    private int[] userChattetWith = new int[3];
+    private ServerUserThread[] userThreadRegister = new ServerUserThread[3];
+
     private Set<ServerUserThread> userThreads = new HashSet<>();
 
     // Konstruktor
@@ -32,7 +38,6 @@ public class Server {
             while (true) {
                 Socket socket = serverSocket.accept();
                 System.out.println("New user connected");
-
                 ServerUserThread newUser = new ServerUserThread(socket, this);
                 userThreads.add(newUser);
                 newUser.start();
@@ -46,11 +51,6 @@ public class Server {
     }
 
     public static void main(String[] args) {
-        /*if (args.length < 1) {
-            System.out.println("Syntax: java ChatServer <port-number>");
-            System.exit(0);
-        }*/
-
         int port = 8989;//Integer.parseInt(args[0]);
 
         Server server = new Server(port);
@@ -60,16 +60,25 @@ public class Server {
     /**
      * Delivers a message from one user to others (broadcasting)
      */
-    void sendMessage(String message, ServerUserThread receiverUser) {       // receiverUser war vorher excludeUser
+    void sendMessage(String message, int sendUserId, int receiverUserId) {       // receiverUser war vorher excludeUser
 
         // todo: Methodenaufruf von WriteInFile
-
+        //userThreadRegister[receiverUser].sendMessage(message);
         // UserThread wird ausglesen aus dme Namen des Users mit dem kommuniziert werden will, und wird als "receiverUser" mitgegeben
         // Dem "receiverUser" wird dann diese Nachricht gesendet
         //
         // for (UserThread aUser : userThreads) {
         //  if (aUser != receiverUser) {
-        receiverUser.sendMessage(message);
+        if(userThreadRegister[receiverUserId] != null) {
+            System.out.println("Diese Nachricht wurde erhalten: " + message);
+            if(userChattetWith[receiverUserId] == sendUserId) {
+                userThreadRegister[receiverUserId].sendMessage(message);
+            }else{
+                System.out.println("Der User ist gerade beschäftigt. Die Nachricht wird gespeichert!");
+            }
+        }else {
+            System.out.println("Der User ist nicht online, die Nachricht wird aber für ihn gespeichert...");
+        }
         //    }
         // }
     }
@@ -77,8 +86,16 @@ public class Server {
     /**
      * Stores username of the newly connected client.
      */
-    void addUserName(String userName) {
-        userNames.add(userName);
+
+    void setThreadId(String userName, ServerUserThread Thread) {
+        for (int i = 0; i < userNameRegister.length; i++) {
+            if(userNameRegister[i].equals(userName)) {
+                userThreadRegister[i] = Thread;
+                break;
+            }
+        }
+
+
     }
 
     /**
@@ -102,4 +119,26 @@ public class Server {
     boolean hasUsers() {
         return !this.userNames.isEmpty();
     }
+
+    int askForID(String username)
+    {
+        System.out.println("Folgender Name soll überprüft werden: '"+username+"'");
+        int answer = -1;
+        for (int i = 0; i < userNameRegister.length; i++) {
+            if(username.equals( userNameRegister[i])){
+                System.out.println("Es wurde eine ID gefunden");
+                answer = i;
+                break;
+            }
+        }
+        return answer;
+    }
+
+    void setChatPartner(int user, int chatPartner){
+        userChattetWith[user] = chatPartner;
+
+    }
+
+
+
 }

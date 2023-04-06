@@ -13,6 +13,11 @@ public class ServerUserThread extends Thread {
     private Socket socket;
     private Server server;
     private PrintWriter writer;
+    private int ThreadId;
+
+    private int chatPartnerId;
+
+    private int ownID;
 
     // Konstruktor
 
@@ -21,45 +26,73 @@ public class ServerUserThread extends Thread {
         this.server = server;
     }
 
+    public ServerUserThread(Server server, int ThreadId){
+        this.server = server;
+        this.ThreadId = ThreadId;
+    }
+
+    public void setUser(Socket socket)
+    {
+        this.socket = socket;
+        System.out.println("Neuer User wurde gesetzt");
+    }
+
     public void run() {
-        try {
-            // Nachricht vom client empfangen
-            InputStream input = socket.getInputStream();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(input));
 
-            OutputStream output = socket.getOutputStream();
-            writer = new PrintWriter(output, true);
+            try {
+                // Nachricht vom client empfangen
+                System.out.println("Ein Neuer USer ist im Thread: "+ThreadId+" angekommen");
+                InputStream input = socket.getInputStream();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(input));
 
-            printUsers();
-            writer.println("Please enter your name:");
+                OutputStream output = socket.getOutputStream();
+                writer = new PrintWriter(output, true);
 
-            String userName = reader.readLine();
-            server.addUserName(userName);
+                printUsers();
+                writer.println("Please enter your name:");
 
-            String serverMessage = "New user connected: " + userName;
-            server.sendMessage(serverMessage, this);        //todo: this muss ausgetauscht werden zum jeweiligen Chatpartner
+                String userName = reader.readLine();
+                server.setThreadId(userName, this);
+                ownID = server.askForID(userName);
 
-            String clientMessage;
+                String serverMessage = "New user connected: " + userName;
 
-            // Endlosschleife
+                boolean foundPartner = false;
+                while(foundPartner == false){
+                    writer.println("Mit wem möchstest du schreiben?");
+                    chatPartnerId = server.askForID(reader.readLine());
+                    if(chatPartnerId != -1){
+                        writer.println("Alles klar, du wirst verbunden");
+                        server.setChatPartner(ownID, chatPartnerId);
+                        foundPartner = true;
+                                            }
+                }// ab hier weiß der User die ID seines Chatpartners
+                //selectChatRoom();
+                server.sendMessage(serverMessage, ownID, chatPartnerId);        //todo: this muss ausgetauscht werden zum jeweiligen Chatpartner
 
-            do {
-                clientMessage = reader.readLine();
-                serverMessage = "[" + userName + "]: " + clientMessage;
-                server.sendMessage(serverMessage, this);  //todo: this muss ausgetauscht werden zum jeweiligen Chatpartner
+                String clientMessage;
 
-            } while (!clientMessage.equals("bye"));     // todo: Globale String Variable mit dem Namen CLOSECONNECTION = "CLOSE"
+                // Endlosschleife
 
-            server.removeUser(userName, this);
-            socket.close();
+                do {
+                    clientMessage = reader.readLine();
+                    serverMessage = "[" + userName + "]: " + clientMessage;
+                    server.sendMessage(serverMessage, ownID, chatPartnerId);  //todo: this muss ausgetauscht werden zum jeweiligen Chatpartner
 
-            serverMessage = userName + " has quitted.";
-            server.sendMessage(serverMessage, this);  //todo: this muss ausgetauscht werden zum jeweiligen Chatpartner
+                } while (!clientMessage.equals("bye"));     // todo: Globale String Variable mit dem Namen CLOSECONNECTION = "CLOSE"
 
-        } catch (IOException ex) {
-            System.out.println("Error in UserThread: " + ex.getMessage());
-            ex.printStackTrace();
-        }
+                server.removeUser(userName, this);
+                socket.close();
+
+                serverMessage = userName + " has quitted.";
+                server.sendMessage(serverMessage, ownID, chatPartnerId);  //todo: this muss ausgetauscht werden zum jeweiligen Chatpartner
+
+            } catch (IOException ex) {
+                System.out.println("Error in UserThread: " + ex.getMessage());
+                ex.printStackTrace();
+            }
+
+
     }
 
     /**
@@ -78,5 +111,14 @@ public class ServerUserThread extends Thread {
      */
     void sendMessage(String message) {
         writer.println(message);
+    }
+
+    void selectChatRoom()
+    {
+        boolean foundPartner = false;
+        while(foundPartner == false){
+            writer.println("Mit wem möchstest du schreiben?");
+
+        }
     }
 }
