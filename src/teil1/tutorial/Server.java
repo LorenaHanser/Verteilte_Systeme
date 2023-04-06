@@ -14,6 +14,7 @@ public class Server {
     private int port;
     private Set<String> userNames = new HashSet<>();
     private Set<ServerUserThread> userThreads = new HashSet<>();
+    private File file = new File();
 
     // Konstruktor
 
@@ -26,6 +27,8 @@ public class Server {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
 
             System.out.println("Chat Server is listening on port " + port);
+
+            file.create();
 
             // Endlosschleife
 

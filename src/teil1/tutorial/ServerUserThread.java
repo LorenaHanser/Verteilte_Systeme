@@ -12,7 +12,9 @@ import java.net.*;
 public class ServerUserThread extends Thread {
     private Socket socket;
     private Server server;
+    private String userName;
     private PrintWriter writer;
+    private File file = new File();
 
     // Konstruktor
 
@@ -33,11 +35,13 @@ public class ServerUserThread extends Thread {
             printUsers();
             writer.println("Please enter your name:");
 
-            String userName = reader.readLine();
+            userName = reader.readLine();
             server.addUserName(userName);
 
             String serverMessage = "New user connected: " + userName;
             server.sendMessage(serverMessage, this);        //todo: this muss ausgetauscht werden zum jeweiligen Chatpartner
+
+            server.sendMessage(file.read(), this); // bisheriger Chat wird an den Client übergeben
 
             String clientMessage;
 
@@ -77,6 +81,7 @@ public class ServerUserThread extends Thread {
      * Sends a message to the client.
      */
     void sendMessage(String message) {
+        file.write(message, this.userName);
         writer.println(message);
     }
 }
