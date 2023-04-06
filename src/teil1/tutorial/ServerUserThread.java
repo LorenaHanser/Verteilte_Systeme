@@ -17,7 +17,7 @@ public class ServerUserThread extends Thread {
 
     private int chatPartnerId;
 
-    private int ownID;
+    private int ownID; //Die Id des Users, der auf dem Thread läuft
 
     // Konstruktor
 
@@ -26,49 +26,43 @@ public class ServerUserThread extends Thread {
         this.server = server;
     }
 
-    public ServerUserThread(Server server, int ThreadId){
-        this.server = server;
-        this.ThreadId = ThreadId;
-    }
+
 
     public void setUser(Socket socket)
     {
         this.socket = socket;
-        System.out.println("Neuer User wurde gesetzt");
     }
 
     public void run() {
 
             try {
-                // Nachricht vom client empfangen
-                System.out.println("Ein Neuer USer ist im Thread: "+ThreadId+" angekommen");
+
                 InputStream input = socket.getInputStream();
                 BufferedReader reader = new BufferedReader(new InputStreamReader(input));
 
                 OutputStream output = socket.getOutputStream();
                 writer = new PrintWriter(output, true);
 
-                printUsers();
                 writer.println("Please enter your name:");
 
                 String userName = reader.readLine();
-                server.setThreadId(userName, this);
-                ownID = server.askForID(userName);
+                server.setThreadId(userName, this); //die Referenzvariable des Threads wird mit dem User verknüpft
+                ownID = server.askForID(userName); // eigene ID wird gespeichert
 
                 String serverMessage = "New user connected: " + userName;
 
                 boolean foundPartner = false;
-                while(foundPartner == false){
+                while(foundPartner == false){ //Endlosschleife, bis existierender Chatpartner gefunden
                     writer.println("Mit wem möchstest du schreiben?");
                     chatPartnerId = server.askForID(reader.readLine());
-                    if(chatPartnerId != -1){
+                    if(chatPartnerId != -1){ //geprüft ob ChatPartnerId gültig ist
                         writer.println("Alles klar, du wirst verbunden");
-                        server.setChatPartner(ownID, chatPartnerId);
+                        server.setChatPartner(ownID, chatPartnerId); //User geht in Chatraum
                         foundPartner = true;
                                             }
                 }// ab hier weiß der User die ID seines Chatpartners
                 //selectChatRoom();
-                server.sendMessage(serverMessage, ownID, chatPartnerId);        //todo: this muss ausgetauscht werden zum jeweiligen Chatpartner
+                server.sendMessage(serverMessage, ownID, chatPartnerId);        //Nachricht an den Partner
 
                 String clientMessage;
 
@@ -96,29 +90,10 @@ public class ServerUserThread extends Thread {
     }
 
     /**
-     * Sends a list of online users to the newly connected user.
-     */
-    void printUsers() {
-        if (server.hasUsers()) {
-            writer.println("Connected users: " + server.getUserNames());
-        } else {
-            writer.println("No other users connected");
-        }
-    }
-
-    /**
      * Sends a message to the client.
      */
     void sendMessage(String message) {
         writer.println(message);
     }
 
-    void selectChatRoom()
-    {
-        boolean foundPartner = false;
-        while(foundPartner == false){
-            writer.println("Mit wem möchstest du schreiben?");
-
-        }
-    }
 }
