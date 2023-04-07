@@ -16,7 +16,7 @@ public class ServerUserThread extends Thread {
     private PrintWriter writer;
     private int ThreadId;
 
-    private int chatPartnerId;
+    private int chatPartnerID;
 
     private int ownID; //Die Id des Users, der auf dem Thread läuft
     private File file = new File();
@@ -56,27 +56,25 @@ public class ServerUserThread extends Thread {
                 boolean foundPartner = false;
                 while(foundPartner == false){ //Endlosschleife, bis existierender Chatpartner gefunden
                     writer.println("Mit wem möchstest du schreiben?");
-                    chatPartnerId = server.askForID(reader.readLine());
-                    if(chatPartnerId != -1){ //geprüft ob ChatPartnerId gültig ist
+                    chatPartnerID = server.askForID(reader.readLine());
+                    if(chatPartnerID != -1){ //geprüft ob ChatPartnerId gültig ist
                         writer.println("Alles klar, du wirst verbunden");
-                        server.setChatPartner(ownID, chatPartnerId); //User geht in Chatraum
+                        server.setChatPartner(ownID, chatPartnerID); //User geht in Chatraum
                         foundPartner = true;
                                             }
                 }// ab hier weiß der User die ID seines Chatpartners
                 //selectChatRoom();
-                server.sendMessage(serverMessage, ownID, chatPartnerId);        //Nachricht an den Partner
+                server.sendMessage(serverMessage, ownID, chatPartnerID);        //Nachricht an den Partner
 
                 String clientMessage;
-            server.sendMessage(file.read(), this); // bisheriger Chat wird an den Client übergeben
-
-
+                server.sendMessage(file.read(ownID, chatPartnerID), ownID); // bisheriger Chat wird an den Client übergeben
 
                 // Endlosschleife
 
                 do {
                     clientMessage = reader.readLine();
                     serverMessage = "[" + userName + "]: " + clientMessage;
-                    server.sendMessage(serverMessage, ownID, chatPartnerId);  //todo: this muss ausgetauscht werden zum jeweiligen Chatpartner
+                    server.sendMessage(serverMessage, ownID, chatPartnerID);  //todo: this muss ausgetauscht werden zum jeweiligen Chatpartner
 
                 } while (!clientMessage.equals("bye"));     // todo: Globale String Variable mit dem Namen CLOSECONNECTION = "CLOSE"
 
@@ -84,7 +82,7 @@ public class ServerUserThread extends Thread {
                 socket.close();
 
                 serverMessage = userName + " has quitted.";
-                server.sendMessage(serverMessage, ownID, chatPartnerId);  //todo: this muss ausgetauscht werden zum jeweiligen Chatpartner
+                server.sendMessage(serverMessage, ownID, chatPartnerID);  //todo: this muss ausgetauscht werden zum jeweiligen Chatpartner
 
             } catch (IOException ex) {
                 System.out.println("Error in UserThread: " + ex.getMessage());
@@ -98,7 +96,7 @@ public class ServerUserThread extends Thread {
      * Sends a message to the client.
      */
     void sendMessage(String message) {
-        file.write(message, this.userName);
+        file.write(message, ownID, chatPartnerID);
         writer.println(message);
     }
 

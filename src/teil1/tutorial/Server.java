@@ -12,10 +12,9 @@ import java.util.*;
  */
 public class Server {
     private int port;
-    private Set<String> userNames = new HashSet<>();
     private File file = new File();
 
-    private String[] userNameRegister = {"David","Daniel","Lorena"}; //Speichert die Usernamen der Index wird als Id für den User genutzt
+    private String[] userNameRegister = {"Daniel","David","Lorena"}; //Speichert die Usernamen der Index wird als Id für den User genutzt
 
     private int[] userChattetWith = new int[3]; //Speichert, wer sich aktuell mit wem im Chat befindet (damit man nicht mit einer Person chatten kann, die gerade mit wem anders chattet)
     private ServerUserThread[] userThreadRegister = new ServerUserThread[3];//Speichert die Referenzvariable des Threads auf dem der User (wenn er online ist) läuft. Der Index für das Feld ist, dabei die ID des Users
@@ -67,7 +66,7 @@ public class Server {
 
         // todo: Methodenaufruf von WriteInFile
 
-        if(userThreadRegister[receiverUserId] != null) { //es wird geschaut, ob der User online ist (zum Vermeiden von Exeption)
+        if(userThreadRegister[receiverUserId] != null) { //es wird geschaut, ob der User online ist (zum Vermeiden von Exeption)        //todo: fix pls
             System.out.println("Diese Nachricht wurde erhalten: " + message);
             if(userChattetWith[receiverUserId] == sendUserId) { //Es wird geschaut, ob der User sich im gleichen Chatraum (mit dem sendenUser) befindet
                 userThreadRegister[receiverUserId].sendMessage(message); //nachricht wird an den User gesendet
@@ -79,6 +78,11 @@ public class Server {
         }
         //    }
         // }
+    }
+
+    void sendMessage(String message,int ownID) {       // receiverUser war vorher excludeUser
+        // todo: Methodenaufruf von WriteInFile
+        userThreadRegister[ownID].sendMessage(message); //nachricht wird an den User gesendet
     }
 
     /**
