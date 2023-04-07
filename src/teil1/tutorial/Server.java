@@ -62,9 +62,9 @@ public class Server {
     /**
      * Delivers a message from one user to others (broadcasting)
      */
-    void sendMessage(String message, int sendUserId, int receiverUserId) {       // receiverUser war vorher excludeUser
+    void sendMessage(String message, int sendUserId, int receiverUserId) {
 
-        // todo: Methodenaufruf von WriteInFile
+        file.write(message, sendUserId, receiverUserId);
 
         if(userThreadRegister[receiverUserId] != null) { //es wird geschaut, ob der User online ist (zum Vermeiden von Exeption)        //todo: fix pls
             System.out.println("Diese Nachricht wurde erhalten: " + message);
@@ -76,12 +76,9 @@ public class Server {
         }else {
             System.out.println("Der User ist nicht online, die Nachricht wird aber für ihn gespeichert..."); //todo: Lustige Kommentare schreiben
         }
-        //    }
-        // }
     }
 
     void sendMessage(String message,int ownID) {       // receiverUser war vorher excludeUser
-        // todo: Methodenaufruf von WriteInFile
         userThreadRegister[ownID].sendMessage(message); //nachricht wird an den User gesendet
     }
 
@@ -96,8 +93,6 @@ public class Server {
                 break;
             }
         }
-
-
     }
 
     /**

@@ -28,7 +28,7 @@ public class ClientReadThread extends Thread {
         while (true) {
             try {
                 String response = reader.readLine();
-                System.out.println("\n" + response);
+                System.out.println(response);
 
             } catch (IOException ex) {
                 System.out.println("Error reading from server: " + ex.getMessage());

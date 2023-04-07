@@ -1,28 +1,44 @@
 package teil1.tutorial;
 
 import java.io.*;
-import java.nio.Buffer;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 public class File {
-    private final String path = "C:\\Users\\Daniel\\Desktop\\Messages\\"; //todo: hier Username anpassen
-    private final String ending = ".txt"; //Dateiendung der Textnachrichten
-    private static final SimpleDateFormat timestampformat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+    private String path;
+    private final String[] FILENAMES = {"DanielDavid", "DanielLorena", "DavidLorena"};
+    private final String ENDING = ".txt"; //Dateiendung der Textnachrichten
+    private String systemSign;
+    private final String DIRECTORY_NAME = "Messages";
+    private static final SimpleDateFormat TIMESTAMPFORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 
-    // Methode zur Erstellung von statischen Chatfiles
+    public File(){
+        this.getPath();
+    }
+
+    // Methode zur Erstellung von Messages-Ordner und Chatfiles
     public void create() {
-        String[] filenames = {"DanielDavid", "DanielLorena", "DavidLorena"};
-
         try {
-            for (String filename : filenames) {
-                if(! new java.io.File(path, filename + ending).exists()) {
-                    PrintWriter myWriter = new PrintWriter(new FileWriter(path + filename + ending));
-                    System.out.println("Datei " + filename + ending + " wurde erstellt.");
+            //Ordner erstellen
+            if(! new java.io.File(path).exists()){
+                boolean createdDirectory = new java.io.File(path).mkdir();
+                if(createdDirectory){
+                    System.out.println("Ordner " + DIRECTORY_NAME + " wurde neu erstellt.");
+                } else {
+                    System.out.println("Ordner " + DIRECTORY_NAME + " konnte nicht erstellt werden.");
+                }
+            } else {
+                System.out.println("Ordner " + DIRECTORY_NAME + " existiert bereits.");
+            }
+
+            //Dateien erstellen
+            for (String filename : FILENAMES) {
+                if(! new java.io.File(path, filename + ENDING).exists()) {
+                    PrintWriter myWriter = new PrintWriter(new FileWriter(path + filename + ENDING));
+                    System.out.println("Datei " + filename + ENDING + " wurde neu erstellt.");
                     myWriter.close();
                 } else {
-                    System.out.println("Datei " + filename + ending + " existiert bereits.");
+                    System.out.println("Datei " + filename + ENDING + " existiert bereits.");
                 }
             }
         } catch (IOException e) {
@@ -36,7 +52,7 @@ public class File {
         String currentLine;
 
         try{
-            BufferedReader bufferedReader = new BufferedReader(new FileReader(path + "DanielLorena" + ending)); // todo: filename dynamisch
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(path + getFilename(ownID, chatPartnerID) + ENDING));
             while((currentLine = bufferedReader.readLine()) != null){
                 chat = chat + currentLine + "\n";
             }
@@ -54,9 +70,9 @@ public class File {
         System.out.println(message);
 
         try {
-            if(! message.equals("New user connected: " ) && ! message.equals("Bisheriger Chat:\n")){
-                BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(path + "DanielLorena" + ending, true)); // todo: filename dynamisch
-                bufferedWriter.write("[" + timestampformat.format(timestamp) + "] " + message);
+            if(! message.contains("New user connected: " ) && ! message.contains(" has quitted.") && ! message.contains("Bisheriger Chat:\n")){
+                BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(path + getFilename(ownID, chatPartnerID) + ENDING, true));
+                bufferedWriter.write("[" + TIMESTAMPFORMAT.format(timestamp) + "] " + message);
                 bufferedWriter.newLine();
                 bufferedWriter.close();
             }
@@ -64,4 +80,38 @@ public class File {
             System.out.println("Fehler beim Speichern in der Datei: " + e. getMessage());
         }
     }
+
+    // Methode ermittelt den Pfad zum Speichern der Chatdateien abhängig von Betriebssystem und Nutzername
+    public void getPath(){
+        String systemUserHome = System.getProperty("user.home");
+        String systemOS = System.getProperty("os.name").toLowerCase();
+        String desktop = "Desktop";
+
+        if(systemOS.contains("windows")){
+            systemSign = "\\";
+            path = systemUserHome + systemSign + desktop + systemSign + DIRECTORY_NAME + systemSign;
+        } else if(systemOS.contains("mac")){
+            systemSign = "/";
+            path = systemUserHome + systemSign + desktop + systemSign + DIRECTORY_NAME + systemSign;
+        } else{
+            System.out.println("Das Betriebssystem wird leider nicht unterstützt :(");
+        }
+    }
+
+    // Methode gibt aus zwei UserIDs den richtigen Dateinamen zurück
+    public String getFilename(int ownID, int chatPartnerID){
+        System.out.println("Die ChatPartnerID lautet " + chatPartnerID);
+        String filename = "";
+        int sum = ownID + chatPartnerID;
+
+        filename = switch (sum) {
+            case 1 -> FILENAMES[0];
+            case 2 -> FILENAMES[1];
+            case 3 -> FILENAMES[2];
+            default -> "error";
+        };
+
+        return filename;
+    }
+
 }
