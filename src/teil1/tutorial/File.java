@@ -13,7 +13,7 @@ public class File {
 
     // Methode zur Erstellung von statischen Chatfiles
     public void create() {
-        String[] filenames = {"DanielLorena", "DavidDaniel", "DavidLorena"};
+        String[] filenames = {"DanielDavid", "DanielLorena", "DavidLorena"};
 
         try {
             for (String filename : filenames) {
