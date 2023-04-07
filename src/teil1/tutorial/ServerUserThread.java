@@ -96,7 +96,6 @@ public class ServerUserThread extends Thread {
      * Sends a message to the client.
      */
     void sendMessage(String message) {
-        file.write(message, ownID, chatPartnerID);
         writer.println(message);
     }
 
