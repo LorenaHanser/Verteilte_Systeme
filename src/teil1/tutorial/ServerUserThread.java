@@ -12,12 +12,14 @@ import java.net.*;
 public class ServerUserThread extends Thread {
     private Socket socket;
     private Server server;
+    private String userName;
     private PrintWriter writer;
     private int ThreadId;
 
     private int chatPartnerId;
 
     private int ownID; //Die Id des Users, der auf dem Thread läuft
+    private File file = new File();
 
     // Konstruktor
 
@@ -65,6 +67,9 @@ public class ServerUserThread extends Thread {
                 server.sendMessage(serverMessage, ownID, chatPartnerId);        //Nachricht an den Partner
 
                 String clientMessage;
+            server.sendMessage(file.read(), this); // bisheriger Chat wird an den Client übergeben
+
+
 
                 // Endlosschleife
 
@@ -93,6 +98,7 @@ public class ServerUserThread extends Thread {
      * Sends a message to the client.
      */
     void sendMessage(String message) {
+        file.write(message, this.userName);
         writer.println(message);
     }
 

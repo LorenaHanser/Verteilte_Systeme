@@ -12,6 +12,8 @@ import java.util.*;
  */
 public class Server {
     private int port;
+    private Set<String> userNames = new HashSet<>();
+    private File file = new File();
 
     private String[] userNameRegister = {"David","Daniel","Lorena"}; //Speichert die Usernamen der Index wird als Id für den User genutzt
 
@@ -31,6 +33,8 @@ public class Server {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
 
             System.out.println("Chat Server is listening on port " + port);
+
+            file.create();
 
             // Endlosschleife
 
