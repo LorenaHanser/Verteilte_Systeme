@@ -20,6 +20,8 @@ public class Server2 {
 
         private String[] userNameRegister = {"Daniel","David","Lorena"}; //Speichert die Usernamen der Index wird als Id für den User genutzt
 
+        private String[] userPassword = {"hallo", "geheim", "test"};
+
         private int[] userChattetWith = new int[3]; //Speichert, wer sich aktuell mit wem im Chat befindet (damit man nicht mit einer Person chatten kann, die gerade mit wem anders chattet)
         private ServerUserThread2[] userThreadRegister = new ServerUserThread2[3];//Speichert die Referenzvariable des Threads auf dem der User (wenn er online ist) läuft. Der Index für das Feld ist, dabei die ID des Users
 
@@ -89,9 +91,29 @@ public class Server2 {
             userThreadRegister[ownID].sendMessage(message); //nachricht wird an den User gesendet
         }
 
-        /**
-         * Stores username of the newly connected client.
-         */
+    boolean checkUsernameExists(String userName){ //überprüft, ob der User existiert
+        boolean usernameValid = false;
+        for (int i = 0; i < userNameRegister.length; i++) {
+            if(userNameRegister[i].equals(userName)) {
+                usernameValid = true;
+                break;
+            }
+        }
+        return usernameValid;
+    }
+
+    boolean checkPasswordValid(String userName, String password){ //Überprüft, ob das Password das richtige ist
+        boolean passwordValid = false;
+        for (int i = 0; i < userNameRegister.length; i++) {
+            if(userNameRegister[i].equals(userName)) {
+                if(userPassword[i].equals(password)) {
+                    passwordValid = true;
+                }
+                break;
+            }
+        }
+        return passwordValid;
+    }
 
         void setThreadId(String userName, ServerUserThread2 Thread) { //nachdem der User sich regestriert hat, wird Referenz von Thread an den Platz vom User gespeichert -> ab jetzt ist Thread erreichbar
             for (int i = 0; i < userNameRegister.length; i++) {
