@@ -46,8 +46,33 @@ public class ServerUserThread extends Thread {
                 writer = new PrintWriter(output, true);
 
                 writer.println("Please enter your name:");
-
+                boolean userSuccessfullAuthenticated = false;
                 String userName = reader.readLine();
+                String password;
+                if(server.checkUsernameExists(userName))
+                {
+                    writer.println("Please insert Password:");
+                    password = reader.readLine();
+                    if(server.checkPasswordValid(userName, password))
+                    {
+                        userSuccessfullAuthenticated = true;
+                    }
+                }
+                while(userSuccessfullAuthenticated == false)
+                {
+                    writer.println("Password oder User falsch! Bitte versuch es nochmal");
+                    writer.println("Please enter your name:");
+                    userName = reader.readLine();
+                    if(server.checkUsernameExists(userName))
+                    {
+                        writer.println("Please insert Password:");
+                        password = reader.readLine();
+                        if(server.checkPasswordValid(userName, password))
+                        {
+                            userSuccessfullAuthenticated = true;
+                        }
+                    }
+                }
                 server.setThreadId(userName, this); //die Referenzvariable des Threads wird mit dem User verknüpft
                 ownID = server.askForID(userName); // eigene ID wird gespeichert
 
