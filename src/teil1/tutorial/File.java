@@ -7,7 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class File {
-    private final String path = "C:\\Users\\Daniel\\Desktop\\Messages\\"; //todo: hier Username anpassen
+    private final String path = "C:\\Users\\I551726\\Desktop\\Messages\\"; //todo: hier Username anpassen
     private final String ending = ".txt"; //Dateiendung der Textnachrichten
     private static final SimpleDateFormat timestampformat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 
