@@ -55,6 +55,7 @@ public class Client {
         // Random funktion für "Lastverteilung"
         int randomNumber = (int) (Math.random()*2);
         //port = port+randomNumber;
+        //port++;
 
 
         Client client = new Client(hostname, port);

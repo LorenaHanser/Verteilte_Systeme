@@ -14,37 +14,48 @@ public class ServerConnectorThread extends Thread {
 
     private PrintWriter writer;
 
-    public ServerConnectorThread(String hostname, int port, Server server){
+    public ServerConnectorThread(String hostname, int port, Server server) {
         this.hostname = hostname;
         this.port = port;
         this.server = server;
 
     }
 
-    public void run(){
+    public void run() {
         //while(true){
-            try {
-                System.out.println("Versuch Sync Server zu verbinden");
+
+        try {
             Socket socket = new Socket(hostname, port);
-                OutputStream output = socket.getOutputStream();
-                writer = new PrintWriter(output, true);
-                System.out.println("Sync Server verbunden");
+            //while (!socket.isConnected()) {
+                try {
+                    System.out.println("Versuch Sync Server zu verbinden");
+                    socket = new Socket(hostname, port);
+                    OutputStream output = socket.getOutputStream();
+                    writer = new PrintWriter(output, true);
+                    System.out.println("Sync Server verbunden");
 
-        } catch (UnknownHostException ex) {
-            System.out.println("Server not found: " + ex.getMessage());
-        } catch (IOException ex) {
-            System.out.println("I/O Error: " + ex.getMessage());
+                } catch (UnknownHostException ex) {
+                    System.out.println("Server not found: " + ex.getMessage());
+                } catch (IOException ex) {
+                    System.out.println("I/O Error: " + ex.getMessage());
+                }
+                //}
+            //}
+
+        } catch (UnknownHostException e) {
+            System.out.println(e.getMessage());
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
         }
-        //}
 
+        //}
     }
 
-
-
-    protected void sendMessageToOtherServer(String rawMessage, int sendUserId, int receiverUserId){
+    protected void sendMessageToOtherServer(String rawMessage, int sendUserId, int receiverUserId) {
         String message = sendUserId + ";" + receiverUserId + ";" + rawMessage;
         System.out.println(message);
         writer.println(message);
 
     }
 }
+

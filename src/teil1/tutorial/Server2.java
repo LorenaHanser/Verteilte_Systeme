@@ -44,11 +44,10 @@ public class Server2 {
 
 
         public void execute() {
-            try (ServerSocket syncServerSocket = new ServerSocket(serverReciverPort)) {
-                Socket syncSocket = syncServerSocket.accept();
-                reciverSyncThread = new ServerReciverThread(syncSocket, this);
+
+                reciverSyncThread = new ServerReciverThread(this, serverReciverPort);
                 reciverSyncThread.start();
-                System.out.println("Sync Server is online");
+                System.out.println("Sync ServerThread gestartet");
 
                 try (ServerSocket serverSocket = new ServerSocket(port)) {
 
@@ -71,10 +70,9 @@ public class Server2 {
                     System.out.println("Error in the server: " + ex.getMessage());
                     ex.printStackTrace();
                 }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
             }
-        }
+
+
 
         public static void main(String[] args) {
             int port = 8990;//Server 2 läuft immer auf Port 8990 Server 1 auf 8989
