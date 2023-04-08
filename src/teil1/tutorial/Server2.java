@@ -18,9 +18,18 @@ public class Server2 {
         private int port;
         private File file = new File();
 
+    private int partnerServerPort = 8991; //Port des Partnerservers (Port für Servercommunication)
+
+    private String partnerServerAdress = "localhost"; //hier die Adresse des anderen Server eintragen.
+
         private String[] userNameRegister = {"Daniel","David","Lorena"}; //Speichert die Usernamen der Index wird als Id für den User genutzt
 
         private String[] userPassword = {"hallo", "geheim", "test"};
+
+        //hier ist der Berich für den Sync
+    private int serverReciverPort = 8991;
+    ServerReciverThread reciverSyncThread;
+    //Ende
 
         private int[] userChattetWith = new int[3]; //Speichert, wer sich aktuell mit wem im Chat befindet (damit man nicht mit einer Person chatten kann, die gerade mit wem anders chattet)
         private ServerUserThread2[] userThreadRegister = new ServerUserThread2[3];//Speichert die Referenzvariable des Threads auf dem der User (wenn er online ist) läuft. Der Index für das Feld ist, dabei die ID des Users
@@ -35,34 +44,43 @@ public class Server2 {
 
 
         public void execute() {
-            try (ServerSocket serverSocket = new ServerSocket(port)) {
+            try (ServerSocket syncServerSocket = new ServerSocket(serverReciverPort)) {
+                Socket syncSocket = syncServerSocket.accept();
+                reciverSyncThread = new ServerReciverThread(syncSocket, this);
+                reciverSyncThread.start();
+                System.out.println("Sync Server is online");
 
-                System.out.println("Chat Server is listening on port " + port);
+                try (ServerSocket serverSocket = new ServerSocket(port)) {
 
-                file.create();
+                    System.out.println("Chat Server is listening on port " + port);
 
-                // Endlosschleife
+                    file.create();
 
-                while (true) {
-                    Socket socket = serverSocket.accept();
-                    System.out.println("New user connected");
-                    ServerUserThread2 newUser = new ServerUserThread2(socket, this);
-                    userThreads.add(newUser);
-                    newUser.start(); //Thread startet mit User -> Name unbekannt desswegen noch kein Eintrag in das userThreadRegister Array
+                    // Endlosschleife
 
+                    while (true) {
+                        Socket socket = serverSocket.accept();
+                        System.out.println("New user connected");
+                        ServerUserThread2 newUser = new ServerUserThread2(socket, this);
+                        userThreads.add(newUser);
+                        newUser.start(); //Thread startet mit User -> Name unbekannt desswegen noch kein Eintrag in das userThreadRegister Array
+
+                    }
+
+                } catch (IOException ex) {
+                    System.out.println("Error in the server: " + ex.getMessage());
+                    ex.printStackTrace();
                 }
-
-            } catch (IOException ex) {
-                System.out.println("Error in the server: " + ex.getMessage());
-                ex.printStackTrace();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         }
 
         public static void main(String[] args) {
             int port = 8990;//Server 2 läuft immer auf Port 8990 Server 1 auf 8989
 
-            teil1.tutorial.Server server = new teil1.tutorial.Server(port);
-            server.execute();
+            Server2 server2 = new Server2(port);
+            server2.execute();
         }
 
         /**

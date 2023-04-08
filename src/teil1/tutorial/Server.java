@@ -18,6 +18,13 @@ public class Server {
 
     private String[] userPassword = {"hallo", "geheim", "test"};
 
+
+    //hier sind die Attribute für die Synccronisation
+
+    private int partnerServerPort = 8991; //Port des Partnerservers (Port für Servercommunication)
+    private String partnerServerAdress = "localhost"; //hier die Adresse des anderen Server eintragen.
+    private ServerConnectorThread SyncThread;
+
     private int[] userChattetWith = new int[3]; //Speichert, wer sich aktuell mit wem im Chat befindet (damit man nicht mit einer Person chatten kann, die gerade mit wem anders chattet)
     private ServerUserThread[] userThreadRegister = new ServerUserThread[3];//Speichert die Referenzvariable des Threads auf dem der User (wenn er online ist) läuft. Der Index für das Feld ist, dabei die ID des Users
 
@@ -36,6 +43,9 @@ public class Server {
             System.out.println("Chat Server is listening on port " + port);
 
             file.create();
+
+            SyncThread = new ServerConnectorThread(partnerServerAdress,partnerServerPort, this);
+            SyncThread.start();
 
             // Endlosschleife
 
@@ -65,6 +75,8 @@ public class Server {
      * Delivers a message from one user to others (broadcasting)
      */
     void sendMessage(String message, int sendUserId, int receiverUserId) {
+
+        SyncThread.sendMessageToOtherServer(message, sendUserId, receiverUserId);
 
         file.write(message, sendUserId, receiverUserId);
 
