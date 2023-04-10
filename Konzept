@@ -6,10 +6,8 @@ Server verbindet den Clienten mit seinem Parnter (wenn online) und sendet ihm de
   Filemanagement:
     Chatverläufe werden für jeweiligen Chaträume (Lorena mit Daniel, Daniel mit David, Lorena mit David) anglegt -> Also eine Datei für einen Chat = 3 Chatdateien
     
-
-   
 Syntax (Naming Conventions) mit Beispiel "Daniel":
-CONNECT Daniel    // Verbindung zum Chatraum mit Daniel aufbauen
+CONNECT Daniel    // Verbindung zum Chatraum mit Daniel aufbauen <- deprecated: User wird gefragt wem er schreiben möchte!
 DISCONNECT        // Verbindung zum Chatraum mit Daniel schließen
 CLOSE             // Verbindung zum Server schließen
 
@@ -23,10 +21,13 @@ Daniel = 0;
 David = 1;
 Lorena = 2;
 
+Passwörter:
+Daniel = hallo
+David = geheim
+Lorena = test
+
 Im Chatfile:
 [06.04.2023 17:01:12] [Daniel]: Nachricht
-
-
 
 Fragen
 - identischer Chatverlauf: Brauchen wir eine oder zwei .txt Dateien pro Chatraum?
