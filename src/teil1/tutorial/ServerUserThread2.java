@@ -29,7 +29,7 @@ public class ServerUserThread2 extends Thread{
         this.socket = socket;
     }
 
-    public void run() {
+    public void run() {/*
 
         try {
 
@@ -106,7 +106,7 @@ public class ServerUserThread2 extends Thread{
         } catch (IOException ex) {
             System.out.println("Error in UserThread: " + ex.getMessage());
             ex.printStackTrace();
-        }
+        }*/
 
 
     }

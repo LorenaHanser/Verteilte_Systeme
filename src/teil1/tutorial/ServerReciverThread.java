@@ -9,11 +9,11 @@ import java.net.Socket;
 
 public class ServerReciverThread extends Thread{
     private Socket socket;
-    private Server2 server;
+    private Server server;
 
     private int port;
     private BufferedReader reader;
-    public ServerReciverThread(Server2 server, int port) {
+    public ServerReciverThread(Server server, int port) {
         this.server = server;
         this.port = port;
 

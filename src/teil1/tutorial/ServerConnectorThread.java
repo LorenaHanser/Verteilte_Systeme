@@ -24,12 +24,11 @@ public class ServerConnectorThread extends Thread {
     public void run() {
         //while(true){
 
-        try {
-            Socket socket = new Socket(hostname, port);
+            //Socket socket = new Socket(hostname, port);
             //while (!socket.isConnected()) {
                 try {
                     System.out.println("Versuch Sync Server zu verbinden");
-                    socket = new Socket(hostname, port);
+                    Socket socket = new Socket(hostname, port);
                     OutputStream output = socket.getOutputStream();
                     writer = new PrintWriter(output, true);
                     System.out.println("Sync Server verbunden");
@@ -42,11 +41,6 @@ public class ServerConnectorThread extends Thread {
                 //}
             //}
 
-        } catch (UnknownHostException e) {
-            System.out.println(e.getMessage());
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-        }
 
         //}
     }

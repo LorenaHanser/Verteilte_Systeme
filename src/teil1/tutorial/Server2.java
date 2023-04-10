@@ -15,7 +15,7 @@ public class Server2 {
      * @author www.codejava.net
      */
 
-        private int port;
+     /*  private int port;
         private File file = new File();
 
     private int partnerServerPort = 8991; //Port des Partnerservers (Port für Servercommunication)
@@ -28,7 +28,7 @@ public class Server2 {
 
         //hier ist der Berich für den Sync
     private int serverReciverPort = 8991;
-    ServerReciverThread reciverSyncThread;
+     ServerReciverThread reciverSyncThread;
     //Ende
 
         private int[] userChattetWith = new int[3]; //Speichert, wer sich aktuell mit wem im Chat befindet (damit man nicht mit einer Person chatten kann, die gerade mit wem anders chattet)
@@ -70,21 +70,24 @@ public class Server2 {
                     System.out.println("Error in the server: " + ex.getMessage());
                     ex.printStackTrace();
                 }
-            }
+            }*/
 
 
 
         public static void main(String[] args) {
+            System.out.println("Server 2 wird gestartet");
             int port = 8990;//Server 2 läuft immer auf Port 8990 Server 1 auf 8989
+            int partnerServerPort = 8992;
+            int serverReciverPort = 8991;
 
-            Server2 server2 = new Server2(port);
-            server2.execute();
+            Server server = new Server(port, partnerServerPort, serverReciverPort);
+            server.execute();
         }
 
         /**
          * Delivers a message from one user to others (broadcasting)
          */
-        void sendMessage(String message, int sendUserId, int receiverUserId) {       // receiverUser war vorher excludeUser
+        /*void sendMessage(String message, int sendUserId, int receiverUserId) {       // receiverUser war vorher excludeUser
 
             // todo: Methodenaufruf von WriteInFile
 
@@ -145,7 +148,7 @@ public class Server2 {
         /**
          * When a client is disconneted, removes the UserThread
          */
-        void removeUser(String userName, ServerUserThread2 aUser) { //noch von Tutorial
+        /*void removeUser(String userName, ServerUserThread2 aUser) { //noch von Tutorial
             userThreads.remove(aUser);
             System.out.println("The user " + userName + " quitted");
         }
@@ -169,7 +172,7 @@ public class Server2 {
         void setChatPartner(int user, int chatPartner){ //der ChatPartner bzw. der Chatraum wird für den User gesetzt (ab jetzt kann er Nachrichten empfangen, aber nur von dem Partner)
             userChattetWith[user] = chatPartner;
 
-        }
+        }*/
 
 
 

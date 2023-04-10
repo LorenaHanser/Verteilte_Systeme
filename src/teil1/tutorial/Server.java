@@ -21,9 +21,17 @@ public class Server {
 
     //hier sind die Attribute für die Synccronisation
 
+    //Variablen für den anderen Server
+
     private int partnerServerPort = 8991; //Port des Partnerservers (Port für Servercommunication)
     private String partnerServerAdress = "localhost"; //hier die Adresse des anderen Server eintragen.
     private ServerConnectorThread SyncThread;
+
+    //Variablen für den eigenen Server
+
+    private int serverReciverPort;
+    ServerReciverThread reciverSyncThread;
+
 
     private int[] userChattetWith = new int[3]; //Speichert, wer sich aktuell mit wem im Chat befindet (damit man nicht mit einer Person chatten kann, die gerade mit wem anders chattet)
     private ServerUserThread[] userThreadRegister = new ServerUserThread[3];//Speichert die Referenzvariable des Threads auf dem der User (wenn er online ist) läuft. Der Index für das Feld ist, dabei die ID des Users
@@ -32,12 +40,18 @@ public class Server {
 
     // Konstruktor
 
-    public Server(int port) {
+    public Server(int port, int partnerServerPort, int serverReciverPort) {
+        System.out.println("Server 1 wird gestartet");
         this.port = port;
+        this.partnerServerPort = partnerServerPort;
+        this.serverReciverPort = serverReciverPort;
     }
 
 
     public void execute() {
+        reciverSyncThread = new ServerReciverThread(this, serverReciverPort);
+        reciverSyncThread.start();
+        System.out.println("Sync ServerThread gestartet");
         try (ServerSocket serverSocket = new ServerSocket(port)) {
 
             System.out.println("Chat Server is listening on port " + port);
@@ -66,8 +80,9 @@ public class Server {
 
     public static void main(String[] args) {
         int port = 8989;//Integer.parseInt(args[0]);
-
-        Server server = new Server(port);
+        int partnerServerPort = 8991;
+        int serverReciverPort = 8992;
+        Server server = new Server(port, partnerServerPort, serverReciverPort);
         server.execute();
     }
 
