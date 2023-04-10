@@ -22,7 +22,7 @@ public class ServerConnectorThread extends Thread {
     }
 
     public void run() {
-        //while(true){
+        while(true){
 
             //Socket socket = new Socket(hostname, port);
             //while (!socket.isConnected()) {
@@ -32,17 +32,22 @@ public class ServerConnectorThread extends Thread {
                     OutputStream output = socket.getOutputStream();
                     writer = new PrintWriter(output, true);
                     System.out.println("Sync Server verbunden");
+                    while(socket.isConnected()){
+
+                    }
+                    System.out.println("Verbindung verlohren");
 
                 } catch (UnknownHostException ex) {
                     System.out.println("Server not found: " + ex.getMessage());
                 } catch (IOException ex) {
                     System.out.println("I/O Error: " + ex.getMessage());
+                    System.out.println("Verbindung über I/O Error verlohren");
                 }
                 //}
             //}
 
 
-        //}
+        }
     }
 
     protected void sendMessageToOtherServer(String rawMessage, int sendUserId, int receiverUserId) {

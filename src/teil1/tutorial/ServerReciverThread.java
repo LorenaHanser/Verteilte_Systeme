@@ -26,7 +26,8 @@ public class ServerReciverThread extends Thread{
 
         while(true){
             socket = syncServerSocket.accept();
-            System.out.println("Sync Server verbunden");
+            System.out.println("Sync Server verbunden")
+            ;
             InputStream input = socket.getInputStream();
             reader = new BufferedReader(new InputStreamReader(input));
             do{
