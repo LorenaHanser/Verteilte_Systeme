@@ -107,6 +107,23 @@ public class Server {
         }
     }
 
+    void sendMessageFromServer(String message, int sendUserId, int receiverUserId) {
+
+
+        file.write(message, sendUserId, receiverUserId);
+
+        if(userThreadRegister[receiverUserId] != null) { //es wird geschaut, ob der User online ist (zum Vermeiden von Exeption)        //todo: fix pls
+            System.out.println("Diese Nachricht wurde erhalten: " + message);
+            if(userChattetWith[receiverUserId] == sendUserId) { //Es wird geschaut, ob der User sich im gleichen Chatraum (mit dem sendenUser) befindet
+                userThreadRegister[receiverUserId].sendMessage(message); //nachricht wird an den User gesendet
+            }else{
+                System.out.println("Der User ist gerade beschäftigt. Die Nachricht wird gespeichert!");
+            }
+        }else {
+            System.out.println("Der User ist nicht online, die Nachricht wird aber für ihn gespeichert..."); //todo: Lustige Kommentare schreiben
+        }
+    }
+
     void sendMessage(String message,int ownID) {       // receiverUser war vorher excludeUser
         userThreadRegister[ownID].sendMessage(message); //nachricht wird an den User gesendet
     }

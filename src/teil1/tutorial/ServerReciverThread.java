@@ -62,7 +62,7 @@ public class ServerReciverThread extends Thread{
         int senderID = Integer.parseInt(rawMessageArray[0]);
         int reciverID = Integer.parseInt(rawMessageArray[1]);
         String message = rawMessageArray[2];
-        server.sendMessage(message,senderID, reciverID);
+        server.sendMessageFromServer(message,senderID, reciverID);
     }
 
 }
