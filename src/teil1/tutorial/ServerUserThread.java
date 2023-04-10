@@ -12,7 +12,8 @@ import java.net.*;
 public class ServerUserThread extends Thread {
     private Socket socket;
     private Server server;
-    private String userName;
+    private final String disconnect = "DISCONNECT";
+    private final String shutdown = "SHUTDOWN";
     private PrintWriter writer;
     private int ThreadId;
 
@@ -99,22 +100,19 @@ public class ServerUserThread extends Thread {
                 do {
                     clientMessage = reader.readLine();
                     serverMessage = "[" + userName + "]: " + clientMessage;
-                    server.sendMessage(serverMessage, ownID, chatPartnerID);  //todo: this muss ausgetauscht werden zum jeweiligen Chatpartner
+                    server.sendMessage(serverMessage, ownID, chatPartnerID);
 
-                } while (!clientMessage.equals("bye"));     // todo: Globale String Variable mit dem Namen CLOSECONNECTION = "CLOSE"
+                } while (!clientMessage.equals(disconnect) && !clientMessage.equals((shutdown)));
 
                 server.removeUser(userName, this);
+                serverMessage = "Client : " + userName + " hat die Verbindung getrennt!";
+                server.sendMessage(serverMessage, ownID, chatPartnerID);
                 socket.close();
-
-                serverMessage = userName + " has quitted.";
-                server.sendMessage(serverMessage, ownID, chatPartnerID);  //todo: this muss ausgetauscht werden zum jeweiligen Chatpartner
 
             } catch (IOException ex) {
                 System.out.println("Error in UserThread: " + ex.getMessage());
                 ex.printStackTrace();
             }
-
-
     }
 
     /**

@@ -31,9 +31,9 @@ public class Client {
             new ClientWriteThread(socket, this).start(); //hier starten wir die Threads
 
         } catch (UnknownHostException ex) {
-            System.out.println("Server not found: " + ex.getMessage());
+            System.out.println("Die Konfiguration stimmt nicht: " + ex.getMessage());
         } catch (IOException ex) {
-            System.out.println("I/O Error: " + ex.getMessage());
+            System.out.println("Der Server ist nicht online: " + ex.getMessage());
         }
 
     }
