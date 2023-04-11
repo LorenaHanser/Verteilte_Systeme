@@ -51,7 +51,10 @@ public class Client {
 
          */
 
-        int port = new LoadDistribution().getPort();
+        LoadDistributionSingleton singleton = LoadDistributionSingleton.getInstance();
+        System.out.println(singleton.isServer1Running());
+
+        int port = 8989; //new LoadDistribution().getPort();
 
         Client client = new Client(hostname, port);
         client.execute();

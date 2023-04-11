@@ -30,6 +30,8 @@ public class Server {
 
     private Set<ServerUserThread> userThreads = new HashSet<>(); //hier werden die Referenzvariablen gespeichert (kann man das überarbeiten?) Vorsicht vor Garbagecollector
 
+    private boolean server1Running;
+
     // Konstruktor
     public Server(int port, int partnerServerPort, int serverReceiverPort) {
         System.out.println("Server 1 wird gestartet");
@@ -46,7 +48,11 @@ public class Server {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
 
             System.out.println("Chat Server is listening on port " + port);
-            LoadDistribution.setServerStatus(port, true);
+            LoadDistributionSingleton singleton = LoadDistributionSingleton.getInstance();
+            singleton.setServer1Running(true);
+            System.out.println(singleton.isServer1Running());
+            server1Running = singleton.isServer1Running();
+            System.out.println(server1Running);
 
             file.create();
 
@@ -56,7 +62,6 @@ public class Server {
             // Endlosschleife
             while (true) {
                 Socket socket = serverSocket.accept();
-                LoadDistribution.increaseClientCounter(port);
                 System.out.println("New user connected");
                 ServerUserThread newUser = new ServerUserThread(socket, this);
                 userThreads.add(newUser);
