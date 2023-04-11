@@ -67,9 +67,9 @@ public class ClientWriteThread extends Thread {
             }
             if (text.equals(disconnect)) {
                 reconnect = true; // Flag setzen
-                break;
+                break; // Schleife beenden, und Socket noch nicht schließen
             } else if (text.equals(shutdown)) {
-                break; // Schleife beenden, aber Socket nicht schließen
+                break; // Schleife beenden, und Socket schließen
             } else {
                 writer.println(text); // Nachricht senden
             }
@@ -93,6 +93,7 @@ public class ClientWriteThread extends Thread {
                     }
                 } else {
                     System.out.println("Fehlerhafte Eingabe!");
+                    socket.close();
                     System.exit(0);
                 }
             } catch (IOException e) {
