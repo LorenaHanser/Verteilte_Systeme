@@ -15,6 +15,9 @@ public class ClientWriteThread extends Thread {
     private Socket socket;
     private Client client;
 
+    private final String disconnect = "DISCONNECT";
+    private final String shutdown = "SHUTDOWN";
+
     // Konstruktor
 
     public ClientWriteThread(Socket socket, Client client) {
@@ -32,6 +35,8 @@ public class ClientWriteThread extends Thread {
     }
 
     public void run() {
+
+        boolean reconnect = false;
 
         //Console console = System.console();
         //überarbeitet von Daniel S.
@@ -60,15 +65,46 @@ public class ClientWriteThread extends Thread {
                 System.out.println("!!!!!!!!!!!!!!!!!! Fehler 2 in WriteThread!!!!!!!!!!!!!!!!!!!!!!!");
                 throw new RuntimeException(e);
             }
-            writer.println(text);
+            if (text.equals(disconnect)) {
+                reconnect = true; // Flag setzen
+                break; // Schleife beenden, und Socket noch nicht schließen
+            } else if (text.equals(shutdown)) {
+                break; // Schleife beenden, und Socket schließen
+            } else {
+                writer.println(text); // Nachricht senden
+            }
 
-        } while (!text.equals("bye"));  // todo: Globale String Variable mit dem Namen CLOSECONNECTION = "CLOSE"
+        } while (true);
 
-        try {
-            socket.close();
-        } catch (IOException ex) {
+        if (reconnect) {
+            // Client fragen, ob er sich neu verbinden möchte
+            System.out.println("Sie wurden abgemeldet. Möchten Sie weiterchatten? (y/n)");
 
-            System.out.println("Error writing to server: " + ex.getMessage());
+            try {
+                String input = userIn.readLine();
+                if (input.equalsIgnoreCase("y")) {
+                    client.execute(); // Neue Verbindung aufbauen
+                } else if (input.equalsIgnoreCase("n")) {
+                    try {
+                        socket.close();
+                        System.exit(0);
+                    } catch (IOException ex) {
+                        System.out.println("Error writing to server: " + ex.getMessage());
+                    }
+                } else {
+                    System.out.println("Fehlerhafte Eingabe!");
+                    socket.close();
+                    System.exit(0);
+                }
+            } catch (IOException e) {
+                System.out.println("Fehler beim Lesen von Benutzereingabe: " + e.getMessage());
+            }
+        } else {
+            try {
+                socket.close();
+            } catch (IOException ex) {
+                System.out.println("Error writing to server: " + ex.getMessage());
+            }
         }
     }
 }
