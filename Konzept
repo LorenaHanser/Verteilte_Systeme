@@ -32,3 +32,5 @@ Im Chatfile:
 Fragen
 - identischer Chatverlauf: Brauchen wir eine oder zwei .txt Dateien pro Chatraum?
 - import java.text.SimpleDateFormat? import java.sql.Timestamp?
+- synchornisation? reicht das wie wir es bisher haben oder delay wichtig zu berücksichtigen? 
+- mcs strategie?
