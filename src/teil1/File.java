@@ -1,4 +1,4 @@
-package teil1.tutorial;
+package teil1;
 
 import java.io.*;
 import java.sql.Timestamp;
@@ -8,9 +8,8 @@ public class File {
     private String path;
     private final String[] FILENAMES = {"DanielDavid", "DanielLorena", "DavidLorena"};
     private final String ENDING = ".txt"; //Dateiendung der Textnachrichten
-    private String systemSign;
     private final String DIRECTORY_NAME = "Messages";
-    private static final SimpleDateFormat TIMESTAMPFORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+    private static final SimpleDateFormat TIMESTAMP_FORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 
     public File(){
         this.getPath();
@@ -48,19 +47,19 @@ public class File {
 
     // Methode, um eine Chatdatei zu lesen und in der Konsole anzeigen zu lassen
     public String read(int ownID, int chatPartnerID){
-        String chat = "Bisheriger Chat:\n";
+        StringBuilder chat = new StringBuilder("Bisheriger Chat:\n");
         String currentLine;
 
         try{
             BufferedReader bufferedReader = new BufferedReader(new FileReader(path + getFilename(ownID, chatPartnerID) + ENDING));
             while((currentLine = bufferedReader.readLine()) != null){
-                chat = chat + currentLine + "\n";
+                chat.append(currentLine).append("\n");
             }
             bufferedReader.close();
         } catch(IOException e){
             System.out.println("Fehler beim Lesen der Datei: " + e.getMessage());
         }
-        return chat;
+        return chat.toString();
     }
 
     // Methode, um eine neue Chatnachricht in der .txt Datei zu speichern
@@ -69,10 +68,23 @@ public class File {
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         System.out.println(message);
 
+        String[] notAllowedStrings = {"New user connected: ", " has quit.", "Bisheriger Chat:\n", "]: null"};
+        boolean writingAllowed = true;
+        for (String notAllowedString : notAllowedStrings) {
+            if (message.contains(notAllowedString)) {
+                writingAllowed = false;
+                break;
+            }
+        }
+
         try {
-            if(! message.contains("New user connected: " ) && ! message.contains(" has quitted.") && ! message.contains("Bisheriger Chat:\n")){
+            if(! new java.io.File(path).exists()) {
+                this.create();
+            }
+
+            if(writingAllowed){
                 BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(path + getFilename(ownID, chatPartnerID) + ENDING, true));
-                bufferedWriter.write("[" + TIMESTAMPFORMAT.format(timestamp) + "] " + message);
+                bufferedWriter.write("[" + TIMESTAMP_FORMAT.format(timestamp) + "] " + message);
                 bufferedWriter.newLine();
                 bufferedWriter.close();
             }
@@ -86,6 +98,7 @@ public class File {
         String systemUserHome = System.getProperty("user.home");
         String systemOS = System.getProperty("os.name").toLowerCase();
         String desktop = "Desktop";
+        String systemSign;
 
         if(systemOS.contains("windows")){
             systemSign = "\\";
@@ -101,7 +114,7 @@ public class File {
     // Methode gibt aus zwei UserIDs den richtigen Dateinamen zurück
     public String getFilename(int ownID, int chatPartnerID){
         System.out.println("Die ChatPartnerID lautet " + chatPartnerID);
-        String filename = "";
+        String filename;
         int sum = ownID + chatPartnerID;
 
         filename = switch (sum) {

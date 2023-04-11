@@ -1,10 +1,4 @@
-package teil1.tutorial;
-
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.HashSet;
-import java.util.Set;
+package teil1;
 
 public class Server2 {
 
