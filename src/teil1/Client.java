@@ -44,11 +44,14 @@ public class Client {
         //if (args.length < 2) return;
 
         String hostname = "localhost";//args[0];
-        int port = 8989;//Server 1 hat immer Port 8989 Server 2 8990
+        /*int port = 8989;//Server 1 hat immer Port 8989 Server 2 8990
         // Random funktion für "Lastverteilung"
         int randomNumber = (int) (Math.random()*2);
         port = port+randomNumber;
 
+         */
+
+        int port = new LoadDistribution().getPort();
 
         Client client = new Client(hostname, port);
         client.execute();

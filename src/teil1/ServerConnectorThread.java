@@ -33,10 +33,7 @@ public class ServerConnectorThread extends Thread {
                 }
                 System.out.println("Verbindung verloren");
 
-            } catch (UnknownHostException ex) {
-
             } catch (IOException ex) {
-
             }
         }
     }

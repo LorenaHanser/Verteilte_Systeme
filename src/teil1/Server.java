@@ -46,6 +46,7 @@ public class Server {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
 
             System.out.println("Chat Server is listening on port " + port);
+            LoadDistribution.setServerStatus(port, true);
 
             file.create();
 
@@ -55,6 +56,7 @@ public class Server {
             // Endlosschleife
             while (true) {
                 Socket socket = serverSocket.accept();
+                LoadDistribution.increaseClientCounter(port);
                 System.out.println("New user connected");
                 ServerUserThread newUser = new ServerUserThread(socket, this);
                 userThreads.add(newUser);
@@ -119,8 +121,8 @@ public class Server {
 
     boolean checkUsernameExists(String userName) { //überprüft, ob der User existiert
         boolean usernameValid = false;
-        for (int i = 0; i < userNameRegister.length; i++) {
-            if (userNameRegister[i].equals(userName)) {
+        for (String s : userNameRegister) {
+            if (s.equals(userName)) {
                 usernameValid = true;
                 break;
             }
