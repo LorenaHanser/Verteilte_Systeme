@@ -4,51 +4,44 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
-/**
- * This is the chat server program.
- * Press Ctrl + C to terminate the program.
- *
- * @author www.codejava.net
- */
 public class Server {
     private int port;
     private File file = new File();
 
-    private String[] userNameRegister = {"Daniel","David","Lorena"}; //Speichert die Usernamen der Index wird als Id für den User genutzt
+    private final String[] userNameRegister = {"Daniel","David","Lorena"}; //Speichert die Usernamen der Index wird als Id für den User genutzt
 
-    private String[] userPassword = {"hallo", "geheim", "test"};
+    private final String[] userPassword = {"hallo", "geheim", "test"};
 
 
-    //hier sind die Attribute für die Synccronisation
+    //hier sind die Attribute für die Synchronisation
 
     //Variablen für den anderen Server
-    private int partnerServerPort; //Port des Partnerservers (Port für Servercommunication)
-    private String partnerServerAdress = "localhost"; //hier die Adresse des anderen Server eintragen.
+    private int partnerServerPort; //Port des Partnerservers (Port für Serverkommunikation)
+    private String partnerServerAddress = "localhost"; //hier die Adresse des anderen Server eintragen.
     private ServerConnectorThread SyncThread;
 
     //Variablen für den eigenen Server
-    private int serverReciverPort;
-    private ServerReciverThread reciverSyncThread;
+    private int serverReceiverPort;
+    private ServerReciverThread receiverSyncThread;
 
 
     private int[] userChattetWith = new int[3]; //Speichert, wer sich aktuell mit wem im Chat befindet (damit man nicht mit einer Person chatten kann, die gerade mit wem anders chattet)
     private ServerUserThread[] userThreadRegister = new ServerUserThread[3];//Speichert die Referenzvariable des Threads auf dem der User (wenn er online ist) läuft. Der Index für das Feld ist, dabei die ID des Users
 
-    private Set<ServerUserThread> userThreads = new HashSet<>(); //hier werden die Referenzvariabeln gespeichert (kann man das überarbeiten?) Vorsicht vor Garbagecollecktor
+    private Set<ServerUserThread> userThreads = new HashSet<>(); //hier werden die Referenzvariablen gespeichert (kann man das überarbeiten?) Vorsicht vor Garbagecollector
 
     // Konstruktor
-
-    public Server(int port, int partnerServerPort, int serverReciverPort) {
+    public Server(int port, int partnerServerPort, int serverReceiverPort) {
         System.out.println("Server 1 wird gestartet");
         this.port = port;
         this.partnerServerPort = partnerServerPort;
-        this.serverReciverPort = serverReciverPort;
+        this.serverReceiverPort = serverReceiverPort;
     }
 
 
     public void execute() {
-        reciverSyncThread = new ServerReciverThread(this, serverReciverPort);
-        reciverSyncThread.start();
+        receiverSyncThread = new ServerReciverThread(this, serverReceiverPort);
+        receiverSyncThread.start();
         System.out.println("Sync ServerThread gestartet");
         try (ServerSocket serverSocket = new ServerSocket(port)) {
 
@@ -56,18 +49,16 @@ public class Server {
 
             file.create();
 
-            SyncThread = new ServerConnectorThread(partnerServerAdress,partnerServerPort, this);
+            SyncThread = new ServerConnectorThread(partnerServerAddress,partnerServerPort, this);
             SyncThread.start();
 
             // Endlosschleife
-
             while (true) {
                 Socket socket = serverSocket.accept();
                 System.out.println("New user connected");
                 ServerUserThread newUser = new ServerUserThread(socket, this);
                 userThreads.add(newUser);
-                newUser.start(); //Thread startet mit User -> Name unbekannt desswegen noch kein Eintrag in das userThreadRegister Array
-
+                newUser.start(); //Thread startet mit User → Name unbekannt deswegen noch kein Eintrag in das userThreadRegister Array
             }
 
         } catch (IOException ex) {
@@ -79,14 +70,11 @@ public class Server {
     public static void main(String[] args) {
         int port = 8989;//Integer.parseInt(args[0]);
         int partnerServerPort = 8991;
-        int serverReciverPort = 8992;
-        Server server = new Server(port, partnerServerPort, serverReciverPort);
+        int serverReceiverPort = 8992;
+        Server server = new Server(port, partnerServerPort, serverReceiverPort);
         server.execute();
     }
 
-    /**
-     * Delivers a message from one user to others (broadcasting)
-     */
     void sendMessage(String message, int sendUserId, int receiverUserId) {
         try {
             SyncThread.sendMessageToOtherServer(message, sendUserId, receiverUserId);
@@ -96,7 +84,7 @@ public class Server {
 
         file.write(message, sendUserId, receiverUserId);
 
-        if(userThreadRegister[receiverUserId] != null) { //es wird geschaut, ob der User online ist (zum Vermeiden von Exeption)        //todo: fix pls
+        if(userThreadRegister[receiverUserId] != null) { //es wird geschaut, ob der User online ist (zum Vermeiden von Exception)        //todo: fix pls
             System.out.println("Diese Nachricht wurde erhalten: " + message);
             if(userChattetWith[receiverUserId] == sendUserId) { //Es wird geschaut, ob der User sich im gleichen Chatraum (mit dem sendenUser) befindet
                 userThreadRegister[receiverUserId].sendMessage(message); //nachricht wird an den User gesendet
@@ -110,11 +98,9 @@ public class Server {
     }
 
     void sendMessageFromServer(String message, int sendUserId, int receiverUserId) {
-
-
         file.write(message, sendUserId, receiverUserId);
 
-        if(userThreadRegister[receiverUserId] != null) { //es wird geschaut, ob der User online ist (zum Vermeiden von Exeption)        //todo: fix pls
+        if(userThreadRegister[receiverUserId] != null) { //es wird geschaut, ob der User online ist (zum Vermeiden von Exception)        //todo: fix pls
             System.out.println("Diese Nachricht wurde erhalten: " + message);
             if(userChattetWith[receiverUserId] == sendUserId) { //Es wird geschaut, ob der User sich im gleichen Chatraum (mit dem sendenUser) befindet
                 userThreadRegister[receiverUserId].sendMessage(message); //nachricht wird an den User gesendet
@@ -155,7 +141,7 @@ public class Server {
         return passwordValid;
     }
 
-    void setThreadId(String userName, ServerUserThread Thread) { //nachdem der User sich regestriert hat, wird Referenz von Thread an den Platz vom User gespeichert -> ab jetzt ist Thread erreichbar
+    void setThreadId(String userName, ServerUserThread Thread) { //nachdem der User sich registriert hat, wird Referenz von Thread an den Platz vom User gespeichert → ab jetzt ist Thread erreichbar
         for (int i = 0; i < userNameRegister.length; i++) {
             if(userNameRegister[i].equals(userName)) {
                 userThreadRegister[i] = Thread;
@@ -165,17 +151,16 @@ public class Server {
     }
 
     /**
-     * When a client is disconneted, removes the UserThread
+     * When a client is disconnected, removes the UserThread
      */
     void removeUser(String userName, ServerUserThread aUser) { //noch von Tutorial
-            userThreads.remove(aUser);
-            System.out.println("The user " + userName + " quitted");
+        userThreads.remove(aUser);
+        System.out.println("The user " + userName + " quit");
     }
 
 
 
-    int askForID(String username) //Es wird geschaut, welche Id der User hat (Index von userNameRegister)
-    {
+    int askForID(String username) { //Es wird geschaut, welche Id der User hat (Index von userNameRegister)
         System.out.println("Folgender Name soll überprüft werden: '"+username+"'");
         int answer = -1;
         for (int i = 0; i < userNameRegister.length; i++) {
@@ -192,7 +177,5 @@ public class Server {
         userChattetWith[user] = chatPartner;
 
     }
-
-
 
 }

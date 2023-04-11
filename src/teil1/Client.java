@@ -3,19 +3,12 @@ package teil1;
 import java.net.*;
 import java.io.*;
 
-/**
- * This is the chat client program.
- * Type 'bye' to terminte the program.
- *
- * @author www.codejava.net
- */
 public class Client {
     private String hostname;
     private int port;
     private String userName;
 
     // Konstruktor
-
     public Client(String hostname, int port) {
         this.hostname = hostname;
         this.port = port;

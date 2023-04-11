@@ -3,13 +3,6 @@ package teil1;
 import java.io.*;
 import java.net.*;
 
-/**
- * This thread is responsible for reading user's input and send it
- * to the server.
- * It runs in an infinite loop until the user types 'bye' to quit.
- *
- * @author www.codejava.net
- */
 public class ClientWriteThread extends Thread {
     private PrintWriter writer;
     private Socket socket;
@@ -42,7 +35,7 @@ public class ClientWriteThread extends Thread {
         //überarbeitet von Daniel S.
         BufferedReader userIn = new BufferedReader(new InputStreamReader(System.in));
 
-        String userName = null;
+        String userName;
         try {
             userName = userIn.readLine();
         } catch (IOException e) {
@@ -56,7 +49,6 @@ public class ClientWriteThread extends Thread {
         String text;
 
         // Endlosschleife
-
         do {
             // switch/case
             try {
@@ -78,7 +70,7 @@ public class ClientWriteThread extends Thread {
 
         if (reconnect) {
             // Client fragen, ob er sich neu verbinden möchte
-            System.out.println("Sie wurden abgemeldet. Möchten Sie weiterchatten? (y/n)");
+            System.out.println("Sie wurden abgemeldet. Möchten Sie weiter chatten? (y/n)");
 
             try {
                 String input = userIn.readLine();
