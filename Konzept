@@ -9,7 +9,7 @@ Server verbindet den Clienten mit seinem Parnter (wenn online) und sendet ihm de
 Syntax (Naming Conventions) mit Beispiel "Daniel":
 CONNECT Daniel    // Verbindung zum Chatraum mit Daniel aufbauen <- deprecated: User wird gefragt wem er schreiben möchte!
 DISCONNECT        // Verbindung zum Chatraum mit Daniel schließen
-CLOSE             // Verbindung zum Server schließen
+SHUTDOWN             // Verbindung zum Server schließen
 
 Filenames:
 DanielDavid.txt
