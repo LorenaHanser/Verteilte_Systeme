@@ -47,19 +47,19 @@ public class File {
 
     // Methode, um eine Chatdatei zu lesen und in der Konsole anzeigen zu lassen
     public String read(int ownID, int chatPartnerID){
-        String chat = "Bisheriger Chat:\n";
+        StringBuilder chat = new StringBuilder("Bisheriger Chat:\n");
         String currentLine;
 
         try{
             BufferedReader bufferedReader = new BufferedReader(new FileReader(path + getFilename(ownID, chatPartnerID) + ENDING));
             while((currentLine = bufferedReader.readLine()) != null){
-                chat = chat + currentLine + "\n";
+                chat.append(currentLine).append("\n");
             }
             bufferedReader.close();
         } catch(IOException e){
             System.out.println("Fehler beim Lesen der Datei: " + e.getMessage());
         }
-        return chat;
+        return chat.toString();
     }
 
     // Methode, um eine neue Chatnachricht in der .txt Datei zu speichern
@@ -68,11 +68,12 @@ public class File {
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         System.out.println(message);
 
-        String[] notAllowedStrings = {"New user connected: ", " has quitted.", "Bisheriger Chat:\n", "]: null"};
+        String[] notAllowedStrings = {"New user connected: ", " has quit.", "Bisheriger Chat:\n", "]: null"};
         boolean writingAllowed = true;
-        for(int i = 0; i < notAllowedStrings.length; i++){
-            if(message.contains(notAllowedStrings[i])){
+        for (String notAllowedString : notAllowedStrings) {
+            if (message.contains(notAllowedString)) {
                 writingAllowed = false;
+                break;
             }
         }
 
@@ -113,7 +114,7 @@ public class File {
     // Methode gibt aus zwei UserIDs den richtigen Dateinamen zurück
     public String getFilename(int ownID, int chatPartnerID){
         System.out.println("Die ChatPartnerID lautet " + chatPartnerID);
-        String filename = "";
+        String filename;
         int sum = ownID + chatPartnerID;
 
         filename = switch (sum) {
