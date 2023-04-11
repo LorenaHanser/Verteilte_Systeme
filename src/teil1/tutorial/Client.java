@@ -54,8 +54,7 @@ public class Client {
         int port = 8989;//Server 1 hat immer Port 8989 Server 2 8990
         // Random funktion für "Lastverteilung"
         int randomNumber = (int) (Math.random()*2);
-        //port = port+randomNumber;
-        port++;
+        port = port+randomNumber;
 
 
         Client client = new Client(hostname, port);

@@ -22,15 +22,13 @@ public class Server {
     //hier sind die Attribute für die Synccronisation
 
     //Variablen für den anderen Server
-
-    private int partnerServerPort = 8991; //Port des Partnerservers (Port für Servercommunication)
+    private int partnerServerPort; //Port des Partnerservers (Port für Servercommunication)
     private String partnerServerAdress = "localhost"; //hier die Adresse des anderen Server eintragen.
     private ServerConnectorThread SyncThread;
 
     //Variablen für den eigenen Server
-
     private int serverReciverPort;
-    ServerReciverThread reciverSyncThread;
+    private ServerReciverThread reciverSyncThread;
 
 
     private int[] userChattetWith = new int[3]; //Speichert, wer sich aktuell mit wem im Chat befindet (damit man nicht mit einer Person chatten kann, die gerade mit wem anders chattet)

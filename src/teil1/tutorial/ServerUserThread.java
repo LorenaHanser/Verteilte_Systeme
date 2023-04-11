@@ -12,9 +12,7 @@ import java.net.*;
 public class ServerUserThread extends Thread {
     private Socket socket;
     private Server server;
-    private String userName;
     private PrintWriter writer;
-    private int ThreadId;
 
     private int chatPartnerID;
 
@@ -26,13 +24,6 @@ public class ServerUserThread extends Thread {
     public ServerUserThread(Socket socket, Server server) {
         this.socket = socket;
         this.server = server;
-    }
-
-
-
-    public void setUser(Socket socket)
-    {
-        this.socket = socket;
     }
 
     public void run() {
@@ -88,7 +79,7 @@ public class ServerUserThread extends Thread {
                         foundPartner = true;
                                             }
                 }// ab hier weiß der User die ID seines Chatpartners
-                //selectChatRoom();
+
                 server.sendMessage(serverMessage, ownID, chatPartnerID);        //Nachricht an den Partner
 
                 String clientMessage;

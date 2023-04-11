@@ -24,8 +24,6 @@ public class ServerConnectorThread extends Thread {
     public void run() {
         while(true){
 
-            //Socket socket = new Socket(hostname, port);
-            //while (!socket.isConnected()) {
                 try {
                     System.out.println("Versuch Sync Server zu verbinden");
                     Socket socket = new Socket(hostname, port);
@@ -43,10 +41,6 @@ public class ServerConnectorThread extends Thread {
                     System.out.println("I/O Error: " + ex.getMessage());
                     System.out.println("Verbindung über I/O Error verlohren");
                 }
-                //}
-            //}
-
-
         }
     }
 
