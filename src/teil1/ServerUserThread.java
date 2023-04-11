@@ -36,22 +36,21 @@ public class ServerUserThread extends Thread {
             boolean userSuccessfulAuthenticated = false;
             String userName = reader.readLine();
             String password;
-            if(server.checkUsernameExists(userName)) {
+            if (server.checkUsernameExists(userName)) {
                 writer.println("Please insert Password:");
                 password = reader.readLine();
-                if(server.checkPasswordValid(userName, password))
-                {
+                if (server.checkPasswordValid(userName, password)) {
                     userSuccessfulAuthenticated = true;
                 }
             }
-            while(!userSuccessfulAuthenticated) {
+            while (!userSuccessfulAuthenticated) {
                 writer.println("Password oder User falsch! Bitte versuch es nochmal");
                 writer.println("Please enter your name:");
                 userName = reader.readLine();
-                if(server.checkUsernameExists(userName)) {
+                if (server.checkUsernameExists(userName)) {
                     writer.println("Please insert Password:");
                     password = reader.readLine();
-                    if(server.checkPasswordValid(userName, password)) {
+                    if (server.checkPasswordValid(userName, password)) {
                         userSuccessfulAuthenticated = true;
                     }
                 }
@@ -62,10 +61,10 @@ public class ServerUserThread extends Thread {
             String serverMessage = "New user connected: " + userName;
 
             boolean foundPartner = false;
-            while(!foundPartner){ //Endlosschleife, bis existierender Chatpartner gefunden
+            while (!foundPartner) { //Endlosschleife, bis existierender Chatpartner gefunden
                 writer.println("Mit wem möchtest du schreiben?");
                 chatPartnerID = server.askForID(reader.readLine());
-                if(chatPartnerID != -1){ //geprüft ob ChatPartnerId gültig ist
+                if (chatPartnerID != -1) { //geprüft ob ChatPartnerId gültig ist
                     writer.println("Alles klar, du wirst verbunden");
                     server.setChatPartner(ownID, chatPartnerID); //User geht in Chatraum
                     foundPartner = true;
