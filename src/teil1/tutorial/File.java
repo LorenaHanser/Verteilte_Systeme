@@ -8,9 +8,8 @@ public class File {
     private String path;
     private final String[] FILENAMES = {"DanielDavid", "DanielLorena", "DavidLorena"};
     private final String ENDING = ".txt"; //Dateiendung der Textnachrichten
-    private String systemSign;
     private final String DIRECTORY_NAME = "Messages";
-    private static final SimpleDateFormat TIMESTAMPFORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+    private static final SimpleDateFormat TIMESTAMP_FORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 
     public File(){
         this.getPath();
@@ -69,10 +68,22 @@ public class File {
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         System.out.println(message);
 
+        String[] notAllowedStrings = {"New user connected: ", " has quitted.", "Bisheriger Chat:\n", "]: null"};
+        boolean writingAllowed = true;
+        for(int i = 0; i < notAllowedStrings.length; i++){
+            if(message.contains(notAllowedStrings[i])){
+                writingAllowed = false;
+            }
+        }
+
         try {
-            if(! message.contains("New user connected: " ) && ! message.contains(" has quitted.") && ! message.contains("Bisheriger Chat:\n")){
+            if(! new java.io.File(path).exists()) {
+                this.create();
+            }
+
+            if(writingAllowed){
                 BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(path + getFilename(ownID, chatPartnerID) + ENDING, true));
-                bufferedWriter.write("[" + TIMESTAMPFORMAT.format(timestamp) + "] " + message);
+                bufferedWriter.write("[" + TIMESTAMP_FORMAT.format(timestamp) + "] " + message);
                 bufferedWriter.newLine();
                 bufferedWriter.close();
             }
@@ -86,6 +97,7 @@ public class File {
         String systemUserHome = System.getProperty("user.home");
         String systemOS = System.getProperty("os.name").toLowerCase();
         String desktop = "Desktop";
+        String systemSign;
 
         if(systemOS.contains("windows")){
             systemSign = "\\";
