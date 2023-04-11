@@ -88,8 +88,11 @@ public class Server {
      * Delivers a message from one user to others (broadcasting)
      */
     void sendMessage(String message, int sendUserId, int receiverUserId) {
-
-        SyncThread.sendMessageToOtherServer(message, sendUserId, receiverUserId);
+        try {
+            SyncThread.sendMessageToOtherServer(message, sendUserId, receiverUserId);
+        }catch (Exception e){
+            System.out.println("Sync Server nicht gefunden");
+        }
 
         file.write(message, sendUserId, receiverUserId);
 
@@ -97,6 +100,7 @@ public class Server {
             System.out.println("Diese Nachricht wurde erhalten: " + message);
             if(userChattetWith[receiverUserId] == sendUserId) { //Es wird geschaut, ob der User sich im gleichen Chatraum (mit dem sendenUser) befindet
                 userThreadRegister[receiverUserId].sendMessage(message); //nachricht wird an den User gesendet
+                System.out.println("Ich glaube die Nachricht sollte übermittelt geworden sein");
             }else{
                 System.out.println("Der User ist gerade beschäftigt. Die Nachricht wird gespeichert!");
             }

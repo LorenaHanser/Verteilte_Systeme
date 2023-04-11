@@ -25,7 +25,6 @@ public class ServerConnectorThread extends Thread {
         while(true){
 
                 try {
-                    System.out.println("Versuch Sync Server zu verbinden");
                     Socket socket = new Socket(hostname, port);
                     OutputStream output = socket.getOutputStream();
                     writer = new PrintWriter(output, true);
@@ -36,17 +35,13 @@ public class ServerConnectorThread extends Thread {
                     System.out.println("Verbindung verlohren");
 
                 } catch (UnknownHostException ex) {
-                    System.out.println("Server not found: " + ex.getMessage());
                 } catch (IOException ex) {
-                    System.out.println("I/O Error: " + ex.getMessage());
-                    System.out.println("Verbindung über I/O Error verlohren");
                 }
         }
     }
 
     protected void sendMessageToOtherServer(String rawMessage, int sendUserId, int receiverUserId) {
         String message = sendUserId + ";" + receiverUserId + ";" + rawMessage;
-        System.out.println(message);
         writer.println(message);
 
     }

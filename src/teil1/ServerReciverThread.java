@@ -48,17 +48,8 @@ public class ServerReciverThread extends Thread{
         }
 
     }
-
-    private String[] splitRespone(String response){
-        return response.split(";",3);//";" wird zum trennen benutzt
-    }
-
     private void sendMessageToServer(String rawMessage){
-        String[] rawMessageArray = splitRespone(rawMessage);//String wird in Array gesplittet
-        for (int i = 0; i < rawMessageArray.length; i++) { //ist lediglich eine Ausgabe
-            System.out.println(rawMessageArray[i]);
-
-        }
+        String[] rawMessageArray = rawMessage.split(";", 3);//String wird in Array gesplittet
         int senderID = Integer.parseInt(rawMessageArray[0]);
         int reciverID = Integer.parseInt(rawMessageArray[1]);
         String message = rawMessageArray[2];
