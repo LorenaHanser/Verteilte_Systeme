@@ -102,6 +102,7 @@ public class ClientWriteThread extends Thread {
         } else {
             try {
                 socket.close();
+                System.exit(0);
             } catch (IOException ex) {
                 System.out.println("Error writing to server: " + ex.getMessage());
             }
