@@ -1,4 +1,4 @@
-package teil1.tutorial;
+package teil1;
 
 import java.io.IOException;
 import java.io.OutputStream;
