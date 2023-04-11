@@ -12,8 +12,8 @@ import java.net.*;
 public class ServerUserThread extends Thread {
     private Socket socket;
     private Server server;
-    private final String disconnect = "DISCONNECT";
-    private final String shutdown = "SHUTDOWN";
+    private final String DISCONNECT = "DISCONNECT";
+    private final String SHUTDOWN = "SHUTDOWN";
     private PrintWriter writer;
 
     private int chatPartnerID;
@@ -94,7 +94,7 @@ public class ServerUserThread extends Thread {
                     serverMessage = "[" + userName + "]: " + clientMessage;
                     server.sendMessage(serverMessage, ownID, chatPartnerID);
 
-                } while (!clientMessage.equals(disconnect) && !clientMessage.equals((shutdown)));
+                } while (!clientMessage.equals(DISCONNECT) && !clientMessage.equals((SHUTDOWN)));
 
                 server.removeUser(userName, this);
                 serverMessage = "Client : " + userName + " hat die Verbindung getrennt!";
