@@ -50,6 +50,7 @@ public class Server {
             System.out.println("Chat Server is listening on port " + port);
             LoadDistributionSingleton singleton = LoadDistributionSingleton.getInstance();
             singleton.setServer1Running(true);
+            LoadDistribution.setServerStatus(port, true);
             System.out.println(singleton.isServer1Running());
             server1Running = singleton.isServer1Running();
             System.out.println(server1Running);
@@ -79,7 +80,9 @@ public class Server {
         int partnerServerPort = 8991;
         int serverReceiverPort = 8992;
         Server server = new Server(port, partnerServerPort, serverReceiverPort);
+        Server server2 = new Server(port+1, serverReceiverPort, partnerServerPort);
         server.execute();
+        server2.execute();
     }
 
     void sendMessage(String message, int sendUserId, int receiverUserId) {

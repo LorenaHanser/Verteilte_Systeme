@@ -49,39 +49,16 @@ public class LoadDistribution {
     public static synchronized int getPort() {
         int port = 0;
 
-        while (true) {
-            switch (clientCounter) {
-                case 0:
-                    // Random Funktion für "Lastverteilung"
-                    int randomNumber = (int) (Math.random() * 2);
-                    port = PORT_SERVER1 + randomNumber;
-                    System.out.println("case 0 - port " + port);
-                    break;
-                case 1:
-                    if (clientCounterServer1 == 1) {
-                        port = PORT_SERVER2;
-                    } else {
-                        port = PORT_SERVER1;
-                    }
-                    System.out.println("case 1 - port " + port);
-                    break;
-                case 2:
-                    System.out.println("case 2");
-                    break;
-                case 3:
-                    System.out.println("case 3");
-                    break;
-                default:
-                    System.out.println("Pech gehabt. Nochmal.");
-                    break;
-            }
-
-            System.out.println(getStatusFromPort(port));
-            if (getStatusFromPort(port)) {
-                return port;
-            }
-
+        if (clientCounterServer1 < clientCounterServer2) {
+            port = PORT_SERVER1;
+        } else if (clientCounterServer1 > clientCounterServer2) {
+            port = PORT_SERVER2;
+        } else if (clientCounterServer1 == clientCounterServer2) {
+            int randomNumber = (int) (Math.random() * 2);
+            port = PORT_SERVER1 + randomNumber;
         }
+
+        return port;
     }
 
     public static synchronized boolean getStatusFromPort(int port) {

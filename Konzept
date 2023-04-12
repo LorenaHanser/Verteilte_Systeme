@@ -32,7 +32,9 @@ Im Chatfile:
 Fragen
 - identischer Chatverlauf: Brauchen wir eine oder zwei .txt Dateien pro Chatraum?
 - import java.text.SimpleDateFormat? import java.sql.Timestamp?
-- synchornisation? reicht das wie wir es bisher haben oder delay wichtig zu berücksichtigen? 
+- Synchronisation? reicht das wie wir es bisher haben oder delay wichtig zu berücksichtigen?
 - mcs strategie?
-- gibt es die möglichkeit das beide server nachrichten haben die der andere nicht hat? 
+- gibt es die möglichkeit, dass beide server nachrichten haben die der andere nicht hat?
 oder kann man es lösen das der chatverlauf des laufenden servers mit dem des neu zugeschalteten servers synchronisiert wird?
+- Lastverteilung: zufällig oder gleichmäßig?
+- Anmeldeserver?

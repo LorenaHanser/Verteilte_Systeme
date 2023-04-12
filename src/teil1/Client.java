@@ -26,7 +26,7 @@ public class Client {
         } catch (UnknownHostException ex) {
             System.out.println("Die Konfiguration stimmt nicht: " + ex.getMessage());
         } catch (IOException ex) {
-            System.out.println("Der Server ist nicht online: " + ex.getMessage());
+            System.out.println("Der Server " + port + " ist nicht online: " + ex.getMessage());
         }
 
     }
@@ -44,17 +44,13 @@ public class Client {
         //if (args.length < 2) return;
 
         String hostname = "localhost";//args[0];
-        /*int port = 8989;//Server 1 hat immer Port 8989 Server 2 8990
+
+        int port = 8989;//Server 1 hat immer Port 8989 Server 2 8990
         // Random funktion für "Lastverteilung"
         int randomNumber = (int) (Math.random()*2);
         port = port+randomNumber;
 
-         */
-
-        LoadDistributionSingleton singleton = LoadDistributionSingleton.getInstance();
-        System.out.println(singleton.isServer1Running());
-
-        int port = 8989; //new LoadDistribution().getPort();
+        //int port = LoadDistribution.getPort();
 
         Client client = new Client(hostname, port);
         client.execute();

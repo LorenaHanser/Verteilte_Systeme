@@ -2,7 +2,7 @@ package teil1;
 
 public class LoadDistributionSingleton {
     private static LoadDistributionSingleton instance;
-    private boolean server1Running = false;
+    private volatile boolean server1Running = false;
 
     private LoadDistributionSingleton(){
         // smart comment
