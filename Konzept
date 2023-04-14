@@ -29,10 +29,12 @@ Lorena = test
 Im Chatfile:
 [06.04.2023 17:01:12] [Daniel]: Nachricht
 
-Fragen
-- identischer Chatverlauf: Brauchen wir eine oder zwei .txt Dateien pro Chatraum?
+Fragen für Fragestunde
+- identischer Chatverlauf: Brauchen wir pro Server eine .txt Datei vom Chat oder insgesamt nur eine?
 - import java.text.SimpleDateFormat? import java.sql.Timestamp?
 - synchornisation? reicht das wie wir es bisher haben oder delay wichtig zu berücksichtigen? 
-- mcs strategie?
-- gibt es die möglichkeit das beide server nachrichten haben die der andere nicht hat? 
-oder kann man es lösen das der chatverlauf des laufenden servers mit dem des neu zugeschalteten servers synchronisiert wird?
+- mcs strategie: geht's darum das bei 3 Servern bei Schreibzugriff/Lesezugriff die Mehrheit schreibt also 2/3 schreiben/lesen müssen
+- gibt es die möglichkeit, dass beide server nachrichten haben die der andere nicht hat?	oder kann man es lösen das der chatverlauf des laufenden servers mit dem des neu zugeschalteten servers synchronisiert wird?
+- Lastverteilung: reicht Math.random() oder abhängig von der Anzahl der Clients und Server?
+- Passwörter hashen?
+
