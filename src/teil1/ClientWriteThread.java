@@ -15,8 +15,8 @@ public class ClientWriteThread extends Thread {
     private Socket socket;
     private Client client;
 
-    private final String disconnect = "DISCONNECT";
-    private final String shutdown = "SHUTDOWN";
+    private final String DISCONNECT = "DISCONNECT";
+    private final String SHUTDOWN = "SHUTDOWN";
 
     // Konstruktor
 
@@ -65,10 +65,10 @@ public class ClientWriteThread extends Thread {
                 System.out.println("!!!!!!!!!!!!!!!!!! Fehler 2 in WriteThread!!!!!!!!!!!!!!!!!!!!!!!");
                 throw new RuntimeException(e);
             }
-            if (text.equals(disconnect)) {
+            if (text.equals(DISCONNECT)) {
                 reconnect = true; // Flag setzen
                 break; // Schleife beenden, und Socket noch nicht schließen
-            } else if (text.equals(shutdown)) {
+            } else if (text.equals(SHUTDOWN)) {
                 break; // Schleife beenden, und Socket schließen
             } else {
                 writer.println(text); // Nachricht senden
@@ -78,22 +78,19 @@ public class ClientWriteThread extends Thread {
 
         if (reconnect) {
             // Client fragen, ob er sich neu verbinden möchte
-            System.out.println("Sie wurden abgemeldet. Möchten Sie weiterchatten? (y/n)");
-
+            try {
+                socket.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             try {
                 String input = userIn.readLine();
                 if (input.equalsIgnoreCase("y")) {
                     client.execute(); // Neue Verbindung aufbauen
                 } else if (input.equalsIgnoreCase("n")) {
-                    try {
-                        socket.close();
-                        System.exit(0);
-                    } catch (IOException ex) {
-                        System.out.println("Error writing to server: " + ex.getMessage());
-                    }
+                    System.exit(0);
                 } else {
                     System.out.println("Fehlerhafte Eingabe!");
-                    socket.close();
                     System.exit(0);
                 }
             } catch (IOException e) {

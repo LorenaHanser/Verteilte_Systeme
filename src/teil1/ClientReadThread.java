@@ -26,14 +26,13 @@ public class ClientReadThread extends Thread {
 
     public void run() {
         // Endlosschleife
-        while (true) {
+        while (socket.isBound()) {
             try {
                 String response = reader.readLine();
                 System.out.println(response);
 
             } catch (IOException ex) {
-                System.out.println("Error reading from server: " + ex.getMessage());
-                ex.printStackTrace();
+                System.out.println("Die Verbindung zum Server wurde getrennt: " + ex.getMessage() + "\n" + "Möchten sie weiterchatten? (y/n)");
                 break;
             }
         }
