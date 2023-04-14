@@ -68,7 +68,7 @@ public class Server {
             while (true) {
                 Socket socket = serverSocket.accept();
                 System.out.println("New user connected");
-                ServerUserThread newUser = new ServerUserThread(socket, this);
+                ServerUserThread newUser = new ServerUserThread(socket, this, serverNummer);
                 userThreads.add(newUser);
                 newUser.start(); //Thread startet mit User -> Name unbekannt desswegen noch kein Eintrag in das userThreadRegister Array
 

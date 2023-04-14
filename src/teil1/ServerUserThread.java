@@ -19,13 +19,14 @@ public class ServerUserThread extends Thread {
     private int chatPartnerID;
 
     private int ownID; //Die Id des Users, der auf dem Thread läuft
-    private File file = new File();
+    private File file;
 
     // Konstruktor
 
-    public ServerUserThread(Socket socket, Server server) {
+    public ServerUserThread(Socket socket, Server server, String serverNummer) {
         this.socket = socket;
         this.server = server;
+        this.file = new File(serverNummer);
     }
 
     public void run() {
