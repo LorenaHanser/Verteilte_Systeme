@@ -82,6 +82,7 @@ public class File {
                 this.create();
             }
 
+
             if (writingAllowed) {
                 BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(path + getFilename(ownID, chatPartnerID) + ENDING, true));
                 bufferedWriter.write("[" + TIMESTAMP_FORMAT.format(timestamp) + "] " + message);
