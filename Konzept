@@ -26,6 +26,18 @@ Daniel = hallo
 David = geheim
 Lorena = test
 
+Ports:
+Adresse: localhost
+Server1:
+  FürClienten: 8988
+  FürServer: 8991
+Server2:
+  Für Clienten: 8989
+  Für Server: 8992
+Server3:
+  Für Clienten: 8990
+  Für Server: 8993
+
 Im Chatfile:
 [06.04.2023 17:01:12] [Daniel]: Nachricht
 
