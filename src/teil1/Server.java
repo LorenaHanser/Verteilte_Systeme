@@ -12,7 +12,9 @@ import java.util.*;
  */
 public class Server {
     private int port;
-    private File file = new File();
+    private File file;
+
+    private String serverNummer;
 
     private String[] userNameRegister = {"Daniel","David","Lorena"}; //Speichert die Usernamen der Index wird als Id für den User genutzt
 
@@ -38,8 +40,9 @@ public class Server {
 
     // Konstruktor
 
-    public Server(int port, int partnerServerPort, int serverReciverPort) {
+    public Server(int port, int partnerServerPort, int serverReciverPort, String serverNummer) {
         System.out.println("Server 1 wird gestartet");
+        this.serverNummer = serverNummer;
         this.port = port;
         this.partnerServerPort = partnerServerPort;
         this.serverReciverPort = serverReciverPort;
@@ -47,6 +50,7 @@ public class Server {
 
 
     public void execute() {
+        file = new File(serverNummer);
         reciverSyncThread = new ServerReciverThread(this, serverReciverPort);
         reciverSyncThread.start();
         System.out.println("Sync ServerThread gestartet");
@@ -80,7 +84,8 @@ public class Server {
         int port = 8989;//Integer.parseInt(args[0]);
         int partnerServerPort = 8991;
         int serverReciverPort = 8992;
-        Server server = new Server(port, partnerServerPort, serverReciverPort);
+        String serverNummer = "1";
+        Server server = new Server(port, partnerServerPort, serverReciverPort,serverNummer);
         server.execute();
     }
 
