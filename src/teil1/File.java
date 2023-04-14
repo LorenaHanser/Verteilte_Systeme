@@ -13,7 +13,7 @@ public class File {
 
     private String serverDirectoryName;
 
-    public File(String serverNummer){
+    public File(String serverNummer) {
         this.serverDirectoryName = DIRECTORY_NAME + serverNummer;
         this.getPath();
     }
@@ -24,7 +24,7 @@ public class File {
             //Ordner erstellen
             if (!new java.io.File(path).exists()) {
                 boolean createdDirectory = new java.io.File(path).mkdir();
-                if(createdDirectory){
+                if (createdDirectory) {
                     System.out.println("Ordner " + serverDirectoryName + " wurde neu erstellt.");
                 } else {
                     System.out.println("Ordner " + serverDirectoryName + " konnte nicht erstellt werden.");
@@ -106,10 +106,10 @@ public class File {
         if (systemOS.contains("windows")) {
             systemSign = "\\";
             path = systemUserHome + systemSign + desktop + systemSign + serverDirectoryName + systemSign;
-        } else if(systemOS.contains("mac")){
+        } else if (systemOS.contains("mac")) {
             systemSign = "/";
             path = systemUserHome + systemSign + desktop + systemSign + serverDirectoryName + systemSign;
-        } else{
+        } else {
             System.out.println("Das Betriebssystem wird leider nicht unterstützt :(");
         }
     }
