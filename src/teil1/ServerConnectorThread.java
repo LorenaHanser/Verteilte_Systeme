@@ -32,7 +32,7 @@ public class ServerConnectorThread extends Thread {
                 while (socket.isConnected()) {
 
                 }
-                System.out.println("Verbindung verlohren");
+                System.out.println("Verbindung verloren");
 
             } catch (UnknownHostException ex) {
             } catch (IOException ex) {

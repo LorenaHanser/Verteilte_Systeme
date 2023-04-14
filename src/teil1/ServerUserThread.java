@@ -98,7 +98,6 @@ public class ServerUserThread extends Thread {
 
         } catch (IOException ex) {
             System.out.println("Error in UserThread: " + ex.getMessage());
-            ex.printStackTrace();
         }
     }
 
