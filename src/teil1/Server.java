@@ -81,9 +81,9 @@ public class Server {
     }
 
     public static void main(String[] args) {
-        int port = 8989;//Integer.parseInt(args[0]);
-        int partnerServerPort = 8991;
-        int serverReciverPort = 8992;
+        int port = 8988;//Server 2 läuft immer auf Port 8990 Server 1 auf 8989 Server 3 auf 8991
+        int partnerServerPort = 8992;
+        int serverReciverPort = 8991;
         String serverNummer = "1";
         Server server = new Server(port, partnerServerPort, serverReciverPort,serverNummer);
         server.execute();
