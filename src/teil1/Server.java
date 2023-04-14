@@ -14,7 +14,7 @@ public class Server {
     private int port;
     private File file = new File();
 
-    private String[] userNameRegister = {"Daniel","David","Lorena"}; //Speichert die Usernamen der Index wird als Id für den User genutzt
+    private String[] userNameRegister = {"Daniel", "David", "Lorena"}; //Speichert die Usernamen der Index wird als Id für den User genutzt
 
     private String[] userPassword = {"hallo", "geheim", "test"};
 
@@ -56,7 +56,7 @@ public class Server {
 
             file.create();
 
-            SyncThread = new ServerConnectorThread(partnerServerAdress,partnerServerPort, this);
+            SyncThread = new ServerConnectorThread(partnerServerAdress, partnerServerPort, this);
             SyncThread.start();
 
             // Endlosschleife
@@ -90,22 +90,22 @@ public class Server {
     void sendMessage(String message, int sendUserId, int receiverUserId) {
         try {
             SyncThread.sendMessageToOtherServer(message, sendUserId, receiverUserId);
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println("Sync Server nicht gefunden");
         }
 
         file.write(message, sendUserId, receiverUserId);
 
-        if(userThreadRegister[receiverUserId] != null) { //es wird geschaut, ob der User online ist (zum Vermeiden von Exeption)        //todo: fix pls
+        if (userThreadRegister[receiverUserId] != null) { //es wird geschaut, ob der User online ist (zum Vermeiden von Exception)
             System.out.println("Diese Nachricht wurde erhalten: " + message);
-            if(userChattetWith[receiverUserId] == sendUserId) { //Es wird geschaut, ob der User sich im gleichen Chatraum (mit dem sendenUser) befindet
+            if (userChattetWith[receiverUserId] == sendUserId) { //Es wird geschaut, ob der User sich im gleichen Chatraum (mit dem sendenUser) befindet
                 userThreadRegister[receiverUserId].sendMessage(message); //nachricht wird an den User gesendet
                 System.out.println("Ich glaube die Nachricht sollte übermittelt geworden sein");
-            }else{
+            } else {
                 System.out.println("Der User ist gerade beschäftigt. Die Nachricht wird gespeichert!");
             }
-        }else {
-            System.out.println("Der User ist nicht online, die Nachricht wird aber für ihn gespeichert..."); //todo: Lustige Kommentare schreiben
+        } else {
+            System.out.println("Der User ist nicht online, die Nachricht wird aber für ihn gespeichert...");
         }
     }
 
@@ -114,27 +114,27 @@ public class Server {
 
         file.write(message, sendUserId, receiverUserId);
 
-        if(userThreadRegister[receiverUserId] != null) { //es wird geschaut, ob der User online ist (zum Vermeiden von Exeption)        //todo: fix pls
+        if (userThreadRegister[receiverUserId] != null) { //es wird geschaut, ob der User online ist (zum Vermeiden von Exception)
             System.out.println("Diese Nachricht wurde erhalten: " + message);
-            if(userChattetWith[receiverUserId] == sendUserId) { //Es wird geschaut, ob der User sich im gleichen Chatraum (mit dem sendenUser) befindet
+            if (userChattetWith[receiverUserId] == sendUserId) { //Es wird geschaut, ob der User sich im gleichen Chatraum (mit dem sendenUser) befindet
                 userThreadRegister[receiverUserId].sendMessage(message); //nachricht wird an den User gesendet
-            }else{
+            } else {
                 System.out.println("Der User ist gerade beschäftigt. Die Nachricht wird gespeichert!");
             }
-        }else {
-            System.out.println("Der User ist nicht online, die Nachricht wird aber für ihn gespeichert..."); //todo: Lustige Kommentare schreiben
+        } else {
+            System.out.println("Der User ist nicht online, die Nachricht wird aber für ihn gespeichert...");
         }
     }
 
-    void sendMessage(String message,int ownID) {       // receiverUser war vorher excludeUser
+    void sendMessage(String message, int ownID) {       // receiverUser war vorher excludeUser
         userThreadRegister[ownID].sendMessage(message); //nachricht wird an den User gesendet
     }
 
 
-    boolean checkUsernameExists(String userName){ //überprüft, ob der User existiert
+    boolean checkUsernameExists(String userName) { //überprüft, ob der User existiert
         boolean usernameValid = false;
         for (int i = 0; i < userNameRegister.length; i++) {
-            if(userNameRegister[i].equals(userName)) {
+            if (userNameRegister[i].equals(userName)) {
                 usernameValid = true;
                 break;
             }
@@ -142,11 +142,11 @@ public class Server {
         return usernameValid;
     }
 
-    boolean checkPasswordValid(String userName, String password){ //Überprüft, ob das Password das richtige ist
+    boolean checkPasswordValid(String userName, String password) { //Überprüft, ob das Password das richtige ist
         boolean passwordValid = false;
         for (int i = 0; i < userNameRegister.length; i++) {
-            if(userNameRegister[i].equals(userName)) {
-                if(userPassword[i].equals(password)) {
+            if (userNameRegister[i].equals(userName)) {
+                if (userPassword[i].equals(password)) {
                     passwordValid = true;
                 }
                 break;
@@ -157,7 +157,7 @@ public class Server {
 
     void setThreadId(String userName, ServerUserThread Thread) { //nachdem der User sich regestriert hat, wird Referenz von Thread an den Platz vom User gespeichert -> ab jetzt ist Thread erreichbar
         for (int i = 0; i < userNameRegister.length; i++) {
-            if(userNameRegister[i].equals(userName)) {
+            if (userNameRegister[i].equals(userName)) {
                 userThreadRegister[i] = Thread;
                 break;
             }
@@ -168,18 +168,17 @@ public class Server {
      * When a client is disconneted, removes the UserThread
      */
     void removeUser(String userName, ServerUserThread aUser) { //noch von Tutorial
-            userThreads.remove(aUser);
-            System.out.println("The user " + userName + " quitted");
+        userThreads.remove(aUser);
+        System.out.println("The user " + userName + " quitted");
     }
-
 
 
     int askForID(String username) //Es wird geschaut, welche Id der User hat (Index von userNameRegister)
     {
-        System.out.println("Folgender Name soll überprüft werden: '"+username+"'");
+        System.out.println("Folgender Name soll überprüft werden: '" + username + "'");
         int answer = -1;
         for (int i = 0; i < userNameRegister.length; i++) {
-            if(username.equals( userNameRegister[i])){
+            if (username.equals(userNameRegister[i])) {
                 System.out.println("Es wurde eine ID gefunden");
                 answer = i;
                 break;
@@ -188,11 +187,10 @@ public class Server {
         return answer;
     }
 
-    void setChatPartner(int user, int chatPartner){ //der ChatPartner bzw. der Chatraum wird für den User gesetzt (ab jetzt kann er Nachrichten empfangen, aber nur von dem Partner)
+    void setChatPartner(int user, int chatPartner) { //der ChatPartner bzw. der Chatraum wird für den User gesetzt (ab jetzt kann er Nachrichten empfangen, aber nur von dem Partner)
         userChattetWith[user] = chatPartner;
 
     }
-
 
 
 }

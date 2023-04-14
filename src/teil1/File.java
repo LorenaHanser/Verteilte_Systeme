@@ -11,7 +11,7 @@ public class File {
     private final String DIRECTORY_NAME = "Messages";
     private static final SimpleDateFormat TIMESTAMP_FORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 
-    public File(){
+    public File() {
         this.getPath();
     }
 
@@ -19,9 +19,9 @@ public class File {
     public void create() {
         try {
             //Ordner erstellen
-            if(! new java.io.File(path).exists()){
+            if (!new java.io.File(path).exists()) {
                 boolean createdDirectory = new java.io.File(path).mkdir();
-                if(createdDirectory){
+                if (createdDirectory) {
                     System.out.println("Ordner " + DIRECTORY_NAME + " wurde neu erstellt.");
                 } else {
                     System.out.println("Ordner " + DIRECTORY_NAME + " konnte nicht erstellt werden.");
@@ -32,7 +32,7 @@ public class File {
 
             //Dateien erstellen
             for (String filename : FILENAMES) {
-                if(! new java.io.File(path, filename + ENDING).exists()) {
+                if (!new java.io.File(path, filename + ENDING).exists()) {
                     PrintWriter myWriter = new PrintWriter(new FileWriter(path + filename + ENDING));
                     System.out.println("Datei " + filename + ENDING + " wurde neu erstellt.");
                     myWriter.close();
@@ -46,17 +46,17 @@ public class File {
     }
 
     // Methode, um eine Chatdatei zu lesen und in der Konsole anzeigen zu lassen
-    public String read(int ownID, int chatPartnerID){
+    public String read(int ownID, int chatPartnerID) {
         StringBuilder chat = new StringBuilder("Bisheriger Chat:\n");
         String currentLine;
 
-        try{
+        try {
             BufferedReader bufferedReader = new BufferedReader(new FileReader(path + getFilename(ownID, chatPartnerID) + ENDING));
-            while((currentLine = bufferedReader.readLine()) != null){
+            while ((currentLine = bufferedReader.readLine()) != null) {
                 chat.append(currentLine).append("\n");
             }
             bufferedReader.close();
-        } catch(IOException e){
+        } catch (IOException e) {
             System.out.println("Fehler beim Lesen der Datei: " + e.getMessage());
         }
         return chat.toString();
@@ -78,41 +78,41 @@ public class File {
         }
 
         try {
-            if(! new java.io.File(path).exists()) {
+            if (!new java.io.File(path).exists()) {
                 this.create();
             }
 
-            if(writingAllowed){
+            if (writingAllowed) {
                 BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(path + getFilename(ownID, chatPartnerID) + ENDING, true));
                 bufferedWriter.write("[" + TIMESTAMP_FORMAT.format(timestamp) + "] " + message);
                 bufferedWriter.newLine();
                 bufferedWriter.close();
             }
-        } catch(IOException e){
-            System.out.println("Fehler beim Speichern in der Datei: " + e. getMessage());
+        } catch (IOException e) {
+            System.out.println("Fehler beim Speichern in der Datei: " + e.getMessage());
         }
     }
 
     // Methode ermittelt den Pfad zum Speichern der Chatdateien abhängig von Betriebssystem und Nutzername
-    public void getPath(){
+    public void getPath() {
         String systemUserHome = System.getProperty("user.home");
         String systemOS = System.getProperty("os.name").toLowerCase();
         String desktop = "Desktop";
         String systemSign;
 
-        if(systemOS.contains("windows")){
+        if (systemOS.contains("windows")) {
             systemSign = "\\";
             path = systemUserHome + systemSign + desktop + systemSign + DIRECTORY_NAME + systemSign;
-        } else if(systemOS.contains("mac")){
+        } else if (systemOS.contains("mac")) {
             systemSign = "/";
             path = systemUserHome + systemSign + desktop + systemSign + DIRECTORY_NAME + systemSign;
-        } else{
+        } else {
             System.out.println("Das Betriebssystem wird leider nicht unterstützt :(");
         }
     }
 
     // Methode gibt aus zwei UserIDs den richtigen Dateinamen zurück
-    public String getFilename(int ownID, int chatPartnerID){
+    public String getFilename(int ownID, int chatPartnerID) {
         System.out.println("Die ChatPartnerID lautet " + chatPartnerID);
         String filename;
         int sum = ownID + chatPartnerID;

@@ -2,6 +2,7 @@ package teil1;
 
 import java.io.*;
 import java.net.*;
+
 public class ClientReadThread extends Thread {
     private BufferedReader reader;
     private Socket socket;

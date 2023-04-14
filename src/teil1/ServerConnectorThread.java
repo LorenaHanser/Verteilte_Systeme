@@ -22,21 +22,21 @@ public class ServerConnectorThread extends Thread {
     }
 
     public void run() {
-        while(true){
+        while (true) {
 
-                try {
-                    Socket socket = new Socket(hostname, port);
-                    OutputStream output = socket.getOutputStream();
-                    writer = new PrintWriter(output, true);
-                    System.out.println("Sync Server verbunden");
-                    while(socket.isConnected()){
+            try {
+                Socket socket = new Socket(hostname, port);
+                OutputStream output = socket.getOutputStream();
+                writer = new PrintWriter(output, true);
+                System.out.println("Sync Server verbunden");
+                while (socket.isConnected()) {
 
-                    }
-                    System.out.println("Verbindung verlohren");
-
-                } catch (UnknownHostException ex) {
-                } catch (IOException ex) {
                 }
+                System.out.println("Verbindung verlohren");
+
+            } catch (UnknownHostException ex) {
+            } catch (IOException ex) {
+            }
         }
     }
 
