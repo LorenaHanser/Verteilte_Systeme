@@ -80,7 +80,11 @@ public class ClientWriteThread extends Thread {
             } else if (text.equals(SHUTDOWN)) {
                 break; // Schleife beenden, und Socket schließen
             } else {
-                writer.println(text); // Nachricht senden
+                if (text.trim().isEmpty()) {
+                    System.out.println("Leere Texteingaben sind nicht erlaubt!");
+                } else{
+                    writer.println(text); // Nachricht senden
+                }
             }
 
         } while (true);

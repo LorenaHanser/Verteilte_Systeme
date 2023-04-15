@@ -123,7 +123,7 @@ public class MyFile {
         try {
             System.out.println(message);
                 BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(path + filename + ENDING, true));
-                bufferedWriter.write(message);
+                bufferedWriter.write(message.trim());
                 bufferedWriter.newLine();
                 bufferedWriter.close();
 
@@ -190,19 +190,20 @@ public class MyFile {
             myFiles1[i] = myFileObj1;
             myFiles2[i] = myFileObj2;
 
-            System.out.println(content1);
-            System.out.println(content2);
-
             if (content1.equals(content2)) {
                 System.out.println("Die beiden Dateien " + FILENAMES[i] + " sind identisch.");
             } else {
                 System.out.println("Die beiden Dateien " + FILENAMES[i] + " sind unterschiedlich.");
                 if (myFiles1[i].lastModified() > myFiles2[i].lastModified()){
+                    System.out.println("Kontent 1 :" + content1);
+                    System.out.println("Kontent 2 :" + content2);
                     System.out.println("File: " + path1 + FILENAMES[i] + " ist neuer als " + path2 + FILENAMES[i] );
                     myFiles2[i].delete();
                     System.out.println(myFiles2[i] + " wurde gelöscht");
                     write(content1, FILENAMES[i], path2);
                 } else if(myFiles2[i].lastModified() > myFiles1[i].lastModified()){
+                    System.out.println("Kontent 1 :" + content1);
+                    System.out.println("Kontent 2 :" + content2);
                     System.out.println("File: " + path2 + FILENAMES[i] + " ist neuer als "  + path1 + FILENAMES[i] );
                     myFiles1[i].delete();
                     System.out.println(myFiles1[i] + " wurde gelöscht");
@@ -210,7 +211,6 @@ public class MyFile {
                 } else {
                     System.out.println("Beide Dateien haben das gleiche Änderungsdatum");
                 }
-
             }
         }
     }
