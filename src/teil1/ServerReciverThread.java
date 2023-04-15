@@ -29,7 +29,9 @@ public class ServerReciverThread extends Thread {
                 reader = new BufferedReader(new InputStreamReader(input));
                 do {
                     try {
+                        System.out.println("Fange an zu lauschen");
                         String response = reader.readLine();
+                        System.out.println("Nachricht erhalten");
                         System.out.println(response);
                         sendMessageToServer(response);
                     } catch (IOException ex) {
@@ -46,11 +48,13 @@ public class ServerReciverThread extends Thread {
     }
 
     private void sendMessageToServer(String rawMessage) {
+        System.out.println("Nachricht erhalten");
         String[] rawMessageArray = rawMessage.split(";", 3);//String wird in Array gesplittet
         int senderID = Integer.parseInt(rawMessageArray[0]);
         int reciverID = Integer.parseInt(rawMessageArray[1]);
         String message = rawMessageArray[2];
         server.sendMessageFromServer(message, senderID, reciverID);
+
     }
 
 }
