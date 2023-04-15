@@ -4,12 +4,7 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
-/**
- * This is the chat server program.
- * Press Ctrl + C to terminate the program.
- *
- * @author www.codejava.net
- */
+
 public class Server {
     private int port;
     private File file;
@@ -55,11 +50,12 @@ public class Server {
 
     public void execute() {
         file = new File(serverNummer);
+
         reciverSyncThread = new ServerReciverMainThread(this, serverReciverPort);
         reciverSyncThread.start();
         System.out.println("Sync ServerThread gestartet");
-        try (ServerSocket serverSocket = new ServerSocket(port)) {
 
+        try (ServerSocket serverSocket = new ServerSocket(port)) {
             System.out.println("Chat Server is listening on port " + port);
 
             file.create();
@@ -77,7 +73,6 @@ public class Server {
                 ServerUserThread newUser = new ServerUserThread(socket, this, serverNummer);
                 userThreads.add(newUser);
                 newUser.start(); //Thread startet mit User -> Name unbekannt desswegen noch kein Eintrag in das userThreadRegister Array
-
             }
 
         } catch (IOException ex) {
@@ -97,7 +92,7 @@ public class Server {
     }
 
     /**
-     * Delivers a message from one user to others (broadcasting)
+     * Delivers a message from one user to the receiverUser
      */
     void sendMessage(String message, int sendUserId, int receiverUserId) {
         try {
