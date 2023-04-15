@@ -1,7 +1,7 @@
 package teil1;
 
 public class Server3 {
-
+//Das ist der Beweis das das zusammenführen geklappt hat
 
         public static void main(String[] args) {
             System.out.println("Server 2 wird gestartet");
