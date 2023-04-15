@@ -2,6 +2,7 @@ package teil1;
 
 import java.io.*;
 import java.net.*;
+import java.nio.channels.AsynchronousByteChannel;
 import java.util.*;
 
 /**
@@ -11,6 +12,16 @@ import java.util.*;
  * @author www.codejava.net
  */
 public class Server {
+    public static final String ANSI_RESET = "\u001B[0m";
+    public static final String ANSI_BLACK = "\u001B[30m";
+    public static final String ANSI_RED = "\u001B[31m";
+    public static final String ANSI_GREEN = "\u001B[32m";
+    public static final String ANSI_YELLOW = "\u001B[33m";
+    public static final String ANSI_BLUE = "\u001B[34m";
+    public static final String ANSI_PURPLE = "\u001B[35m";
+    public static final String ANSI_CYAN = "\u001B[36m";
+    public static final String ANSI_WHITE = "\u001B[37m";
+
     private int port;
     private File file = new File();
 
@@ -28,7 +39,7 @@ public class Server {
 
     //Variablen für den eigenen Server
     private int serverReciverPort;
-    private ServerReciverThread reciverSyncThread;
+    private ServerReceiverThread reciverSyncThread;
 
     private int[] userChattetWith = new int[3]; //Speichert, wer sich aktuell mit wem im Chat befindet (damit man nicht mit einer Person chatten kann, die gerade mit wem anders chattet)
     private ServerUserThread[] userThreadRegister = new ServerUserThread[3];//Speichert die Referenzvariable des Threads auf dem der User (wenn er online ist) läuft. Der Index für das Feld ist, dabei die ID des Users
@@ -37,19 +48,19 @@ public class Server {
 
     // Konstruktor
     public Server(int port, int partnerServerPort, int serverReceiverPort) {
-        System.out.println("Server 1 wird gestartet");
+        System.out.println(ANSI_YELLOW + "Server 1 wird gestartet" + ANSI_RESET);
         this.port = port;
         this.partnerServerPort = partnerServerPort;
         this.serverReciverPort = serverReceiverPort;
     }
 
     public void execute() {
-        reciverSyncThread = new ServerReciverThread(this, serverReciverPort);
+        reciverSyncThread = new ServerReceiverThread(this, serverReciverPort);
         reciverSyncThread.start();
-        System.out.println("Sync ServerThread gestartet");
+        System.out.println(ANSI_YELLOW + "Sync ServerThread gestartet" + ANSI_RESET);
         try (ServerSocket serverSocket = new ServerSocket(port)) {
 
-            System.out.println("Chat Server is listening on port " + port);
+            System.out.println(ANSI_YELLOW + "Chat Server is listening on port " + port + ANSI_YELLOW);
 
             file.create();
 
@@ -60,7 +71,7 @@ public class Server {
 
             while (true) {
                 Socket socket = serverSocket.accept();
-                System.out.println("New user connected");
+                System.out.println(ANSI_YELLOW + "New user connected" + ANSI_YELLOW);
                 ServerUserThread newUser = new ServerUserThread(socket, this);
                 userThreads.add(newUser);
                 newUser.start(); //Thread startet mit User → Name unbekannt deswegen noch kein Eintrag in das userThreadRegister Array
@@ -68,7 +79,7 @@ public class Server {
             }
 
         } catch (IOException ex) {
-            System.out.println("Error in the server: " + ex.getMessage());
+            System.out.println(ANSI_RED + "Error in the server: " + ex.getMessage() + ANSI_RESET);
         }
     }
 
@@ -87,37 +98,38 @@ public class Server {
         try {
             SyncThread.sendMessageToOtherServer(message, sendUserId, receiverUserId);
         } catch (Exception e) {
-            System.out.println("Sync Server nicht gefunden");
+            System.out.println(ANSI_RED + "Sync Server nicht gefunden" + ANSI_RESET);
         }
 
+        // Timestamp prüfen(?)
         file.write(message, sendUserId, receiverUserId);
 
         if (userThreadRegister[receiverUserId] != null) { //es wird geschaut, ob der User online ist (zum Vermeiden von Exception)
-            System.out.println("Diese Nachricht wurde erhalten: " + message);
+            System.out.println(ANSI_YELLOW + "Diese Nachricht wurde erhalten: " + message + ANSI_RESET);
             if (userChattetWith[receiverUserId] == sendUserId) { //Es wird geschaut, ob der User sich im gleichen Chatraum (mit dem sendenUser) befindet
                 userThreadRegister[receiverUserId].sendMessage(message); //nachricht wird an den User gesendet
-                System.out.println("Ich glaube die Nachricht sollte übermittelt geworden sein");
             } else {
-                System.out.println("Der User ist gerade beschäftigt. Die Nachricht wird gespeichert!");
+                System.out.println(ANSI_YELLOW + "Der User ist gerade beschäftigt. Die Nachricht: " + ANSI_CYAN + message + ANSI_YELLOW + " wird gespeichert" + ANSI_RESET);
             }
         } else {
-            System.out.println("Der User ist nicht online, die Nachricht wird aber für ihn gespeichert...");
+            System.out.println(ANSI_YELLOW + "Der User ist nicht online, die Nachricht: " + ANSI_CYAN + message + ANSI_YELLOW + " wird aber für ihn gespeichert..." + ANSI_RESET);
         }
     }
 
     void sendMessageFromServer(String message, int sendUserId, int receiverUserId) {
 
+        // Timestamp prüfen(?)
         file.write(message, sendUserId, receiverUserId);
 
         if (userThreadRegister[receiverUserId] != null) { //es wird geschaut, ob der User online ist (zum Vermeiden von Exception)
-            System.out.println("Diese Nachricht wurde erhalten: " + message);
+            System.out.println(ANSI_YELLOW + "Diese Nachricht wurde erhalten: " + ANSI_CYAN + message + ANSI_RESET);
             if (userChattetWith[receiverUserId] == sendUserId) { //Es wird geschaut, ob der User sich im gleichen Chatraum (mit dem sendenUser) befindet
                 userThreadRegister[receiverUserId].sendMessage(message); //nachricht wird an den User gesendet
             } else {
-                System.out.println("Der User ist gerade beschäftigt. Die Nachricht wird gespeichert!");
+                System.out.println(ANSI_YELLOW + "Der User ist gerade beschäftigt. Die Nachricht: " + ANSI_CYAN + message + ANSI_YELLOW + " wird gespeichert!");
             }
         } else {
-            System.out.println("Der User ist nicht online, die Nachricht wird aber für ihn gespeichert...");
+            System.out.println(ANSI_YELLOW + "Der User ist nicht online, die Nachricht: " + ANSI_CYAN + message + ANSI_YELLOW + " wird aber für ihn gespeichert...");
         }
     }
 
@@ -163,15 +175,13 @@ public class Server {
      */
     void removeUser(String userName, ServerUserThread aUser) { //noch von Tutorial
         userThreads.remove(aUser);
-        System.out.println("The user " + userName + " quit");
+        System.out.println(ANSI_YELLOW + "The user " + userName + " quit." + ANSI_RESET);
     }
 
     int askForID(String username) { //Es wird geschaut, welche Id der User hat (Index von userNameRegister)
-        System.out.println("Folgender Name soll überprüft werden: '" + username + "'");
         int answer = -1;
         for (int i = 0; i < userNameRegister.length; i++) {
             if (username.equals(userNameRegister[i])) {
-                System.out.println("Es wurde eine ID gefunden");
                 answer = i;
                 break;
             }
