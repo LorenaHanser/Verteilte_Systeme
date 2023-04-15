@@ -1,4 +1,4 @@
-package teil1;
+package teil2;
 
 public class Server2 {
 

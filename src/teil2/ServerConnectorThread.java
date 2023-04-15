@@ -1,4 +1,4 @@
-package teil1;
+package teil2;
 
 import java.io.IOException;
 import java.io.OutputStream;

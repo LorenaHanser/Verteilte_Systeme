@@ -1,10 +1,8 @@
-package teil1;
+package teil2;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.Socket;
-import java.net.UnknownHostException;
 
 /**
  * This is the chat client program.
