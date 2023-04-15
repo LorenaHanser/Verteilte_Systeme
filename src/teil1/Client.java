@@ -53,7 +53,6 @@ public class Client {
         int randomNumber = (int) (Math.random() * 2);       // Lastverteilung mit Math.random()
         port = port + randomNumber;
 
-
         Client client = new Client(hostname, port);
         client.execute();
     }

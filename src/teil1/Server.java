@@ -30,21 +30,18 @@ public class Server {
     private int serverReciverPort;
     private ServerReciverThread reciverSyncThread;
 
-
     private int[] userChattetWith = new int[3]; //Speichert, wer sich aktuell mit wem im Chat befindet (damit man nicht mit einer Person chatten kann, die gerade mit wem anders chattet)
     private ServerUserThread[] userThreadRegister = new ServerUserThread[3];//Speichert die Referenzvariable des Threads auf dem der User (wenn er online ist) läuft. Der Index für das Feld ist, dabei die ID des Users
 
     private Set<ServerUserThread> userThreads = new HashSet<>(); //hier werden die Referenzvariabeln gespeichert (kann man das überarbeiten?) Vorsicht vor Garbagecollector
 
     // Konstruktor
-
-    public Server(int port, int partnerServerPort, int serverReciverPort) {
+    public Server(int port, int partnerServerPort, int serverReceiverPort) {
         System.out.println("Server 1 wird gestartet");
         this.port = port;
         this.partnerServerPort = partnerServerPort;
-        this.serverReciverPort = serverReciverPort;
+        this.serverReciverPort = serverReceiverPort;
     }
-
 
     public void execute() {
         reciverSyncThread = new ServerReciverThread(this, serverReciverPort);
@@ -110,7 +107,6 @@ public class Server {
 
     void sendMessageFromServer(String message, int sendUserId, int receiverUserId) {
 
-
         file.write(message, sendUserId, receiverUserId);
 
         if (userThreadRegister[receiverUserId] != null) { //es wird geschaut, ob der User online ist (zum Vermeiden von Exception)
@@ -128,7 +124,6 @@ public class Server {
     void sendMessage(String message, int ownID) {       // receiverUser war vorher excludeUser
         userThreadRegister[ownID].sendMessage(message); //nachricht wird an den User gesendet
     }
-
 
     boolean checkUsernameExists(String userName) { //überprüft, ob der User existiert
         boolean usernameValid = false;
@@ -171,9 +166,7 @@ public class Server {
         System.out.println("The user " + userName + " quit");
     }
 
-
-    int askForID(String username) //Es wird geschaut, welche Id der User hat (Index von userNameRegister)
-    {
+    int askForID(String username) { //Es wird geschaut, welche Id der User hat (Index von userNameRegister)
         System.out.println("Folgender Name soll überprüft werden: '" + username + "'");
         int answer = -1;
         for (int i = 0; i < userNameRegister.length; i++) {
@@ -190,6 +183,5 @@ public class Server {
         userChattetWith[user] = chatPartner;
 
     }
-
 
 }
