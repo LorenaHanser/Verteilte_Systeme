@@ -52,7 +52,8 @@ Fragen für Fragestunde
 
 Farben für Messages:
 - Red -> Errors (Fehler beim Erstellen des User-Threads...)
-- Yellow -> Server-Nachrichten (z.b. Server 1 gestartert, Chat Server is listening on Port )
-- Purpel -> Client-Nachrichten für den Client (z.b. Client hat die Verbindung zu PORT aufgebaut)
+- Yellow -> Server-Nachrichten (z.b. Server 1 gestartet, Chat Server is listening on Port )
+- Purple -> Client-Nachrichten für den Client (z.b. Client hat die Verbindung zu PORT aufgebaut, Organisationsgedöns)
 - Green -> Sendende Nachricht 
 - Cyan -> Empfange Nachricht
+- Blue -> Bisheriger Chatverlauf

@@ -39,7 +39,7 @@ public class Server {
     private ServerConnectorThread SyncThread;
 
     //Variablen für den eigenen Server
-    private int serverReciverPort;
+    private int serverReceiverPort;
     private ServerReceiverThread receiverSyncThread;
 
     private int[] userChattetWith = new int[3]; //Speichert, wer sich aktuell mit wem im Chat befindet (damit man nicht mit einer Person chatten kann, die gerade mit wem anders chattet)
@@ -53,7 +53,7 @@ public class Server {
         this.serverNummer = serverNummer;
         this.port = port;
         this.partnerServerPort = partnerServerPort;
-        this.serverReciverPort = serverReceiverPort;
+        this.serverReceiverPort = serverReceiverPort;
     }
 
     public void execute() {
