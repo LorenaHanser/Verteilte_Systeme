@@ -94,7 +94,7 @@ public class ServerUserThread extends Thread {
             server.sendMessage(serverMessage, ownID, chatPartnerID);        //Nachricht an den Partner
 
             String clientMessage;
-            server.sendMessage(file.read(ownID, chatPartnerID), ownID); // bisheriger Chat wird an den Client übergeben
+            server.sendMessage(file.readWholeChatFile(ownID, chatPartnerID), ownID); // bisheriger Chat wird an den Client übergeben
 
             // Endlosschleife
 

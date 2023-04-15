@@ -23,10 +23,12 @@ public class File {
     private static final SimpleDateFormat TIMESTAMP_FORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 
     private String serverDirectoryName;
+    private int serverNumber;
 
-    public File(String serverNummer) {
-        this.serverDirectoryName = DIRECTORY_NAME + serverNummer;
-        this.getPath();
+    public File(String serverNumber) {
+        this.serverNumber = Integer.parseInt(serverNumber);
+        this.serverDirectoryName = DIRECTORY_NAME + serverNumber;
+        this.path = this.getPath(Integer.parseInt(serverNumber));
     }
 
     // Methode zur Erstellung von Messages-Ordner und Chatfiles
@@ -57,15 +59,22 @@ public class File {
         } catch (IOException e) {
             System.out.println(ANSI_RED + "Fehler bei der Erstellung der Dateien: " + e.getMessage() + ANSI_RESET);
         }
+        this.synchronize();
     }
 
     // Methode, um eine Chatdatei zu lesen und in der Konsole anzeigen zu lassen
-    public String read(int ownID, int chatPartnerID) {
-        StringBuilder chat = new StringBuilder(ANSI_PURPLE + "Bisheriger Chat:\n" + ANSI_RESET);
+    // zum Aufrufen von außerhalb der Klasse
+    public String readWholeChatFile(int ownID, int chatPartnerID) {
+        return ANSI_PURPLE + "Bisheriger Chat:\n" + ANSI_RESET + this.readWholeChatFile(path, this.getFilename(ownID, chatPartnerID));
+    }
+
+    // zum Aufrufen innerhalb der Klasse File, damit die Methode synchronize() richtig ausgeführt werden kann
+    public String readWholeChatFile(String path, String filename) {
+        StringBuilder chat = new StringBuilder();
         String currentLine;
 
         try {
-            BufferedReader bufferedReader = new BufferedReader(new FileReader(path + getFilename(ownID, chatPartnerID) + ENDING));
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(path + filename + ENDING));
             while ((currentLine = bufferedReader.readLine()) != null) {
                 chat.append(ANSI_BLUE).append(currentLine).append(ANSI_RESET).append("\n");
             }
@@ -108,21 +117,23 @@ public class File {
     }
 
     // Methode ermittelt den Pfad zum Speichern der Chatdateien abhängig von Betriebssystem und Nutzername
-    public void getPath() {
+    public String getPath(int serverNumber) {
         String systemUserHome = System.getProperty("user.home");
         String systemOS = System.getProperty("os.name").toLowerCase();
         String desktop = "Desktop";
         String systemSign;
+        String path = "";
 
         if (systemOS.contains("windows")) {
             systemSign = "\\";
-            path = systemUserHome + systemSign + desktop + systemSign + serverDirectoryName + systemSign;
+            path = systemUserHome + systemSign + desktop + systemSign + DIRECTORY_NAME + serverNumber + systemSign;
         } else if (systemOS.contains("mac")) {
             systemSign = "/";
-            path = systemUserHome + systemSign + desktop + systemSign + serverDirectoryName + systemSign;
+            path = systemUserHome + systemSign + desktop + systemSign + DIRECTORY_NAME + serverNumber + systemSign;
         } else {
             System.out.println(ANSI_RED + "Das Betriebssystem wird leider nicht unterstützt :(\n" + ANSI_PURPLE + "Der Dateipfad zum Home-Verzeichnis kann manuell eingegeben werden." + ANSI_RESET);
         }
+        return path;
     }
 
     // Methode gibt aus zwei UserIDs den richtigen Dateinamen zurück
@@ -140,4 +151,23 @@ public class File {
         return filename;
     }
 
+    public void synchronize() {
+        // todo: Methode dynamisch machen
+        for(int i = 0; i < FILENAMES.length; i++){
+            String path1 = this.getPath(1);
+            String path2 = this.getPath(2);
+
+            String content1 = "";
+            String content2 = "";
+
+            content1 = this.readWholeChatFile(path1, FILENAMES[i]);
+            content2 = this.readWholeChatFile(path2, FILENAMES[i]);
+
+            if (content1.equals(content2)) {
+                System.out.println("Die beiden Dateien " + FILENAMES[i] + " sind identisch.");
+            } else {
+                System.out.println("Die beiden Dateien " + FILENAMES[i] + " sind unterschiedlich.");
+            }
+        }
+    }
 }
