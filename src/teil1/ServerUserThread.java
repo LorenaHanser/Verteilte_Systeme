@@ -34,7 +34,7 @@ public class ServerUserThread extends Thread {
 
     // Konstruktor
 
-    public ServerUserThread(Socket socket, Server server, String serverNummer) {
+    public ServerUserThread(Socket socket, Server server, int serverNummer) {
         this.socket = socket;
         this.server = server;
         this.file = new File(serverNummer);
