@@ -6,13 +6,24 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.Socket;
 
-public class ServerReciverThread extends Thread {
+public class ServerReceiverThread extends Thread {
+
+    public static final String ANSI_RESET = "\u001B[0m";
+    public static final String ANSI_BLACK = "\u001B[30m";
+    public static final String ANSI_RED = "\u001B[31m";
+    public static final String ANSI_GREEN = "\u001B[32m";
+    public static final String ANSI_YELLOW = "\u001B[33m";
+    public static final String ANSI_BLUE = "\u001B[34m";
+    public static final String ANSI_PURPLE = "\u001B[35m";
+    public static final String ANSI_CYAN = "\u001B[36m";
+    public static final String ANSI_WHITE = "\u001B[37m";
+
     private Socket socket;
     private Server server;
     private BufferedReader reader;
 
 
-    public ServerReciverThread(Socket socket, Server server){
+    public ServerReceiverThread(Socket socket, Server server){
         this.socket = socket;
         this.server = server;
 
@@ -23,7 +34,7 @@ public class ServerReciverThread extends Thread {
         try {
             while (true) {
 
-                System.out.println("SyncThread gestartet");
+                System.out.println(ANSI_YELLOW + "Sync Server verbunden" + ANSI_RESET);
                 InputStream input = socket.getInputStream();
                 reader = new BufferedReader(new InputStreamReader(input));
                 do {
@@ -34,12 +45,12 @@ public class ServerReciverThread extends Thread {
                         System.out.println(response);
                         sendMessageToServer(response);
                     } catch (IOException ex) {
-                        System.out.println("Error reading from server: " + ex.getMessage());
+                        System.out.println(ANSI_RED + "Error reading from server: " + ex.getMessage() + ANSI_RESET);
                         ex.printStackTrace();
                         break;
                     }
                 } while (socket.isConnected());
-                System.out.println("Sync Server Verbindung verlohren");
+                System.out.println(ANSI_RED + "Sync Server Verbindung verloren" + ANSI_RESET);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -50,10 +61,9 @@ public class ServerReciverThread extends Thread {
         System.out.println("Nachricht erhalten");
         String[] rawMessageArray = rawMessage.split(";", 3);//String wird in Array gesplittet
         int senderID = Integer.parseInt(rawMessageArray[0]);
-        int reciverID = Integer.parseInt(rawMessageArray[1]);
+        int receiverID = Integer.parseInt(rawMessageArray[1]);
         String message = rawMessageArray[2];
-        server.sendMessageFromServer(message, senderID, reciverID);
-
+        server.sendMessageFromServer(message, senderID, receiverID);
     }
 
 }

@@ -50,3 +50,10 @@ Fragen für Fragestunde
 - Lastverteilung: reicht Math.random() oder abhängig von der Anzahl der Clients und Server?
 - Passwörter hashen?
 
+Farben für Messages:
+- Red -> Errors (Fehler beim Erstellen des User-Threads...)
+- Yellow -> Server-Nachrichten (z.b. Server 1 gestartet, Chat Server is listening on Port )
+- Purple -> Client-Nachrichten für den Client (z.b. Client hat die Verbindung zu PORT aufgebaut, Organisationsgedöns)
+- Green -> Sendende Nachricht 
+- Cyan -> Empfange Nachricht
+- Blue -> Bisheriger Chatverlauf

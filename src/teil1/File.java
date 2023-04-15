@@ -5,6 +5,17 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 
 public class File {
+
+    public static final String ANSI_RESET = "\u001B[0m";
+    public static final String ANSI_BLACK = "\u001B[30m";
+    public static final String ANSI_RED = "\u001B[31m";
+    public static final String ANSI_GREEN = "\u001B[32m";
+    public static final String ANSI_YELLOW = "\u001B[33m";
+    public static final String ANSI_BLUE = "\u001B[34m";
+    public static final String ANSI_PURPLE = "\u001B[35m";
+    public static final String ANSI_CYAN = "\u001B[36m";
+    public static final String ANSI_WHITE = "\u001B[37m";
+
     private String path;
     private final String[] FILENAMES = {"DanielDavid", "DanielLorena", "DavidLorena"};
     private final String ENDING = ".txt"; //Dateiendung der Textnachrichten
@@ -25,42 +36,42 @@ public class File {
             if (!new java.io.File(path).exists()) {
                 boolean createdDirectory = new java.io.File(path).mkdir();
                 if (createdDirectory) {
-                    System.out.println("Ordner " + serverDirectoryName + " wurde neu erstellt.");
+                    System.out.println(ANSI_WHITE + "Ordner " + serverDirectoryName + " wurde neu erstellt." + ANSI_RESET);
                 } else {
-                    System.out.println("Ordner " + serverDirectoryName + " konnte nicht erstellt werden.");
+                    System.out.println(ANSI_WHITE + "Ordner " + serverDirectoryName + " konnte nicht erstellt werden." + ANSI_RESET);
                 }
             } else {
-                System.out.println("Ordner " + serverDirectoryName + " existiert bereits.");
+                System.out.println(ANSI_WHITE + "Ordner " + serverDirectoryName + " existiert bereits." + ANSI_RESET);
             }
 
             //Dateien erstellen
             for (String filename : FILENAMES) {
                 if (!new java.io.File(path, filename + ENDING).exists()) {
                     PrintWriter myWriter = new PrintWriter(new FileWriter(path + filename + ENDING));
-                    System.out.println("Datei " + filename + ENDING + " wurde neu erstellt.");
+                    System.out.println(ANSI_WHITE + "Datei " + filename + ENDING + " wurde neu erstellt." + ANSI_RESET);
                     myWriter.close();
                 } else {
-                    System.out.println("Datei " + filename + ENDING + " existiert bereits.");
+                    System.out.println(ANSI_WHITE + "Datei " + filename + ENDING + " existiert bereits." + ANSI_RESET);
                 }
             }
         } catch (IOException e) {
-            System.out.println("Fehler bei der Erstellung der Dateien: " + e.getMessage());
+            System.out.println(ANSI_RED + "Fehler bei der Erstellung der Dateien: " + e.getMessage() + ANSI_RESET);
         }
     }
 
     // Methode, um eine Chatdatei zu lesen und in der Konsole anzeigen zu lassen
     public String read(int ownID, int chatPartnerID) {
-        StringBuilder chat = new StringBuilder("Bisheriger Chat:\n");
+        StringBuilder chat = new StringBuilder(ANSI_PURPLE + "Bisheriger Chat:\n" + ANSI_RESET);
         String currentLine;
 
         try {
             BufferedReader bufferedReader = new BufferedReader(new FileReader(path + getFilename(ownID, chatPartnerID) + ENDING));
             while ((currentLine = bufferedReader.readLine()) != null) {
-                chat.append(currentLine).append("\n");
+                chat.append(ANSI_BLUE).append(currentLine).append(ANSI_RESET).append("\n");
             }
             bufferedReader.close();
         } catch (IOException e) {
-            System.out.println("Fehler beim Lesen der Datei: " + e.getMessage());
+            System.out.println(ANSI_RED + "Fehler beim Lesen der Datei: " + e.getMessage() + ANSI_RESET);
         }
         return chat.toString();
     }
@@ -71,9 +82,9 @@ public class File {
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         System.out.println(message);
 
-        String[] notAllowedStrings = {"New user connected: ", " has quit.", "Bisheriger Chat:\n", "]: null"};
+        String[] notAllowedColors = {ANSI_BLACK, ANSI_RED, ANSI_GREEN, ANSI_YELLOW, ANSI_BLUE, ANSI_PURPLE, ANSI_CYAN, ANSI_WHITE, "]: null"};
         boolean writingAllowed = true;
-        for (String notAllowedString : notAllowedStrings) {
+        for (String notAllowedString : notAllowedColors) {
             if (message.contains(notAllowedString)) {
                 writingAllowed = false;
                 break;
@@ -92,7 +103,7 @@ public class File {
                 bufferedWriter.close();
             }
         } catch (IOException e) {
-            System.out.println("Fehler beim Speichern in der Datei: " + e.getMessage());
+            System.out.println(ANSI_RED + "Fehler beim Speichern in der Datei: " + e.getMessage() + ANSI_RESET);
         }
     }
 
@@ -110,13 +121,12 @@ public class File {
             systemSign = "/";
             path = systemUserHome + systemSign + desktop + systemSign + serverDirectoryName + systemSign;
         } else {
-            System.out.println("Das Betriebssystem wird leider nicht unterstützt :(");
+            System.out.println(ANSI_RED + "Das Betriebssystem wird leider nicht unterstützt :(\n" + ANSI_PURPLE + "Der Dateipfad zum Home-Verzeichnis kann manuell eingegeben werden." + ANSI_RESET);
         }
     }
 
     // Methode gibt aus zwei UserIDs den richtigen Dateinamen zurück
     public String getFilename(int ownID, int chatPartnerID) {
-        System.out.println("Die ChatPartnerID lautet " + chatPartnerID);
         String filename;
         int sum = ownID + chatPartnerID;
 
@@ -124,7 +134,7 @@ public class File {
             case 1 -> FILENAMES[0];
             case 2 -> FILENAMES[1];
             case 3 -> FILENAMES[2];
-            default -> "error";
+            default -> "Error";
         };
 
         return filename;
