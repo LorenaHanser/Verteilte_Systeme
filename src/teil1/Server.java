@@ -24,13 +24,16 @@ public class Server {
     //hier sind die Attribute für die Synccronisation
 
     //Variablen für den anderen Server
-    private int partnerServerPort; //Port des Partnerservers (Port für Servercommunication)
+    private int partner1ServerPort; //Port des Partnerservers (Port für Servercommunication)
+    private int partner2ServerPort;
     private String partnerServerAdress = "localhost"; //hier die Adresse des anderen Server eintragen.
-    private ServerConnectorThread SyncThread;
+    private ServerConnectorThread SyncThread1;
+    private ServerConnectorThread SyncThread2;
 
     //Variablen für den eigenen Server
     private int serverReciverPort;
     private ServerReciverThread reciverSyncThread;
+
 
 
     private int[] userChattetWith = new int[3]; //Speichert, wer sich aktuell mit wem im Chat befindet (damit man nicht mit einer Person chatten kann, die gerade mit wem anders chattet)
@@ -40,11 +43,12 @@ public class Server {
 
     // Konstruktor
 
-    public Server(int port, int partnerServerPort, int serverReciverPort, String serverNummer) {
+    public Server(int port, int partner1ServerPort, int partner2ServerPort, int serverReciverPort, String serverNummer) {
         System.out.println("Server 1 wird gestartet");
         this.serverNummer = serverNummer;
         this.port = port;
-        this.partnerServerPort = partnerServerPort;
+        this.partner1ServerPort = partner1ServerPort;
+        this.partner2ServerPort = partner2ServerPort;
         this.serverReciverPort = serverReciverPort;
     }
 
@@ -60,8 +64,10 @@ public class Server {
 
             file.create();
 
-            SyncThread = new ServerConnectorThread(partnerServerAdress, partnerServerPort, this);
-            SyncThread.start();
+            SyncThread1 = new ServerConnectorThread(partnerServerAdress, partner1ServerPort, this); // hier noch 2. Port anmelden
+            SyncThread2 = new ServerConnectorThread(partnerServerAdress, partner2ServerPort, this); // hier noch 2. Port anmelden
+            SyncThread1.start();
+            SyncThread2.start();
 
             // Endlosschleife
 
@@ -82,10 +88,11 @@ public class Server {
 
     public static void main(String[] args) {
         int port = 8988;//Server 2 läuft immer auf Port 8990 Server 1 auf 8989 Server 3 auf 8991
-        int partnerServerPort = 8992;
+        int partner1ServerPort = 8992;
+        int partner2ServerPort = 8993;
         int serverReciverPort = 8991;
         String serverNummer = "1";
-        Server server = new Server(port, partnerServerPort, serverReciverPort,serverNummer);
+        Server server = new Server(port, partner1ServerPort, partner2ServerPort, serverReciverPort,serverNummer);
         server.execute();
     }
 
@@ -94,7 +101,8 @@ public class Server {
      */
     void sendMessage(String message, int sendUserId, int receiverUserId) {
         try {
-            SyncThread.sendMessageToOtherServer(message, sendUserId, receiverUserId);
+            SyncThread1.sendMessageToOtherServer(message, sendUserId, receiverUserId);
+            SyncThread2.sendMessageToOtherServer(message, sendUserId, receiverUserId);
         } catch (Exception e) {
             System.out.println("Sync Server nicht gefunden");
         }
