@@ -52,11 +52,16 @@ public class ServerConnectorThread extends Thread {
 
     protected void sendMessageToOtherServer(String rawMessage, int sendUserId, int receiverUserId) {
         System.out.println("Message wird gesendet!");
-        String message = sendUserId + ";" + receiverUserId + ";" + rawMessage;
+        String message = server.MESSAGE +";"+ sendUserId + ";" + receiverUserId + ";" + rawMessage;
         writer.println(message);
         System.out.println("Nachricht wurde gesendet!");
 
 
+    }
+
+    protected void sendUserAktivity(int userID, int userAktivity){
+        String message = server.USER_AKTIVITY +";"+ userID +";"+server.getServerNummer()+";"+ userAktivity;
+        writer.println(message);
     }
 }
 
