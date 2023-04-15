@@ -92,7 +92,7 @@ public class Server {
     }
 
     /**
-     * Delivers a message from one user to others (broadcasting)
+     * Delivers a message from one user to another
      */
     void sendMessage(String message, int sendUserId, int receiverUserId) {
         try {
