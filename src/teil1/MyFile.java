@@ -3,8 +3,9 @@ package teil1;
 import java.io.*;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
-public class File {
+public class MyFile {
 
     public static final String ANSI_RESET = "\u001B[0m";
     public static final String ANSI_BLACK = "\u001B[30m";
@@ -25,7 +26,7 @@ public class File {
     private String serverDirectoryName;
     private int serverNumber;
 
-    public File(String serverNumber) {
+    public MyFile(String serverNumber) {
         this.serverNumber = Integer.parseInt(serverNumber);
         this.serverDirectoryName = DIRECTORY_NAME + serverNumber;
         this.path = this.getPath(Integer.parseInt(serverNumber));
@@ -76,7 +77,8 @@ public class File {
         try {
             BufferedReader bufferedReader = new BufferedReader(new FileReader(path + filename + ENDING));
             while ((currentLine = bufferedReader.readLine()) != null) {
-                chat.append(ANSI_BLUE).append(currentLine).append(ANSI_RESET).append("\n");
+   //             chat.append(ANSI_BLUE).append(currentLine).append(ANSI_RESET).append("\n");
+                chat.append(currentLine).append("\n");
             }
             bufferedReader.close();
         } catch (IOException e) {
@@ -111,6 +113,20 @@ public class File {
                 bufferedWriter.newLine();
                 bufferedWriter.close();
             }
+        } catch (IOException e) {
+            System.out.println(ANSI_RED + "Fehler beim Speichern in der Datei: " + e.getMessage() + ANSI_RESET);
+        }
+    }
+
+    // Methode, um alle Textnachrichten der Datei in die andere Datei zu übertragen
+    public void write(String message, String filename, String path ) {
+        try {
+            System.out.println(message);
+                BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(path + filename + ENDING, true));
+                bufferedWriter.write(message);
+                bufferedWriter.newLine();
+                bufferedWriter.close();
+
         } catch (IOException e) {
             System.out.println(ANSI_RED + "Fehler beim Speichern in der Datei: " + e.getMessage() + ANSI_RESET);
         }
@@ -163,10 +179,38 @@ public class File {
             content1 = this.readWholeChatFile(path1, FILENAMES[i]);
             content2 = this.readWholeChatFile(path2, FILENAMES[i]);
 
+            File[] myFiles1 = new File[3];
+            File[] myFiles2 = new File[3];
+            String genauerPfad = path1 + FILENAMES[i] + ENDING;
+            String genauerPfad2 = path2 + FILENAMES[i] + ENDING;
+
+            File myFileObj1 = new File(genauerPfad);
+            File myFileObj2 = new File(genauerPfad2);
+
+            myFiles1[i] = myFileObj1;
+            myFiles2[i] = myFileObj2;
+
+            System.out.println(content1);
+            System.out.println(content2);
+
             if (content1.equals(content2)) {
                 System.out.println("Die beiden Dateien " + FILENAMES[i] + " sind identisch.");
             } else {
                 System.out.println("Die beiden Dateien " + FILENAMES[i] + " sind unterschiedlich.");
+                if (myFiles1[i].lastModified() > myFiles2[i].lastModified()){
+                    System.out.println("File: " + path1 + FILENAMES[i] + " ist neuer als " + path2 + FILENAMES[i] );
+                    myFiles2[i].delete();
+                    System.out.println(myFiles2[i] + " wurde gelöscht");
+                    write(content1, FILENAMES[i], path2);
+                } else if(myFiles2[i].lastModified() > myFiles1[i].lastModified()){
+                    System.out.println("File: " + path2 + FILENAMES[i] + " ist neuer als "  + path1 + FILENAMES[i] );
+                    myFiles1[i].delete();
+                    System.out.println(myFiles1[i] + " wurde gelöscht");
+                    write(content2, FILENAMES[i], path1);
+                } else {
+                    System.out.println("Beide Dateien haben das gleiche Änderungsdatum");
+                }
+
             }
         }
     }
