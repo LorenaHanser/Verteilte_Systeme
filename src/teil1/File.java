@@ -24,8 +24,8 @@ public class File {
 
     private String serverDirectoryName;
 
-    public File(String serverNummer) {
-        this.serverDirectoryName = DIRECTORY_NAME + serverNummer;
+    public File(int serverNummer) {
+        this.serverDirectoryName = DIRECTORY_NAME + Integer.toString(serverNummer);
         this.getPath();
     }
 

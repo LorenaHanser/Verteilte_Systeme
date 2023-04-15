@@ -9,7 +9,7 @@ public class Server3 {
             int partner1ServerPort = 8991;
             int partner2ServerPort = 8992;
             int serverReciverPort = 8993;
-            String serverNummer = "3";
+            int serverNummer = 3;
 
             Server server = new Server(port, partner1ServerPort, partner2ServerPort, serverReciverPort, serverNummer);
             server.execute();

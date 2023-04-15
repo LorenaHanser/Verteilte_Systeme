@@ -19,7 +19,7 @@ public class Server {
     private int port;
     private File file;
 
-    private String serverNummer;
+    private int serverNummer;
 
     private String[] userNameRegister = {"Daniel", "David", "Lorena"}; //Speichert die Usernamen der Index wird als Id für den User genutzt
 
@@ -41,14 +41,14 @@ public class Server {
     private MCS uhr;
 
 
-
+    private int[] userIsOnServer = new int[3]; //evtl muss auf protected oder public
     private int[] userChattetWith = new int[3]; //Speichert, wer sich aktuell mit wem im Chat befindet (damit man nicht mit einer Person chatten kann, die gerade mit wem anders chattet)
     private ServerUserThread[] userThreadRegister = new ServerUserThread[3];//Speichert die Referenzvariable des Threads auf dem der User (wenn er online ist) läuft. Der Index für das Feld ist, dabei die ID des Users
 
     private Set<ServerUserThread> userThreads = new HashSet<>(); //hier werden die Referenzvariabeln gespeichert (kann man das überarbeiten?) Vorsicht vor Garbagecollector
 
     // Konstruktor
-    public Server(int port, int partner1ServerPort, int partner2ServerPort, int serverReceiverPort, String serverNummer) {
+    public Server(int port, int partner1ServerPort, int partner2ServerPort, int serverReceiverPort, int serverNummer) {
         System.out.println(ANSI_YELLOW + "Server 1 wird gestartet" + ANSI_RESET);
         this.serverNummer = serverNummer;
         this.port = port;
@@ -93,7 +93,7 @@ public class Server {
         int partner1ServerPort = 8992;
         int partner2ServerPort = 8993;
         int serverReceiverPort = 8991;
-        String serverNummer = "1";
+        int serverNummer = 1;
         Server server = new Server(port, partner1ServerPort, partner2ServerPort, serverReceiverPort, serverNummer);
         server.execute();
     }
@@ -173,6 +173,7 @@ public class Server {
         for (int i = 0; i < userNameRegister.length; i++) {
             if (userNameRegister[i].equals(userName)) {
                 userThreadRegister[i] = Thread;
+                userIsOnServer[i] = serverNummer;
                 break;
             }
         }

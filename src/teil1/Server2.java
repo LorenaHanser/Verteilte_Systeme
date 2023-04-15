@@ -18,7 +18,7 @@ public class Server2 {
         int partner1ServerPort = 8991;
             int partner2ServerPort = 8993;
         int serverReceiverPort = 8992;
-        String serverNummer = "2";
+        int serverNummer = 2;
 
             Server server = new Server(port, partner1ServerPort, partner2ServerPort, serverReceiverPort, serverNummer);
             server.execute();
