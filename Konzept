@@ -51,7 +51,8 @@ Fragen für Fragestunde
 - Passwörter hashen?
 
 Farben für Messages:
-- Red -> Errors
-- Yellow -> Server-Nachrichten
-- Green -> Sendende Nachricht
+- Red -> Errors (Fehler beim Erstellen des User-Threads...)
+- Yellow -> Server-Nachrichten (z.b. Server 1 gestartert, Chat Server is listening on Port )
+- Purpel -> Client-Nachrichten für den Client (z.b. Client hat die Verbindung zu PORT aufgebaut)
+- Green -> Sendende Nachricht 
 - Cyan -> Empfange Nachricht
