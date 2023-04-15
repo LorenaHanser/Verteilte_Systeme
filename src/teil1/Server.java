@@ -16,6 +16,12 @@ public class Server {
     public static final String ANSI_CYAN = "\u001B[36m";
     public static final String ANSI_WHITE = "\u001B[37m";
 
+    //Für das Protokoll
+    public static final int USER_AKTIVITY = 0;
+    public static final int MESSAGE = 1;
+    public static final int LOGGED_OUT = 0;
+    public static final int LOGGED_IN = 1;
+
     private int port;
     private File file;
 
@@ -164,7 +170,6 @@ public class Server {
         for (int i = 0; i < userNameRegister.length; i++) {
             if (userNameRegister[i].equals(userName)) {
                 userThreadRegister[i] = Thread;
-                userIsOnServer[i] = serverNummer;
                 break;
             }
         }
@@ -193,5 +198,30 @@ public class Server {
         userChattetWith[user] = chatPartner;
 
     }
+
+    int getServerNummer(){
+        return serverNummer;
+    }
+
+    void setUserLoggedIn(int userID){
+        userIsOnServer[userID] = serverNummer;
+        SyncThread1.sendUserAktivity(userID, LOGGED_IN);
+        SyncThread2.sendUserAktivity(userID, LOGGED_IN);
+    }
+    void setUserLoggedInLocal(int userID, int serverID){
+        userIsOnServer[userID] = serverID;
+        System.out.println("User wurde an einem anderen Server angemeldet");
+    }
+
+    void setUserLoggedOut(int userID){
+        userIsOnServer[userID] = -1;
+        SyncThread1.sendUserAktivity(userID, LOGGED_OUT);
+        SyncThread2.sendUserAktivity(userID, LOGGED_OUT);
+    }
+    void setUserLoggedOutLocal(int userID){
+        userIsOnServer[userID] = -1;
+        System.out.println("User wurde an einem anderen Server abgemeldet");
+    }
+
 
 }
