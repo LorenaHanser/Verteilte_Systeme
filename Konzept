@@ -50,3 +50,8 @@ Fragen für Fragestunde
 - Lastverteilung: reicht Math.random() oder abhängig von der Anzahl der Clients und Server?
 - Passwörter hashen?
 
+Farben für Messages:
+- Red -> Errors
+- Yellow -> Server-Nachrichten
+- Green -> Sendende Nachricht
+- Blaue -> Empfange Nachricht
