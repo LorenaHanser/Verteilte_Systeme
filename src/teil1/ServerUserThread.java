@@ -10,6 +10,17 @@ import java.net.*;
  * @author www.codejava.net
  */
 public class ServerUserThread extends Thread {
+
+    public static final String ANSI_RESET = "\u001B[0m";
+    public static final String ANSI_BLACK = "\u001B[30m";
+    public static final String ANSI_RED = "\u001B[31m";
+    public static final String ANSI_GREEN = "\u001B[32m";
+    public static final String ANSI_YELLOW = "\u001B[33m";
+    public static final String ANSI_BLUE = "\u001B[34m";
+    public static final String ANSI_PURPLE = "\u001B[35m";
+    public static final String ANSI_CYAN = "\u001B[36m";
+    public static final String ANSI_WHITE = "\u001B[37m";
+
     private Socket socket;
     private Server server;
     private final String DISCONNECT = "DISCONNECT";
@@ -31,6 +42,8 @@ public class ServerUserThread extends Thread {
 
     public void run() {
 
+        String userName = "";
+
         try {
 
             InputStream input = socket.getInputStream();
@@ -39,23 +52,23 @@ public class ServerUserThread extends Thread {
             OutputStream output = socket.getOutputStream();
             writer = new PrintWriter(output, true);
 
-            writer.println("Please enter your name:");
+            writer.println(ANSI_PURPLE + "Please enter your name:" + ANSI_RESET);
             boolean userSuccessfullAuthenticated = false;
-            String userName = reader.readLine();
+            userName = reader.readLine();
             String password;
             if (server.checkUsernameExists(userName)) {
-                writer.println("Please insert Password:");
+                writer.println(ANSI_PURPLE + "Please insert Password:" + ANSI_RESET);
                 password = reader.readLine();
                 if (server.checkPasswordValid(userName, password)) {
                     userSuccessfullAuthenticated = true;
                 }
             }
-            while (userSuccessfullAuthenticated == false) {
-                writer.println("Password oder User falsch! Bitte versuch es nochmal");
-                writer.println("Please enter your name:");
+            while (!userSuccessfullAuthenticated) {
+                writer.println(ANSI_RED + "Password oder User falsch! Bitte versuch es nochmal" + ANSI_RESET);
+                writer.println(ANSI_PURPLE + "Please enter your name:" + ANSI_RESET);
                 userName = reader.readLine();
                 if (server.checkUsernameExists(userName)) {
-                    writer.println("Please insert Password:");
+                    writer.println(ANSI_PURPLE + "Please insert Password:" + ANSI_RESET);
                     password = reader.readLine();
                     if (server.checkPasswordValid(userName, password)) {
                         userSuccessfullAuthenticated = true;
@@ -65,14 +78,14 @@ public class ServerUserThread extends Thread {
             server.setThreadId(userName, this); //die Referenzvariable des Threads wird mit dem User verknüpft
             ownID = server.askForID(userName); // eigene ID wird gespeichert
 
-            String serverMessage = "New user connected: " + userName;
+            String serverMessage = ANSI_PURPLE + "New user connected: " + userName + ANSI_RESET;
 
             boolean foundPartner = false;
-            while (foundPartner == false) { //Endlosschleife, bis existierender Chatpartner gefunden
-                writer.println("Mit wem möchstest du schreiben?");
+            while (!foundPartner) { //Endlosschleife, bis existierender Chatpartner gefunden
+                writer.println(ANSI_PURPLE + "Mit wem möchtest du schreiben?" + ANSI_RESET);
                 chatPartnerID = server.askForID(reader.readLine());
                 if (chatPartnerID != -1) { //geprüft ob ChatPartnerId gültig ist
-                    writer.println("Alles klar, du wirst verbunden");
+                    writer.println(ANSI_PURPLE + "Alles klar, du wirst verbunden" + ANSI_RESET);
                     server.setChatPartner(ownID, chatPartnerID); //User geht in Chatraum
                     foundPartner = true;
                 }
@@ -93,13 +106,14 @@ public class ServerUserThread extends Thread {
             } while (!clientMessage.equals(DISCONNECT) && !clientMessage.equals((SHUTDOWN)));
 
             server.removeUser(userName, this);
-            serverMessage = "Client : " + userName + " hat die Verbindung getrennt!";
+            serverMessage = ANSI_PURPLE + "Client: " + userName + " hat die Verbindung getrennt!" + ANSI_RESET;
             server.sendMessage(serverMessage, ownID, chatPartnerID);
             socket.close();
 
         } catch (IOException ex) {
-            System.out.println("Error in UserThread: " + ex.getMessage());
-            ex.printStackTrace();
+            System.out.println(ANSI_RED + "Error in UserThread: " + ex.getMessage() + ANSI_RESET);
+            String serverMessage = ANSI_YELLOW + "Client: " + userName + " hat die Verbindung getrennt!" + ANSI_RESET;
+            server.sendMessage(serverMessage, ownID, chatPartnerID);
         }
     }
 
@@ -107,7 +121,7 @@ public class ServerUserThread extends Thread {
      * Sends a message to the client.
      */
     void sendMessage(String message) {
-        writer.println(message);
+        writer.println(ANSI_CYAN + message + ANSI_RESET);
     }
 
 }
