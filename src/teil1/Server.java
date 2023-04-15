@@ -32,7 +32,7 @@ public class Server {
 
     //Variablen für den eigenen Server
     private int serverReciverPort;
-    private ServerReciverThread reciverSyncThread;
+    private ServerReciverMainThread reciverSyncThread;
 
 
 
@@ -55,7 +55,7 @@ public class Server {
 
     public void execute() {
         file = new File(serverNummer);
-        reciverSyncThread = new ServerReciverThread(this, serverReciverPort);
+        reciverSyncThread = new ServerReciverMainThread(this, serverReciverPort);
         reciverSyncThread.start();
         System.out.println("Sync ServerThread gestartet");
         try (ServerSocket serverSocket = new ServerSocket(port)) {

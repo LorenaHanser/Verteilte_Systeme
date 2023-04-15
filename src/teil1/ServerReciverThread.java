@@ -10,25 +10,21 @@ import java.net.Socket;
 public class ServerReciverThread extends Thread {
     private Socket socket;
     private Server server;
-
-    private int port;
     private BufferedReader reader;
 
-    public ServerReciverThread(Server server, int port) {
+
+    public ServerReciverThread(Socket socket, Server server){
+        this.socket = socket;
         this.server = server;
-        this.port = port;
 
     }
 
     @Override
     public void run() {
         try {
-            ServerSocket syncServerSocket = new ServerSocket(port);
-
             while (true) {
-                socket = syncServerSocket.accept();
-                System.out.println("Sync Server verbunden")
-                ;
+
+                System.out.println("SyncThread gestartet");
                 InputStream input = socket.getInputStream();
                 reader = new BufferedReader(new InputStreamReader(input));
                 do {
@@ -47,7 +43,6 @@ public class ServerReciverThread extends Thread {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
     }
 
     private void sendMessageToServer(String rawMessage) {
