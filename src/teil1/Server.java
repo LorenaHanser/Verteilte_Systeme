@@ -19,10 +19,10 @@ public class Server {
     private String[] userPassword = {"hallo", "geheim", "test"};
 
 
-    //hier sind die Attribute für die Synccronisation
+    //hier sind die Attribute für die Synchronisation
 
     //Variablen für den anderen Server
-    private int partnerServerPort; //Port des Partnerservers (Port für Servercommunication)
+    private int partnerServerPort; //Port des Partnerservers (Port für Serverkommunikation)
     private String partnerServerAdress = "localhost"; //hier die Adresse des anderen Server eintragen.
     private ServerConnectorThread SyncThread;
 
@@ -34,7 +34,7 @@ public class Server {
     private int[] userChattetWith = new int[3]; //Speichert, wer sich aktuell mit wem im Chat befindet (damit man nicht mit einer Person chatten kann, die gerade mit wem anders chattet)
     private ServerUserThread[] userThreadRegister = new ServerUserThread[3];//Speichert die Referenzvariable des Threads auf dem der User (wenn er online ist) läuft. Der Index für das Feld ist, dabei die ID des Users
 
-    private Set<ServerUserThread> userThreads = new HashSet<>(); //hier werden die Referenzvariabeln gespeichert (kann man das überarbeiten?) Vorsicht vor Garbagecollecktor
+    private Set<ServerUserThread> userThreads = new HashSet<>(); //hier werden die Referenzvariabeln gespeichert (kann man das überarbeiten?) Vorsicht vor Garbagecollector
 
     // Konstruktor
 
@@ -66,7 +66,7 @@ public class Server {
                 System.out.println("New user connected");
                 ServerUserThread newUser = new ServerUserThread(socket, this);
                 userThreads.add(newUser);
-                newUser.start(); //Thread startet mit User -> Name unbekannt desswegen noch kein Eintrag in das userThreadRegister Array
+                newUser.start(); //Thread startet mit User → Name unbekannt deswegen noch kein Eintrag in das userThreadRegister Array
 
             }
 
@@ -78,8 +78,8 @@ public class Server {
     public static void main(String[] args) {
         int port = 8989;//Integer.parseInt(args[0]);
         int partnerServerPort = 8991;
-        int serverReciverPort = 8992;
-        Server server = new Server(port, partnerServerPort, serverReciverPort);
+        int serverReceiverPort = 8992;
+        Server server = new Server(port, partnerServerPort, serverReceiverPort);
         server.execute();
     }
 
@@ -154,7 +154,7 @@ public class Server {
         return passwordValid;
     }
 
-    void setThreadId(String userName, ServerUserThread Thread) { //nachdem der User sich regestriert hat, wird Referenz von Thread an den Platz vom User gespeichert -> ab jetzt ist Thread erreichbar
+    void setThreadId(String userName, ServerUserThread Thread) { //nachdem der User sich registriert hat, wird Referenz von Thread an den Platz vom User gespeichert → ab jetzt ist Thread erreichbar
         for (int i = 0; i < userNameRegister.length; i++) {
             if (userNameRegister[i].equals(userName)) {
                 userThreadRegister[i] = Thread;
@@ -164,11 +164,11 @@ public class Server {
     }
 
     /**
-     * When a client is disconneted, removes the UserThread
+     * When a client is disconnected, removes the UserThread
      */
     void removeUser(String userName, ServerUserThread aUser) { //noch von Tutorial
         userThreads.remove(aUser);
-        System.out.println("The user " + userName + " quitted");
+        System.out.println("The user " + userName + " quit");
     }
 
 

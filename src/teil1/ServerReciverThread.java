@@ -42,7 +42,7 @@ public class ServerReciverThread extends Thread {
                         break;
                     }
                 } while (socket.isConnected());
-                System.out.println("Sync Server Verbindung verlohren");
+                System.out.println("Sync Server Verbindung verloren");
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -53,9 +53,9 @@ public class ServerReciverThread extends Thread {
     private void sendMessageToServer(String rawMessage) {
         String[] rawMessageArray = rawMessage.split(";", 3);//String wird in Array gesplittet
         int senderID = Integer.parseInt(rawMessageArray[0]);
-        int reciverID = Integer.parseInt(rawMessageArray[1]);
+        int receiverID = Integer.parseInt(rawMessageArray[1]);
         String message = rawMessageArray[2];
-        server.sendMessageFromServer(message, senderID, reciverID);
+        server.sendMessageFromServer(message, senderID, receiverID);
     }
 
 }

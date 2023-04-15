@@ -15,7 +15,6 @@ public class Client {
     private String userName;
 
     // Konstruktor
-
     public Client(String hostname, int port) {
         this.hostname = hostname;
         this.port = port;
@@ -25,7 +24,7 @@ public class Client {
         try {
             Socket socket = new Socket(hostname, port);
 
-            System.out.println("Connected to the chat server");
+            System.out.println("Connected to the chat server (port: " + port + ")");
 
             new ClientReadThread(socket, this).start();
             new ClientWriteThread(socket, this).start(); //hier starten wir die Threads
@@ -46,7 +45,6 @@ public class Client {
     String getUserName() {
         return this.userName;
     }
-
 
     public static void main(String[] args) {
 

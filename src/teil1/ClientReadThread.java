@@ -32,7 +32,7 @@ public class ClientReadThread extends Thread {
                 System.out.println(response);
 
             } catch (IOException ex) {
-                System.out.println("Die Verbindung zum Server wurde getrennt: " + ex.getMessage() + "\n" + "Möchten sie weiterchatten? (y/n)");
+                System.out.println("Die Verbindung zum Server wurde getrennt: " + ex.getMessage() + "\n" + "Möchten sie weiter chatten? (y/n)");
                 break;
             }
         }

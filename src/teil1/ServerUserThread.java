@@ -68,7 +68,7 @@ public class ServerUserThread extends Thread {
 
             boolean foundPartner = false;
             while (foundPartner == false) { //Endlosschleife, bis existierender Chatpartner gefunden
-                writer.println("Mit wem möchstest du schreiben?");
+                writer.println("Mit wem möchtest du schreiben?");
                 chatPartnerID = server.askForID(reader.readLine());
                 if (chatPartnerID != -1) { //geprüft ob ChatPartnerId gültig ist
                     writer.println("Alles klar, du wirst verbunden");

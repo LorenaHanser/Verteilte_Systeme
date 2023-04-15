@@ -7,9 +7,9 @@ public class Server2 {
         System.out.println("Server 2 wird gestartet");
         int port = 8990;//Server 2 läuft immer auf Port 8990 Server 1 auf 8989
         int partnerServerPort = 8992;
-        int serverReciverPort = 8991;
+        int serverReceiverPort = 8991;
 
-        Server server = new Server(port, partnerServerPort, serverReciverPort);
+        Server server = new Server(port, partnerServerPort, serverReceiverPort);
         server.execute();
     }
 }
