@@ -1,4 +1,4 @@
-package teil2;
+package teil1;
 
 import java.io.*;
 import java.net.*;
@@ -28,6 +28,7 @@ public class Server {
     //Variablen für den eigenen Server
     private int serverReciverPort;
     private ServerReciverMainThread reciverSyncThread;
+    private MCS uhr;
 
 
 
@@ -45,6 +46,7 @@ public class Server {
         this.partner1ServerPort = partner1ServerPort;
         this.partner2ServerPort = partner2ServerPort;
         this.serverReciverPort = serverReciverPort;
+        this.uhr = new MCS();
     }
 
 
@@ -102,7 +104,7 @@ public class Server {
             System.out.println("Sync Server nicht gefunden");
         }
 
-        file.write(message, sendUserId, receiverUserId);
+        file.write(message, sendUserId, receiverUserId); // todo muss durch MCS ersetzt werden
 
         if (userThreadRegister[receiverUserId] != null) { //es wird geschaut, ob der User online ist (zum Vermeiden von Exception)
             System.out.println("Diese Nachricht wurde erhalten: " + message);
@@ -120,7 +122,7 @@ public class Server {
     void sendMessageFromServer(String message, int sendUserId, int receiverUserId) {
 
 
-        file.write(message, sendUserId, receiverUserId);
+        file.write(message, sendUserId, receiverUserId); // todo muss durch MCS ersetzt werden
 
         if (userThreadRegister[receiverUserId] != null) { //es wird geschaut, ob der User online ist (zum Vermeiden von Exception)
             System.out.println("Diese Nachricht wurde erhalten: " + message);
