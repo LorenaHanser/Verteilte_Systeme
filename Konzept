@@ -54,4 +54,4 @@ Farben für Messages:
 - Red -> Errors
 - Yellow -> Server-Nachrichten
 - Green -> Sendende Nachricht
-- Blaue -> Empfange Nachricht
+- Cyan -> Empfange Nachricht
