@@ -3,7 +3,6 @@ package teil1;
 import java.io.*;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 
 public class MyFile {
 
@@ -66,7 +65,7 @@ public class MyFile {
     // Methode, um eine Chatdatei zu lesen und in der Konsole anzeigen zu lassen
     // zum Aufrufen von außerhalb der Klasse
     public String readWholeChatFile(int ownID, int chatPartnerID) {
-        return ANSI_PURPLE + "Bisheriger Chat:\n" + ANSI_RESET + this.readWholeChatFile(path, this.getFilename(ownID, chatPartnerID));
+        return ANSI_PURPLE + "Bisheriger Chat:\n" + ANSI_BLUE + this.readWholeChatFile(path, this.getFilename(ownID, chatPartnerID)) + ANSI_RESET;
     }
 
     // zum Aufrufen innerhalb der Klasse File, damit die Methode synchronize() richtig ausgeführt werden kann
@@ -77,7 +76,6 @@ public class MyFile {
         try {
             BufferedReader bufferedReader = new BufferedReader(new FileReader(path + filename + ENDING));
             while ((currentLine = bufferedReader.readLine()) != null) {
-   //             chat.append(ANSI_BLUE).append(currentLine).append(ANSI_RESET).append("\n");
                 chat.append(currentLine).append("\n");
             }
             bufferedReader.close();
@@ -91,7 +89,6 @@ public class MyFile {
     // [06.04.2023 17:01:12] [Daniel]: Nachricht
     public void write(String message, int ownID, int chatPartnerID) {
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        System.out.println(message);
 
         String[] notAllowedColors = {ANSI_BLACK, ANSI_RED, ANSI_GREEN, ANSI_YELLOW, ANSI_BLUE, ANSI_PURPLE, ANSI_CYAN, ANSI_WHITE, "]: null"};
         boolean writingAllowed = true;
@@ -119,13 +116,12 @@ public class MyFile {
     }
 
     // Methode, um alle Textnachrichten der Datei in die andere Datei zu übertragen
-    public void write(String message, String filename, String path ) {
+    public void write(String message, String filename, String path) {
         try {
-            System.out.println(message);
-                BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(path + filename + ENDING, true));
-                bufferedWriter.write(message.trim());
-                bufferedWriter.newLine();
-                bufferedWriter.close();
+            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(path + filename + ENDING, true));
+            bufferedWriter.write(message.trim());
+            bufferedWriter.newLine();
+            bufferedWriter.close();
 
         } catch (IOException e) {
             System.out.println(ANSI_RED + "Fehler beim Speichern in der Datei: " + e.getMessage() + ANSI_RESET);
@@ -169,47 +165,30 @@ public class MyFile {
 
     public void synchronize() {
         // todo: Methode dynamisch machen
-        for(int i = 0; i < FILENAMES.length; i++){
+        for (String filename : FILENAMES) {
             String path1 = this.getPath(1);
             String path2 = this.getPath(2);
 
-            String content1 = "";
-            String content2 = "";
+            String contentServer1 = this.readWholeChatFile(path1, filename);
+            String contentServer2 = this.readWholeChatFile(path2, filename);
 
-            content1 = this.readWholeChatFile(path1, FILENAMES[i]);
-            content2 = this.readWholeChatFile(path2, FILENAMES[i]);
+            File currentFileServer1 = new File(path1 + filename + ENDING);
+            File currentFileServer2 = new File(path2 + filename + ENDING);
 
-            File[] myFiles1 = new File[3];
-            File[] myFiles2 = new File[3];
-            String genauerPfad = path1 + FILENAMES[i] + ENDING;
-            String genauerPfad2 = path2 + FILENAMES[i] + ENDING;
-
-            File myFileObj1 = new File(genauerPfad);
-            File myFileObj2 = new File(genauerPfad2);
-
-            myFiles1[i] = myFileObj1;
-            myFiles2[i] = myFileObj2;
-
-            if (content1.equals(content2)) {
-                System.out.println("Die beiden Dateien " + FILENAMES[i] + " sind identisch.");
+            if (contentServer1.equals(contentServer2)) {
+                System.out.println(ANSI_WHITE + "Die beiden Dateien " + filename + " sind identisch." + ANSI_RESET);
             } else {
-                System.out.println("Die beiden Dateien " + FILENAMES[i] + " sind unterschiedlich.");
-                if (myFiles1[i].lastModified() > myFiles2[i].lastModified()){
-                    System.out.println("Kontent 1 :" + content1);
-                    System.out.println("Kontent 2 :" + content2);
-                    System.out.println("File: " + path1 + FILENAMES[i] + " ist neuer als " + path2 + FILENAMES[i] );
-                    myFiles2[i].delete();
-                    System.out.println(myFiles2[i] + " wurde gelöscht");
-                    write(content1, FILENAMES[i], path2);
-                } else if(myFiles2[i].lastModified() > myFiles1[i].lastModified()){
-                    System.out.println("Kontent 1 :" + content1);
-                    System.out.println("Kontent 2 :" + content2);
-                    System.out.println("File: " + path2 + FILENAMES[i] + " ist neuer als "  + path1 + FILENAMES[i] );
-                    myFiles1[i].delete();
-                    System.out.println(myFiles1[i] + " wurde gelöscht");
-                    write(content2, FILENAMES[i], path1);
+                System.out.println(ANSI_WHITE + "Die beiden Dateien " + filename + " sind unterschiedlich." + ANSI_RESET);
+                if (currentFileServer1.lastModified() > currentFileServer2.lastModified()) {
+                    System.out.println(ANSI_WHITE + "File: " + path1 + filename + " ist neuer als " + path2 + filename + ANSI_RESET);
+                    System.out.println(ANSI_WHITE + "Die ältere Datei: " + filename + " wurde gelöscht: " + currentFileServer2.delete() + ANSI_RESET);
+                    write(contentServer1, filename, path2);
+                } else if (currentFileServer2.lastModified() > currentFileServer1.lastModified()) {
+                    System.out.println(ANSI_WHITE + "File: " + path2 + filename + " ist neuer als " + path1 + filename + ANSI_RESET);
+                    System.out.println(ANSI_WHITE + "Die ältere Datei: " + filename + " wurde gelöscht: " + currentFileServer1.delete() + ANSI_RESET);
+                    write(contentServer2, filename, path1);
                 } else {
-                    System.out.println("Beide Dateien haben das gleiche Änderungsdatum");
+                    System.out.println(ANSI_WHITE + "Beide Dateien haben das gleiche Änderungsdatum!" + ANSI_RESET);
                 }
             }
         }
