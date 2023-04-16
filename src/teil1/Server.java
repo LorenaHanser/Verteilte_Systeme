@@ -46,7 +46,7 @@ public class Server {
     private ServerReceiverMainThread receiverSyncThread;
     private MCS uhr;
 
-
+    private int[] serverPort = {8991, 8992, 8993};
     private int[] userIsOnServer = new int[3]; //evtl muss auf protected oder public
     private int[] userChattetWith = new int[3]; //Speichert, wer sich aktuell mit wem im Chat befindet (damit man nicht mit einer Person chatten kann, die gerade mit wem anders chattet)
     private ServerUserThread[] userThreadRegister = new ServerUserThread[3];//Speichert die Referenzvariable des Threads auf dem der User (wenn er online ist) läuft. Der Index für das Feld ist, dabei die ID des Users
@@ -109,8 +109,14 @@ public class Server {
      */
     void sendMessage(String message, int sendUserId, int receiverUserId) {
         try {
-            SyncThread1.sendMessageToOtherServer(message, sendUserId, receiverUserId);
-            SyncThread2.sendMessageToOtherServer(message, sendUserId, receiverUserId);
+            if (userIsOnServer[receiverUserId] > 0) {
+                int portFromReciverServer = serverPort[userIsOnServer[receiverUserId]]; //hier wird ermittelt, auf welchem Server sich der User befindet und welchen Port (zur Threadidentifizierung dieser hat)
+                if(portFromReciverServer == partner1ServerPort){
+                    SyncThread1.sendMessageToOtherServer(message, sendUserId, receiverUserId);
+                } else if (portFromReciverServer == partner2ServerPort) {
+                    SyncThread2.sendMessageToOtherServer(message, sendUserId, receiverUserId);
+                }
+            }
         } catch (Exception e) {
             System.out.println(ANSI_RED + "Sync Server nicht gefunden" + ANSI_RESET);
         }
@@ -208,26 +214,28 @@ public class Server {
 
     }
 
-    int getServerNummer(){
+    int getServerNummer() {
         return serverNummer;
     }
 
-    void setUserLoggedIn(int userID){
+    void setUserLoggedIn(int userID) {
         userIsOnServer[userID] = serverNummer;
         SyncThread1.sendUserAktivity(userID, LOGGED_IN);
         SyncThread2.sendUserAktivity(userID, LOGGED_IN);
     }
-    void setUserLoggedInLocal(int userID, int serverID){
+
+    void setUserLoggedInLocal(int userID, int serverID) {
         userIsOnServer[userID] = serverID;
         System.out.println("User wurde an einem anderen Server angemeldet");
     }
 
-    void setUserLoggedOut(int userID){
+    void setUserLoggedOut(int userID) {
         userIsOnServer[userID] = -1;
         SyncThread1.sendUserAktivity(userID, LOGGED_OUT);
         SyncThread2.sendUserAktivity(userID, LOGGED_OUT);
     }
-    void setUserLoggedOutLocal(int userID){
+
+    void setUserLoggedOutLocal(int userID) {
         userIsOnServer[userID] = -1;
         System.out.println("User wurde an einem anderen Server abgemeldet");
     }
