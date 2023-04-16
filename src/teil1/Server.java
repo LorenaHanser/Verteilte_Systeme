@@ -22,7 +22,7 @@ public class Server {
     public static final String ANSI_WHITE = "\u001B[37m";
 
     private int port;
-    private MyFile myFile;
+    private FileHandler fileHandler;
 
     private String serverNummer;
 
@@ -57,7 +57,7 @@ public class Server {
     }
 
     public void execute() {
-        myFile = new MyFile(serverNummer);
+        fileHandler = new FileHandler(serverNummer);
         receiverSyncThread = new ServerReceiverThread(this, serverReceiverPort);
         receiverSyncThread.start();
         System.out.println(ANSI_YELLOW + "Sync ServerThread gestartet" + ANSI_RESET);
@@ -65,7 +65,7 @@ public class Server {
 
             System.out.println(ANSI_YELLOW + "Chat Server is listening on port " + port + ANSI_YELLOW);
 
-            myFile.create();
+            fileHandler.create();
 
             SyncThread = new ServerConnectorThread(partnerServerAdress, partnerServerPort, this);
             SyncThread.start();
@@ -106,7 +106,7 @@ public class Server {
         }
 
         // Timestamp prüfen(?)
-        myFile.write(message, sendUserId, receiverUserId);
+        fileHandler.write(message, sendUserId, receiverUserId);
 
         if (userThreadRegister[receiverUserId] != null) { //es wird geschaut, ob der User online ist (zum Vermeiden von Exception)
             System.out.println(ANSI_YELLOW + "Diese Nachricht wurde erhalten: " + message + ANSI_RESET);
@@ -123,7 +123,7 @@ public class Server {
     void sendMessageFromServer(String message, int sendUserId, int receiverUserId) {
 
         // Timestamp prüfen(?)
-        myFile.write(message, sendUserId, receiverUserId);
+        fileHandler.write(message, sendUserId, receiverUserId);
 
         if (userThreadRegister[receiverUserId] != null) { //es wird geschaut, ob der User online ist (zum Vermeiden von Exception)
             System.out.println(ANSI_YELLOW + "Diese Nachricht wurde erhalten: " + ANSI_CYAN + message + ANSI_RESET);

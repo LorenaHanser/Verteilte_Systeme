@@ -4,7 +4,7 @@ import java.io.*;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 
-public class MyFile {
+public class FileHandler {
 
     public static final String ANSI_RESET = "\u001B[0m";
     public static final String ANSI_BLACK = "\u001B[30m";
@@ -25,7 +25,7 @@ public class MyFile {
     private String serverDirectoryName;
     private int serverNumber;
 
-    public MyFile(String serverNumber) {
+    public FileHandler(String serverNumber) {
         this.serverNumber = Integer.parseInt(serverNumber);
         this.serverDirectoryName = DIRECTORY_NAME + serverNumber;
         this.path = this.getPath(Integer.parseInt(serverNumber));
@@ -35,8 +35,8 @@ public class MyFile {
     public void create() {
         try {
             //Ordner erstellen
-            if (!new java.io.File(path).exists()) {
-                boolean createdDirectory = new java.io.File(path).mkdir();
+            if (!new File(path).exists()) {
+                boolean createdDirectory = new File(path).mkdir();
                 if (createdDirectory) {
                     System.out.println(ANSI_WHITE + "Ordner " + serverDirectoryName + " wurde neu erstellt." + ANSI_RESET);
                 } else {
@@ -48,7 +48,7 @@ public class MyFile {
 
             //Dateien erstellen
             for (String filename : FILENAMES) {
-                if (!new java.io.File(path, filename + ENDING).exists()) {
+                if (!new File(path, filename + ENDING).exists()) {
                     PrintWriter myWriter = new PrintWriter(new FileWriter(path + filename + ENDING));
                     System.out.println(ANSI_WHITE + "Datei " + filename + ENDING + " wurde neu erstellt." + ANSI_RESET);
                     myWriter.close();
@@ -100,7 +100,7 @@ public class MyFile {
         }
 
         try {
-            if (!new java.io.File(path).exists()) {
+            if (!new File(path).exists()) {
                 this.create();
             }
 
