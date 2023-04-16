@@ -20,7 +20,7 @@ public class MyFile {
     private final String[] FILENAMES = {"DanielDavid", "DanielLorena", "DavidLorena"};
     private final String ENDING = ".txt"; //Dateiendung der Textnachrichten
     private final String DIRECTORY_NAME = "Messages";
-    private static final SimpleDateFormat TIMESTAMP_FORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+    private static final SimpleDateFormat TIMESTAMP_FORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss:SSS");
 
     private String serverDirectoryName;
     private int serverNumber;
