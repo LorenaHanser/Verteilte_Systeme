@@ -110,7 +110,7 @@ public class Server {
     void sendMessage(String message, int sendUserId, int receiverUserId) {
         try {
             if (userIsOnServer[receiverUserId] > 0) {
-                int portFromReciverServer = serverPort[userIsOnServer[receiverUserId]]; //hier wird ermittelt, auf welchem Server sich der User befindet und welchen Port (zur Threadidentifizierung dieser hat)
+                int portFromReciverServer = serverPort[userIsOnServer[receiverUserId]-1]; //hier wird ermittelt, auf welchem Server sich der User befindet und welchen Port (zur Threadidentifizierung dieser hat) -1 weil Servernummern ab 1 starten (doofe Sache)
                 if(portFromReciverServer == partner1ServerPort){
                     SyncThread1.sendMessageToOtherServer(message, sendUserId, receiverUserId);
                 } else if (portFromReciverServer == partner2ServerPort) {
