@@ -1,8 +1,6 @@
 package teil1;
 
 import java.io.*;
-import java.sql.Timestamp;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 public class FileHandler {
@@ -106,14 +104,12 @@ public class FileHandler {
 
             if (writingAllowed) {
                 BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(path + getFilename(clientMessage.getUserId(), clientMessage.getReceiverId()) + ENDING, true));
-                bufferedWriter.write("[" + TIMESTAMP_FORMAT.parse(String.valueOf(clientMessage.getTimestamp())) + "] [" + clientMessage.getUserName() + "]: " + clientMessage.getContent());
+                bufferedWriter.write("[" + TIMESTAMP_FORMAT.format(clientMessage.getTimestamp()) + "] [" + clientMessage.getUserName() + "]: " + clientMessage.getContent());
                 bufferedWriter.newLine();
                 bufferedWriter.close();
             }
         } catch (IOException e) {
             System.out.println(ANSI_RED + "Fehler beim Speichern in der Datei: " + e.getMessage() + ANSI_RESET);
-        } catch (ParseException e) {
-            System.out.println(ANSI_RED + "Fehler beim Speichern des Zeitstempels in der Datei: " + e.getMessage() + ANSI_RESET);
         }
     }
 
