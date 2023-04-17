@@ -18,7 +18,7 @@ public class ServerMessage extends Message {
     }
 
     public void setServerId(int serverId) {
-        this.serverId = serverId;
+        this.serverId = -serverId;
     }
 
     public int getStatus() {
@@ -35,8 +35,8 @@ public class ServerMessage extends Message {
         return this.getUserId() + this.getSplitSymbol() + this.getServerId() + this.getSplitSymbol() + this.getStatus();
     }
 
-    public ServerMessage toObject(String string){
-        String[] attributes = string.split(this.getSplitSymbol(), 3);
+    public static ServerMessage toObject(String string){
+        String[] attributes = string.split(Message.getSplitSymbol(), 3);
 
         int userId = Integer.parseInt(attributes[0]);
         int serverId = Integer.parseInt(attributes[1]);

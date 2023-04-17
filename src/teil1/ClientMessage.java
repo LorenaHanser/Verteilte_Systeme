@@ -3,18 +3,34 @@ package teil1;
 import java.sql.Timestamp;
 
 public class ClientMessage extends Message {
-    private Timestamp timestamp;
+
     // int userId durch Vererbung
     private int receiverId;
+    private Timestamp timestamp;
     private int type;
     private String content;
 
     // Konstruktor
-    public ClientMessage(Timestamp timestamp, int userId, int receiverId, int type, String content) {
-        this.setTimestamp(timestamp);
+    public ClientMessage(int userId, int receiverId, Timestamp timestamp, int type, String content) {
         this.setUserId(userId);
         this.setReceiverId(receiverId);
+        this.setTimestamp(timestamp);
         this.setType(type);
+        this.setContent(content);
+    }
+
+    public ClientMessage(String clientResponse, int userId, int receiverId) {
+        String[] clientResponseSplit = clientResponse.split(";",2);
+        this.setUserId(userId);
+        this.setReceiverId(receiverId);
+        this.setTimestamp(Timestamp.valueOf(clientResponseSplit[0]));
+        this.setType(Server.NEW_MESSAGE);
+        this.setContent(clientResponseSplit[1]);
+    }
+    public ClientMessage(int userId, int receiverId,  String content) {
+        this.setUserId(userId);
+        this.setReceiverId(receiverId);
+        this.setType(Server.NEW_MESSAGE_WITHOUT_TIMESTAMP);
         this.setContent(content);
     }
 
@@ -54,18 +70,29 @@ public class ClientMessage extends Message {
     // Methoden
     @Override
     public String toString() {
-        return this.getTimestamp() + this.getSplitSymbol() + this.getUserId() + this.getSplitSymbol() + this.getReceiverId() + this.getSplitSymbol() + this.getType() + this.getSplitSymbol() + this.getContent();
+        return this.getUserId() + this.getSplitSymbol() + this.getReceiverId() + this.getSplitSymbol() + this.getTimestamp() + this.getSplitSymbol() + this.getType() + this.getSplitSymbol() + this.getContent();
     }
 
-    public ClientMessage toObject(String string) {
-        String[] attributes = string.split(this.getSplitSymbol(), 5);
-
-        Timestamp timestamp = Timestamp.valueOf(attributes[0]);
-        int userId = Integer.parseInt(attributes[1]);
-        int receiverId = Integer.parseInt(attributes[2]);
+    public static ClientMessage toObject(String string) {
+        String[] attributes = string.split(Message.getSplitSymbol(), 5);
+        System.out.println("Das steht in der Nachricht, die als ClientMessage ausgegeben werden");
+        for (int i = 0; i < attributes.length; i++) {
+            System.out.println(attributes[i]);
+        }
+        int userId = Integer.parseInt(attributes[0]);
+        int receiverId = Integer.parseInt(attributes[1]);
+        Timestamp timestamp = Timestamp.valueOf(attributes[2]);
         int type = Integer.parseInt(attributes[3]);
         String content = attributes[4];
 
-        return new ClientMessage(timestamp, userId, receiverId, type, content);
+        return new ClientMessage(userId, receiverId, timestamp, type, content);
+    }
+
+    public String getUserName() {
+        return Server.USER_NAME_REGISTER[this.getUserId()];
+    }
+
+    public String getMessage() {
+        return "[" + this.getUserName() + "]: " + this.getContent();
     }
 }

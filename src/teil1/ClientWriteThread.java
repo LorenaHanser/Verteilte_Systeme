@@ -2,6 +2,7 @@ package teil1;
 
 import java.io.*;
 import java.net.*;
+import java.sql.Timestamp;
 
 /**
  * This thread is responsible for reading user's input and send it
@@ -63,13 +64,21 @@ public class ClientWriteThread extends Thread {
         writer.println(userName);
 
         String text;
+        Timestamp timestamp;
 
         // Endlosschleife
         do {
             // switch/case
             try {
                 text = userIn.readLine();
+                timestamp = new Timestamp(System.currentTimeMillis());
                 //System.out.println("-- wir sind in ClientWriteThread run()");
+                if (text.trim().isEmpty()) {
+                    System.out.println("Leere Texteingaben sind nicht erlaubt!");
+                } else{
+                    String message = timestamp+ ";"+text;
+                    writer.println(message); // Nachricht senden
+                }
             } catch (IOException e) {
                 System.out.println(ANSI_RED + "!!!!!!!!!!!!!!!!!! Fehler 2 in WriteThread!!!!!!!!!!!!!!!!!!!!!!!" + ANSI_RESET);
                 throw new RuntimeException(e);
@@ -79,14 +88,7 @@ public class ClientWriteThread extends Thread {
                 break; // Schleife beenden, und Socket noch nicht schließen
             } else if (text.equals(SHUTDOWN)) {
                 break; // Schleife beenden, und Socket schließen
-            } else {
-                if (text.trim().isEmpty()) {
-                    System.out.println("Leere Texteingaben sind nicht erlaubt!");
-                } else{
-                    writer.println(text); // Nachricht senden
-                }
             }
-
         } while (true);
 
         if (reconnect) {

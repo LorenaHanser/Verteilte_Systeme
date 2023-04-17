@@ -17,19 +17,22 @@ public class Server {
     public static final String ANSI_WHITE = "\u001B[37m";
 
     //Für das Protokoll
-    public static final int USER_AKTIVITY = 0;
-    public static final int MESSAGE = 1;
+    //public static final int USER_AKTIVITY = 0;
+    //public static final int MESSAGE = 1;
     public static final int LOGGED_OUT = 0;
     public static final int LOGGED_IN = 1;
+
+    public static final int NEW_MESSAGE = 0;
+    public  static final int NEW_MESSAGE_WITHOUT_TIMESTAMP = 1;
 
     private int port;
     private FileHandler fileHandler;
 
-    private int serverNummer;
+    private int serverNumber;
 
-    private String[] userNameRegister = {"Daniel", "David", "Lorena"}; //Speichert die Usernamen der Index wird als Id für den User genutzt
+    public static final String[] USER_NAME_REGISTER = {"Daniel", "David", "Lorena"}; //Speichert die Usernamen der Index wird als Id für den User genutzt
 
-    private String[] userPassword = {"hallo", "geheim", "test"};
+    private final String[] USER_PASSWORD = {"hallo", "geheim", "test"};
 
 
     //hier sind die Attribute für die Synchronisation
@@ -37,7 +40,7 @@ public class Server {
     //Variablen für den anderen Server
     private int partnerServerPort; //Port des Partnerservers (Port für Serverkommunikation)
     private String partnerServerAdress = "localhost"; //hier die Adresse des anderen Server eintragen.
-    private ServerConnectorThread SyncThread;
+    private ServerConnectorThread syncThread;
 
     //Variablen für den eigenen Server
     private int serverReceiverPort;
@@ -49,16 +52,16 @@ public class Server {
     private Set<ServerUserThread> userThreads = new HashSet<>(); //hier werden die Referenzvariabeln gespeichert (kann man das überarbeiten?) Vorsicht vor Garbagecollector
 
     // Konstruktor
-    public Server(int port, int partnerServerPort, int serverReceiverPort, int serverNummer) {
+    public Server(int port, int partnerServerPort, int serverReceiverPort, int serverNumber) {
         System.out.println(ANSI_YELLOW + "Server 1 wird gestartet" + ANSI_RESET);
-        this.serverNummer = serverNummer;
+        this.serverNumber = serverNumber;
         this.port = port;
         this.partnerServerPort = partnerServerPort;
         this.serverReceiverPort = serverReceiverPort;
     }
 
     public void execute() {
-        fileHandler = new FileHandler(serverNummer);
+        fileHandler = new FileHandler(serverNumber);
         receiverSyncThread = new ServerReceiverThread(this, serverReceiverPort);
         receiverSyncThread.start();
         System.out.println(ANSI_YELLOW + "Sync ServerThread gestartet" + ANSI_RESET);
@@ -68,15 +71,15 @@ public class Server {
 
             fileHandler.create();
 
-            SyncThread = new ServerConnectorThread(partnerServerAdress, partnerServerPort, this);
-            SyncThread.start();
+            syncThread = new ServerConnectorThread(partnerServerAdress, partnerServerPort, this);
+            syncThread.start();
 
             // Endlosschleife
 
             while (true) {
                 Socket socket = serverSocket.accept();
                 System.out.println(ANSI_YELLOW + "New user connected" + ANSI_YELLOW);
-                ServerUserThread newUser = new ServerUserThread(socket, this, serverNummer);
+                ServerUserThread newUser = new ServerUserThread(socket, this, serverNumber);
                 userThreads.add(newUser);
                 newUser.start(); //Thread startet mit User → Name unbekannt deswegen noch kein Eintrag in das userThreadRegister Array
 
@@ -99,42 +102,29 @@ public class Server {
     /**
      * Delivers a message from one user to another
      */
-    void sendMessage(String message, int sendUserId, int receiverUserId) {
+    void sendMessageToServer(ClientMessage clientMessage) {
         try {
-            SyncThread.sendMessageToOtherServer(message, sendUserId, receiverUserId);
+            syncThread.sendMessageToOtherServer(clientMessage);
         } catch (Exception e) {
             System.out.println(ANSI_RED + "Sync Server nicht gefunden" + ANSI_RESET);
         }
-
-        // Timestamp prüfen(?)
-        fileHandler.write(message, sendUserId, receiverUserId);
-
-        if (userThreadRegister[receiverUserId] != null) { //es wird geschaut, ob der User online ist (zum Vermeiden von Exception)
-            System.out.println(ANSI_YELLOW + "Diese Nachricht wurde erhalten: " + message + ANSI_RESET);
-            if (userChattetWith[receiverUserId] == sendUserId) { //Es wird geschaut, ob der User sich im gleichen Chatraum (mit dem sendenUser) befindet
-                userThreadRegister[receiverUserId].sendMessage(message); //nachricht wird an den User gesendet
-            } else {
-                System.out.println(ANSI_YELLOW + "Der User ist gerade beschäftigt. Die Nachricht: " + ANSI_CYAN + message + ANSI_YELLOW + " wird gespeichert" + ANSI_RESET);
-            }
-        } else {
-            System.out.println(ANSI_YELLOW + "Der User ist nicht online, die Nachricht: " + ANSI_CYAN + message + ANSI_YELLOW + " wird aber für ihn gespeichert..." + ANSI_RESET);
-        }
+        sendMessage(clientMessage);
     }
 
-    void sendMessageFromServer(String message, int sendUserId, int receiverUserId) {
+    void sendMessage(ClientMessage clientMessage) {
 
         // Timestamp prüfen(?)
-        fileHandler.write(message, sendUserId, receiverUserId);
-
-        if (userThreadRegister[receiverUserId] != null) { //es wird geschaut, ob der User online ist (zum Vermeiden von Exception)
-            System.out.println(ANSI_YELLOW + "Diese Nachricht wurde erhalten: " + ANSI_CYAN + message + ANSI_RESET);
-            if (userChattetWith[receiverUserId] == sendUserId) { //Es wird geschaut, ob der User sich im gleichen Chatraum (mit dem sendenUser) befindet
-                userThreadRegister[receiverUserId].sendMessage(message); //nachricht wird an den User gesendet
+        fileHandler.write(clientMessage); //todo:fileHandler anpassen und dann !auskommentieren.
+        // todo nur Nachrichten Typ 1 und 2 Sollen verarbeitet werden (stand 17.04.)
+        if (userThreadRegister[clientMessage.getReceiverId()] != null) { //es wird geschaut, ob der User online ist (zum Vermeiden von Exception)
+            System.out.println(ANSI_YELLOW + "Diese Nachricht wurde erhalten: " + ANSI_CYAN + clientMessage.toString() + ANSI_RESET);
+            if (userChattetWith[clientMessage.getReceiverId()] == clientMessage.getUserId()) { //Es wird geschaut, ob der User sich im gleichen Chatraum (mit dem sendenUser) befindet
+                userThreadRegister[clientMessage.getReceiverId()].sendMessage(clientMessage.getMessage()); //nachricht wird an den User gesendet
             } else {
-                System.out.println(ANSI_YELLOW + "Der User ist gerade beschäftigt. Die Nachricht: " + ANSI_CYAN + message + ANSI_YELLOW + " wird gespeichert!");
+                System.out.println(ANSI_YELLOW + "Der User ist gerade beschäftigt. Die Nachricht: " + ANSI_CYAN + clientMessage.getContent() + ANSI_YELLOW + " wird gespeichert!");
             }
         } else {
-            System.out.println(ANSI_YELLOW + "Der User ist nicht online, die Nachricht: " + ANSI_CYAN + message + ANSI_YELLOW + " wird aber für ihn gespeichert...");
+            System.out.println(ANSI_YELLOW + "Der User ist nicht online, die Nachricht: " + ANSI_CYAN + clientMessage.getContent() + ANSI_YELLOW + " wird aber für ihn gespeichert...");
         }
     }
 
@@ -144,8 +134,8 @@ public class Server {
 
     boolean checkUsernameExists(String userName) { //überprüft, ob der User existiert
         boolean usernameValid = false;
-        for (int i = 0; i < userNameRegister.length; i++) {
-            if (userNameRegister[i].equals(userName)) {
+        for (int i = 0; i < USER_NAME_REGISTER.length; i++) {
+            if (USER_NAME_REGISTER[i].equals(userName)) {
                 usernameValid = true;
                 break;
             }
@@ -155,9 +145,9 @@ public class Server {
 
     boolean checkPasswordValid(String userName, String password) { //Überprüft, ob das Password das richtige ist
         boolean passwordValid = false;
-        for (int i = 0; i < userNameRegister.length; i++) {
-            if (userNameRegister[i].equals(userName)) {
-                if (userPassword[i].equals(password)) {
+        for (int i = 0; i < USER_NAME_REGISTER.length; i++) {
+            if (USER_NAME_REGISTER[i].equals(userName)) {
+                if (USER_PASSWORD[i].equals(password)) {
                     passwordValid = true;
                 }
                 break;
@@ -167,10 +157,10 @@ public class Server {
     }
 
     void setThreadId(String userName, ServerUserThread Thread) { //nachdem der User sich registriert hat, wird Referenz von Thread an den Platz vom User gespeichert → ab jetzt ist Thread erreichbar
-        for (int i = 0; i < userNameRegister.length; i++) {
-            if (userNameRegister[i].equals(userName)) {
+        for (int i = 0; i < USER_NAME_REGISTER.length; i++) {
+            if (USER_NAME_REGISTER[i].equals(userName)) {
                 userThreadRegister[i] = Thread;
-                userIsOnServer[i] = serverNummer;
+                userIsOnServer[i] = serverNumber;
                 break;
             }
         }
@@ -186,8 +176,8 @@ public class Server {
 
     int askForID(String username) { //Es wird geschaut, welche Id der User hat (Index von userNameRegister)
         int answer = -1;
-        for (int i = 0; i < userNameRegister.length; i++) {
-            if (username.equals(userNameRegister[i])) {
+        for (int i = 0; i < USER_NAME_REGISTER.length; i++) {
+            if (username.equals(USER_NAME_REGISTER[i])) {
                 answer = i;
                 break;
             }
@@ -200,26 +190,28 @@ public class Server {
 
     }
 
-    int getServerNummer(){
-        return serverNummer;
+    int getServerNumber(){
+        return serverNumber;
     }
 
     void setUserLoggedIn(int userID){
-        userIsOnServer[userID] = serverNummer;
-        SyncThread.sendUserActivity(userID, LOGGED_IN);
-    }
-    void setUserLoggedInLocal(int userID, int serverID){
-        userIsOnServer[userID] = serverID;
-        System.out.println("User wurde an einem anderen Server angemeldet");
+        ServerMessage newActivity = new ServerMessage(userID, getServerNumber(), LOGGED_IN);
+        syncThread.sendUserActivity(newActivity);
+        changeUserActivity(newActivity);
     }
 
     void setUserLoggedOut(int userID){
-        userIsOnServer[userID] = -1;
-        SyncThread.sendUserActivity(userID, LOGGED_OUT);
+        ServerMessage newActivity = new ServerMessage(userID, getServerNumber(), LOGGED_OUT);
+        syncThread.sendUserActivity(newActivity);
+        changeUserActivity(newActivity);
     }
-    void setUserLoggedOutLocal(int userID){
-        userIsOnServer[userID] = -1;
-        System.out.println("User wurde an einem anderen Server abgemeldet");
+
+    void changeUserActivity(ServerMessage serverMessage){
+        if(serverMessage.getStatus() == LOGGED_IN){
+            userIsOnServer[serverMessage.getUserId()] = serverMessage.getServerId();
+        } else if (serverMessage.getStatus() == LOGGED_OUT) {
+            userIsOnServer[serverMessage.getUserId()] = 0;
+        }
     }
 
 

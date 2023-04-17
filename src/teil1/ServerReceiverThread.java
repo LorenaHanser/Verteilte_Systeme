@@ -46,7 +46,11 @@ public class ServerReceiverThread extends Thread {
                     try {
                         String response = reader.readLine();
                         System.out.println(response);
-                        sendMessageToServer(response);
+                        if(Message.isClientMessage(response)){
+                            sendMessageToServer(ClientMessage.toObject(response));
+                        }else{
+                            sendUserActivityToServer(ServerMessage.toObject(response));
+                        }
                     } catch (IOException ex) {
                         System.out.println(ANSI_RED + "Error reading from server: " + ex.getMessage() + ANSI_RESET);
                         ex.printStackTrace();
@@ -61,17 +65,15 @@ public class ServerReceiverThread extends Thread {
 
     }
 
-    private void sendMessageToServer(Message message) {
+    private void sendMessageToServer(ClientMessage clientMessage) {
         System.out.println("Nachricht erhalten");
+        // todo nur Nachrichten Typ 1 und 2 sollen in sendMessage verarbeitet werden (stand 17.04.) (rest war für Sync gedacht)
+        server.sendMessage(clientMessage);
+    }
 
-        if (message instanceof ClientMessage) {
-            System.out.println("Es gab eine Useraktivität");
-            ClientMessage clientMessage = (ClientMessage) message;
-
-        } else if (message instanceof ServerMessage) {
-
-        }
-
+    private void sendUserActivityToServer(ServerMessage serverMessage) {
+        System.out.println("User Activity erhalten");
+        server.changeUserActivity(serverMessage);
     }
 
 }

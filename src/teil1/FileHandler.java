@@ -2,6 +2,7 @@ package teil1;
 
 import java.io.*;
 import java.sql.Timestamp;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 public class FileHandler {
@@ -87,13 +88,12 @@ public class FileHandler {
 
     // Methode, um eine neue Chatnachricht in der .txt Datei zu speichern
     // [06.04.2023 17:01:12] [Daniel]: Nachricht
-    public void write(String message, int ownID, int chatPartnerID) {
-        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-
+    public void write(ClientMessage clientMessage) {
+        // todo: die Abfrage brauchen wir eigentlich mit dem neuen Protokoll nicht...
         String[] notAllowedColors = {ANSI_BLACK, ANSI_RED, ANSI_GREEN, ANSI_YELLOW, ANSI_BLUE, ANSI_PURPLE, ANSI_CYAN, ANSI_WHITE, "]: null"};
         boolean writingAllowed = true;
         for (String notAllowedString : notAllowedColors) {
-            if (message.contains(notAllowedString)) {
+            if (clientMessage.getContent().contains(notAllowedString)) {
                 writingAllowed = false;
                 break;
             }
@@ -105,13 +105,15 @@ public class FileHandler {
             }
 
             if (writingAllowed) {
-                BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(path + getFilename(ownID, chatPartnerID) + ENDING, true));
-                bufferedWriter.write("[" + TIMESTAMP_FORMAT.format(timestamp) + "] " + message);
+                BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(path + getFilename(clientMessage.getUserId(), clientMessage.getReceiverId()) + ENDING, true));
+                bufferedWriter.write("[" + TIMESTAMP_FORMAT.parse(String.valueOf(clientMessage.getTimestamp())) + "] [" + clientMessage.getUserName() + "]: " + clientMessage.getContent());
                 bufferedWriter.newLine();
                 bufferedWriter.close();
             }
         } catch (IOException e) {
             System.out.println(ANSI_RED + "Fehler beim Speichern in der Datei: " + e.getMessage() + ANSI_RESET);
+        } catch (ParseException e) {
+            System.out.println(ANSI_RED + "Fehler beim Speichern des Zeitstempels in der Datei: " + e.getMessage() + ANSI_RESET);
         }
     }
 
