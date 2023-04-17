@@ -75,10 +75,7 @@ public class ClientMessage extends Message {
 
     public static ClientMessage toObject(String string) {
         String[] attributes = string.split(Message.getSplitSymbol(), 5);
-        System.out.println("Das steht in der Nachricht, die als ClientMessage ausgegeben werden");
-        for (int i = 0; i < attributes.length; i++) {
-            System.out.println(attributes[i]);
-        }
+
         int userId = Integer.parseInt(attributes[0]);
         int receiverId = Integer.parseInt(attributes[1]);
         Timestamp timestamp = Timestamp.valueOf(attributes[2]);

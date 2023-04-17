@@ -123,7 +123,7 @@ public class Server {
             } else {
                 System.out.println(ANSI_YELLOW + "Der User ist gerade beschäftigt. Die Nachricht: " + ANSI_CYAN + clientMessage.getContent() + ANSI_YELLOW + " wird gespeichert!");
             }
-        } else {
+        } else if(userIsOnServer[clientMessage.getReceiverId()] < 1){
             System.out.println(ANSI_YELLOW + "Der User ist nicht online, die Nachricht: " + ANSI_CYAN + clientMessage.getContent() + ANSI_YELLOW + " wird aber für ihn gespeichert...");
         }
     }
