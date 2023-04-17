@@ -30,14 +30,14 @@ public class ServerUserThread extends Thread {
     private int chatPartnerID;
 
     private int ownID; //Die Id des Users, der auf dem Thread läuft
-    private File file;
+    private FileHandler fileHandler;
 
     // Konstruktor
 
     public ServerUserThread(Socket socket, Server server, int serverNummer) {
         this.socket = socket;
         this.server = server;
-        this.file = new File(serverNummer);
+        this.fileHandler = new FileHandler(serverNummer);
     }
 
     public void run() {
@@ -95,7 +95,7 @@ public class ServerUserThread extends Thread {
             server.sendMessage(serverMessage, ownID, chatPartnerID);        //Nachricht an den Partner
 
             String clientMessage;
-            server.sendMessage(file.read(ownID, chatPartnerID), ownID); // bisheriger Chat wird an den Client übergeben
+            server.sendMessage(fileHandler.readWholeChatFile(ownID, chatPartnerID), ownID); // bisheriger Chat wird an den Client übergeben
 
             // Endlosschleife
 

@@ -4,7 +4,7 @@ import java.io.*;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 
-public class File {
+public class FileHandler {
 
     public static final String ANSI_RESET = "\u001B[0m";
     public static final String ANSI_BLACK = "\u001B[30m";
@@ -20,21 +20,23 @@ public class File {
     private final String[] FILENAMES = {"DanielDavid", "DanielLorena", "DavidLorena"};
     private final String ENDING = ".txt"; //Dateiendung der Textnachrichten
     private final String DIRECTORY_NAME = "Messages";
-    private static final SimpleDateFormat TIMESTAMP_FORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+    private static final SimpleDateFormat TIMESTAMP_FORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss:SSS");
 
     private String serverDirectoryName;
+    private int serverNumber;
 
-    public File(int serverNummer) {
-        this.serverDirectoryName = DIRECTORY_NAME + Integer.toString(serverNummer);
-        this.getPath();
+    public FileHandler(int serverNumber) {
+        this.serverNumber = serverNumber;
+        this.serverDirectoryName = DIRECTORY_NAME + serverNumber;
+        this.path = this.getPath(serverNumber);
     }
 
     // Methode zur Erstellung von Messages-Ordner und Chatfiles
     public void create() {
         try {
             //Ordner erstellen
-            if (!new java.io.File(path).exists()) {
-                boolean createdDirectory = new java.io.File(path).mkdir();
+            if (!new File(path).exists()) {
+                boolean createdDirectory = new File(path).mkdir();
                 if (createdDirectory) {
                     System.out.println(ANSI_WHITE + "Ordner " + serverDirectoryName + " wurde neu erstellt." + ANSI_RESET);
                 } else {
@@ -46,7 +48,7 @@ public class File {
 
             //Dateien erstellen
             for (String filename : FILENAMES) {
-                if (!new java.io.File(path, filename + ENDING).exists()) {
+                if (!new File(path, filename + ENDING).exists()) {
                     PrintWriter myWriter = new PrintWriter(new FileWriter(path + filename + ENDING));
                     System.out.println(ANSI_WHITE + "Datei " + filename + ENDING + " wurde neu erstellt." + ANSI_RESET);
                     myWriter.close();
@@ -57,17 +59,24 @@ public class File {
         } catch (IOException e) {
             System.out.println(ANSI_RED + "Fehler bei der Erstellung der Dateien: " + e.getMessage() + ANSI_RESET);
         }
+        this.synchronize();
     }
 
     // Methode, um eine Chatdatei zu lesen und in der Konsole anzeigen zu lassen
-    public String read(int ownID, int chatPartnerID) {
-        StringBuilder chat = new StringBuilder(ANSI_PURPLE + "Bisheriger Chat:\n" + ANSI_RESET);
+    // zum Aufrufen von außerhalb der Klasse
+    public String readWholeChatFile(int ownID, int chatPartnerID) {
+        return ANSI_PURPLE + "Bisheriger Chat:\n" + ANSI_BLUE + this.readWholeChatFile(path, this.getFilename(ownID, chatPartnerID)) + ANSI_RESET;
+    }
+
+    // zum Aufrufen innerhalb der Klasse File, damit die Methode synchronize() richtig ausgeführt werden kann
+    public String readWholeChatFile(String path, String filename) {
+        StringBuilder chat = new StringBuilder();
         String currentLine;
 
         try {
-            BufferedReader bufferedReader = new BufferedReader(new FileReader(path + getFilename(ownID, chatPartnerID) + ENDING));
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(path + filename + ENDING));
             while ((currentLine = bufferedReader.readLine()) != null) {
-                chat.append(ANSI_BLUE).append(currentLine).append(ANSI_RESET).append("\n");
+                chat.append(currentLine).append("\n");
             }
             bufferedReader.close();
         } catch (IOException e) {
@@ -80,7 +89,6 @@ public class File {
     // [06.04.2023 17:01:12] [Daniel]: Nachricht
     public void write(String message, int ownID, int chatPartnerID) {
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        System.out.println(message);
 
         String[] notAllowedColors = {ANSI_BLACK, ANSI_RED, ANSI_GREEN, ANSI_YELLOW, ANSI_BLUE, ANSI_PURPLE, ANSI_CYAN, ANSI_WHITE, "]: null"};
         boolean writingAllowed = true;
@@ -92,7 +100,7 @@ public class File {
         }
 
         try {
-            if (!new java.io.File(path).exists()) {
+            if (!new File(path).exists()) {
                 this.create();
             }
 
@@ -107,22 +115,37 @@ public class File {
         }
     }
 
+    // Methode, um alle Textnachrichten der Datei in die andere Datei zu übertragen
+    public void write(String message, String filename, String path) {
+        try {
+            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(path + filename + ENDING, true));
+            bufferedWriter.write(message.trim());
+            bufferedWriter.newLine();
+            bufferedWriter.close();
+
+        } catch (IOException e) {
+            System.out.println(ANSI_RED + "Fehler beim Speichern in der Datei: " + e.getMessage() + ANSI_RESET);
+        }
+    }
+
     // Methode ermittelt den Pfad zum Speichern der Chatdateien abhängig von Betriebssystem und Nutzername
-    public void getPath() {
+    public String getPath(int serverNumber) {
         String systemUserHome = System.getProperty("user.home");
         String systemOS = System.getProperty("os.name").toLowerCase();
         String desktop = "Desktop";
         String systemSign;
+        String path = "";
 
         if (systemOS.contains("windows")) {
             systemSign = "\\";
-            path = systemUserHome + systemSign + desktop + systemSign + serverDirectoryName + systemSign;
+            path = systemUserHome + systemSign + desktop + systemSign + DIRECTORY_NAME + serverNumber + systemSign;
         } else if (systemOS.contains("mac")) {
             systemSign = "/";
-            path = systemUserHome + systemSign + desktop + systemSign + serverDirectoryName + systemSign;
+            path = systemUserHome + systemSign + desktop + systemSign + DIRECTORY_NAME + serverNumber + systemSign;
         } else {
             System.out.println(ANSI_RED + "Das Betriebssystem wird leider nicht unterstützt :(\n" + ANSI_PURPLE + "Der Dateipfad zum Home-Verzeichnis kann manuell eingegeben werden." + ANSI_RESET);
         }
+        return path;
     }
 
     // Methode gibt aus zwei UserIDs den richtigen Dateinamen zurück
@@ -140,4 +163,34 @@ public class File {
         return filename;
     }
 
+    public void synchronize() {
+        // todo: Methode dynamisch machen
+        for (String filename : FILENAMES) {
+            String path1 = this.getPath(1);
+            String path2 = this.getPath(2);
+
+            String contentServer1 = this.readWholeChatFile(path1, filename);
+            String contentServer2 = this.readWholeChatFile(path2, filename);
+
+            File currentFileServer1 = new File(path1 + filename + ENDING);
+            File currentFileServer2 = new File(path2 + filename + ENDING);
+
+            if (contentServer1.equals(contentServer2)) {
+                System.out.println(ANSI_WHITE + "Die beiden Dateien " + filename + " sind identisch." + ANSI_RESET);
+            } else {
+                System.out.println(ANSI_WHITE + "Die beiden Dateien " + filename + " sind unterschiedlich." + ANSI_RESET);
+                if (currentFileServer1.lastModified() > currentFileServer2.lastModified()) {
+                    System.out.println(ANSI_WHITE + "File: " + path1 + filename + " ist neuer als " + path2 + filename + ANSI_RESET);
+                    System.out.println(ANSI_WHITE + "Die ältere Datei: " + filename + " wurde gelöscht: " + currentFileServer2.delete() + ANSI_RESET);
+                    write(contentServer1, filename, path2);
+                } else if (currentFileServer2.lastModified() > currentFileServer1.lastModified()) {
+                    System.out.println(ANSI_WHITE + "File: " + path2 + filename + " ist neuer als " + path1 + filename + ANSI_RESET);
+                    System.out.println(ANSI_WHITE + "Die ältere Datei: " + filename + " wurde gelöscht: " + currentFileServer1.delete() + ANSI_RESET);
+                    write(contentServer2, filename, path1);
+                } else {
+                    System.out.println(ANSI_WHITE + "Beide Dateien haben das gleiche Änderungsdatum!" + ANSI_RESET);
+                }
+            }
+        }
+    }
 }
