@@ -39,11 +39,13 @@ public class ServerReceiverThread extends Thread {
                 reader = new BufferedReader(new InputStreamReader(input));
                 do {
                     try {
-                        System.out.println("Fange an zu lauschen");
                         String response = reader.readLine();
-                        System.out.println("Nachricht erhalten");
                         System.out.println(response);
-                        sendMessageToServer(response);
+                        if(Message.isClientMessage(response)){
+                            sendMessageToServer(ClientMessage.toObject(response));
+                        }else{
+                            sendUserActivityToServer(ServerMessage.toObject(response));
+                        }
                     } catch (IOException ex) {
                         System.out.println(ANSI_RED + "Error reading from server: " + ex.getMessage() + ANSI_RESET);
                         ex.printStackTrace();
@@ -57,29 +59,15 @@ public class ServerReceiverThread extends Thread {
         }
     }
 
-    private void sendMessageToServer(String rawMessage) {
+    private void sendMessageToServer(ClientMessage clientMessage) {
         System.out.println("Nachricht erhalten");
-        String[] rawMessageHeader = rawMessage.split(";", 2);
-        int header = Integer.parseInt(rawMessageHeader[0]);
-        if(header == server.USER_AKTIVITY){
-            System.out.println("Es gab eine Useraktivität");
-            String[] rawMessageArray = rawMessageHeader[1].split(";", 3);
-            int userID = Integer.parseInt(rawMessageArray[0]);
-            int serverID = Integer.parseInt(rawMessageArray[1]);
-            int userStatus = Integer.parseInt(rawMessageArray[2]);
-            if(userStatus == server.LOGGED_IN){
-                server.setUserLoggedInLocal(userID, serverID);
-            } else if (userStatus == server.LOGGED_OUT) {
-                server.setUserLoggedOutLocal(userID);
-            }
-        } else if (header == server.MESSAGE) {
-            String[] rawMessageArray = rawMessageHeader[1].split(";", 3);//String wird in Array gesplittet
-            int senderID = Integer.parseInt(rawMessageArray[0]);
-            int receiverID = Integer.parseInt(rawMessageArray[1]);
-            String message = rawMessageArray[2];
-            server.sendMessageFromServer(message, senderID, receiverID);
-        }
-
+        // todo nur Nachrichten Typ 1 und 2 sollen in sendMessage verarbeitet werden (stand 17.04.) (rest war für Sync gedacht)
+        server.sendMessage(clientMessage);
     }
 
-}
+    private void sendUserActivityToServer(ServerMessage serverMessage) {
+        System.out.println("User Activity erhalten");
+        server.changeUserActivity(serverMessage);
+    }
+
+    }
