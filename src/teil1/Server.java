@@ -4,12 +4,7 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
-/**
- * This is the chat server program.
- * Press Ctrl + C to terminate the program.
- *
- * @author www.codejava.net
- */
+
 public class Server {
     public static final String ANSI_RESET = "\u001B[0m";
     public static final String ANSI_BLACK = "\u001B[30m";
@@ -20,6 +15,12 @@ public class Server {
     public static final String ANSI_PURPLE = "\u001B[35m";
     public static final String ANSI_CYAN = "\u001B[36m";
     public static final String ANSI_WHITE = "\u001B[37m";
+
+    //Für das Protokoll
+    public static final int USER_AKTIVITY = 0;
+    public static final int MESSAGE = 1;
+    public static final int LOGGED_OUT = 0;
+    public static final int LOGGED_IN = 1;
 
     private int port;
     private File file;
@@ -198,5 +199,28 @@ public class Server {
         userChattetWith[user] = chatPartner;
 
     }
+
+    int getServerNummer(){
+        return serverNummer;
+    }
+
+    void setUserLoggedIn(int userID){
+        userIsOnServer[userID] = serverNummer;
+        SyncThread.sendUserAktivity(userID, LOGGED_IN);
+    }
+    void setUserLoggedInLocal(int userID, int serverID){
+        userIsOnServer[userID] = serverID;
+        System.out.println("User wurde an einem anderen Server angemeldet");
+    }
+
+    void setUserLoggedOut(int userID){
+        userIsOnServer[userID] = -1;
+        SyncThread.sendUserAktivity(userID, LOGGED_OUT);
+    }
+    void setUserLoggedOutLocal(int userID){
+        userIsOnServer[userID] = -1;
+        System.out.println("User wurde an einem anderen Server abgemeldet");
+    }
+
 
 }

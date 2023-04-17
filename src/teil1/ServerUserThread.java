@@ -77,6 +77,7 @@ public class ServerUserThread extends Thread {
             }
             server.setThreadId(userName, this); //die Referenzvariable des Threads wird mit dem User verknüpft
             ownID = server.askForID(userName); // eigene ID wird gespeichert
+            server.setUserLoggedIn(ownID);
 
             String serverMessage = ANSI_PURPLE + "New user connected: " + userName + ANSI_RESET;
 
@@ -107,6 +108,7 @@ public class ServerUserThread extends Thread {
 
             server.removeUser(userName, this);
             serverMessage = ANSI_PURPLE + "Client: " + userName + " hat die Verbindung getrennt!" + ANSI_RESET;
+            server.setUserLoggedOut(ownID);
             server.sendMessage(serverMessage, ownID, chatPartnerID);
             socket.close();
 
