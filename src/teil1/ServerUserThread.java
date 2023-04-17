@@ -97,7 +97,7 @@ public class ServerUserThread extends Thread {
 
             String clientMessage;
             //todo: hier ist die Ausgabe der File -> muss aktualisiert werden
-            //server.sendMessage(fileHandler.readWholeChatFile(ownID, chatPartnerID), ownID); // bisheriger Chat wird an den Client übergeben
+            server.sendMessage(fileHandler.readWholeChatFile(ownID, chatPartnerID), ownID); // bisheriger Chat wird an den Client übergeben
 
             // Endlosschleife
 
