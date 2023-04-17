@@ -73,11 +73,16 @@ public class ServerReceiverThread extends Thread {
                 server.setUserLoggedOutLocal(userID);
             }
         } else if (header == server.MESSAGE) {
-            String[] rawMessageArray = rawMessageHeader[1].split(";", 3);//String wird in Array gesplittet
+            String[] rawMessageArray = rawMessageHeader[1].split(";", 4);//String wird in Array gesplittet
             int senderID = Integer.parseInt(rawMessageArray[0]);
             int receiverID = Integer.parseInt(rawMessageArray[1]);
-            String message = rawMessageArray[2];
-            server.sendMessageFromServer(message, senderID, receiverID);
+            int isNewMessage = Integer.parseInt(rawMessageArray[2]);
+            if(isNewMessage == 1) {
+                String message = rawMessageArray[3];
+                server.sendMessageFromServer(message, senderID, receiverID);
+            } else if (isNewMessage == 0) {
+                    System.out.println("Auf unsere Letzte Anfrage wurde erhalten: "+rawMessageArray[3]);
+            }
         }
 
     }

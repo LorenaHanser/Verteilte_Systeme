@@ -52,7 +52,7 @@ public class ServerConnectorThread extends Thread {
 
     protected void sendMessageToOtherServer(String rawMessage, int sendUserId, int receiverUserId) {
         System.out.println("Message wird gesendet!");
-        String message = server.MESSAGE +";"+ sendUserId + ";" + receiverUserId + ";" + rawMessage;
+        String message = server.MESSAGE +";"+ sendUserId + ";" + receiverUserId + ";"+server.MESSAGE +";" + rawMessage;
         writer.println(message);
         System.out.println("Nachricht wurde gesendet!");
 

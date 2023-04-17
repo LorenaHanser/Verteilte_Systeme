@@ -21,6 +21,8 @@ public class Server {
     public static final int MESSAGE = 1;
     public static final int LOGGED_OUT = 0;
     public static final int LOGGED_IN = 1;
+    public static final int ANSWER_TO_MESSAGE = 0;
+    public static final int ACCEPT_MESSAGE = 0;
 
     private int port;
     private File file;
@@ -115,6 +117,8 @@ public class Server {
                     SyncThread1.sendMessageToOtherServer(message, sendUserId, receiverUserId);
                 } else if (portFromReciverServer == partner2ServerPort) {
                     SyncThread2.sendMessageToOtherServer(message, sendUserId, receiverUserId);
+                }else{
+                    SyncThread1.sendMessageToOtherServer(message, sendUserId, receiverUserId);
                 }
             }
         } catch (Exception e) {
