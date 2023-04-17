@@ -41,8 +41,8 @@ public class Server {
     private int partner1ServerPort; //Port des Partnerservers (Port für Serverkommunikation)
     private int partner2ServerPort;
     private String partnerServerAdress = "localhost"; //hier die Adresse des anderen Server eintragen.
-    private ServerConnectorThread SyncThread1;
-    private ServerConnectorThread SyncThread2;
+    private ServerConnectorThread syncThread1;
+    private ServerConnectorThread syncThread2;
 
     //Variablen für den eigenen Server
     private int serverReceiverPort;
@@ -77,10 +77,10 @@ public class Server {
 
             fileHandler.create();
 
-            SyncThread1 = new ServerConnectorThread(partnerServerAdress, partner1ServerPort, this); // hier noch 2. Port anmelden
-            SyncThread2 = new ServerConnectorThread(partnerServerAdress, partner2ServerPort, this); // hier noch 2. Port anmelden
-            SyncThread1.start();
-            SyncThread2.start();
+            syncThread1 = new ServerConnectorThread(partnerServerAdress, partner1ServerPort, this); // hier noch 2. Port anmelden
+            syncThread2 = new ServerConnectorThread(partnerServerAdress, partner2ServerPort, this); // hier noch 2. Port anmelden
+            syncThread1.start();
+            syncThread2.start();
 
             // Endlosschleife
 
@@ -112,8 +112,8 @@ public class Server {
      */
     void sendMessageToServer(ClientMessage clientMessage) {
         try {
-            SyncThread1.sendMessageToOtherServer(clientMessage);
-            SyncThread2.sendMessageToOtherServer(clientMessage);
+            syncThread1.sendMessageToOtherServer(clientMessage);
+            syncThread2.sendMessageToOtherServer(clientMessage);
         } catch (Exception e) {
             System.out.println(ANSI_RED + "Sync Server nicht gefunden" + ANSI_RESET);
         }
@@ -205,13 +205,15 @@ public class Server {
 
     void setUserLoggedIn(int userID){
         ServerMessage newActivity = new ServerMessage(userID, getServerNumber(), LOGGED_IN);
-        syncThread.sendUserActivity(newActivity);
+        syncThread1.sendUserActivity(newActivity);
+        syncThread2.sendUserActivity(newActivity);
         changeUserActivity(newActivity);
     }
 
     void setUserLoggedOut(int userID){
         ServerMessage newActivity = new ServerMessage(userID, getServerNumber(), LOGGED_OUT);
-        syncThread.sendUserActivity(newActivity);
+        syncThread1.sendUserActivity(newActivity);
+        syncThread2.sendUserActivity(newActivity);
         changeUserActivity(newActivity);
     }
 
