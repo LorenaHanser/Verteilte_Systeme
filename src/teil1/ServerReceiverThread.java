@@ -61,27 +61,15 @@ public class ServerReceiverThread extends Thread {
 
     }
 
-    private void sendMessageToServer(String rawMessage) {
+    private void sendMessageToServer(Message message) {
         System.out.println("Nachricht erhalten");
-        String[] rawMessageHeader = rawMessage.split(";", 2);
-        int header = Integer.parseInt(rawMessageHeader[0]);
-        if(header == server.USER_AKTIVITY){
+
+        if (message instanceof ClientMessage) {
             System.out.println("Es gab eine Useraktivität");
-            String[] rawMessageArray = rawMessageHeader[1].split(";", 3);
-            int userID = Integer.parseInt(rawMessageArray[0]);
-            int serverID = Integer.parseInt(rawMessageArray[1]);
-            int userStatus = Integer.parseInt(rawMessageArray[2]);
-            if(userStatus == server.LOGGED_IN){
-                server.setUserLoggedInLocal(userID, serverID);
-            } else if (userStatus == server.LOGGED_OUT) {
-                server.setUserLoggedOutLocal(userID);
-            }
-        } else if (header == server.MESSAGE) {
-            String[] rawMessageArray = rawMessageHeader[1].split(";", 3);//String wird in Array gesplittet
-            int senderID = Integer.parseInt(rawMessageArray[0]);
-            int receiverID = Integer.parseInt(rawMessageArray[1]);
-            String message = rawMessageArray[2];
-            server.sendMessageFromServer(message, senderID, receiverID);
+            ClientMessage clientMessage = (ClientMessage) message;
+
+        } else if (message instanceof ServerMessage) {
+
         }
 
     }

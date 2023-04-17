@@ -206,7 +206,7 @@ public class Server {
 
     void setUserLoggedIn(int userID){
         userIsOnServer[userID] = serverNummer;
-        SyncThread.sendUserAktivity(userID, LOGGED_IN);
+        SyncThread.sendUserActivity(userID, LOGGED_IN);
     }
     void setUserLoggedInLocal(int userID, int serverID){
         userIsOnServer[userID] = serverID;
@@ -215,7 +215,7 @@ public class Server {
 
     void setUserLoggedOut(int userID){
         userIsOnServer[userID] = -1;
-        SyncThread.sendUserAktivity(userID, LOGGED_OUT);
+        SyncThread.sendUserActivity(userID, LOGGED_OUT);
     }
     void setUserLoggedOutLocal(int userID){
         userIsOnServer[userID] = -1;
