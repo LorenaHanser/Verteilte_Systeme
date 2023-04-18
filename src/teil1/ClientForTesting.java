@@ -23,7 +23,7 @@ public class ClientForTesting {
                 port = Integer.parseInt(answer);
                 if (port <= 8990 && port >= 8988) {
                     portFound = true;
-                }else{
+                } else {
                     System.out.println("Leider ist die Eingabe nicht korrekt");
                 }
             }

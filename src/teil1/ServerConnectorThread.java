@@ -56,8 +56,8 @@ public class ServerConnectorThread extends Thread {
         writer.println(clientMessage.toString());
     }
 
-    protected void sendUserActivity(ServerMessage serverMessage){
-        if(writer != null){
+    protected void sendUserActivity(ServerMessage serverMessage) {
+        if (writer != null) {
             writer.println(serverMessage.toString());
         }
     }

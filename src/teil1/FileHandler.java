@@ -64,6 +64,7 @@ public class FileHandler {
     // Methode, um eine Chatdatei zu lesen und in der Konsole anzeigen zu lassen
     // zum Aufrufen von außerhalb der Klasse
     public String readWholeChatFile(int ownID, int chatPartnerID) {
+        this.synchronize();
         return ANSI_PURPLE + "Bisheriger Chat:\n" + ANSI_BLUE + this.readWholeChatFile(path, this.getFilename(ownID, chatPartnerID)) + ANSI_RESET;
     }
 
@@ -88,7 +89,7 @@ public class FileHandler {
     // [06.04.2023 17:01:12] [Daniel]: Nachricht
     public void write(ClientMessage clientMessage) {
         // todo: die Abfrage brauchen wir eigentlich mit dem neuen Protokoll nicht...
-        String[] notAllowedColors = {ANSI_BLACK, ANSI_RED, ANSI_GREEN, ANSI_YELLOW, ANSI_BLUE, ANSI_PURPLE, ANSI_CYAN, ANSI_WHITE, "]: null"};
+        String[] notAllowedColors = {ANSI_BLACK, ANSI_RED, ANSI_GREEN, ANSI_YELLOW, ANSI_BLUE, ANSI_PURPLE, ANSI_CYAN, ANSI_WHITE, "SHUTDOWN", "DISCONNECT"};
         boolean writingAllowed = true;
         for (String notAllowedString : notAllowedColors) {
             if (clientMessage.getContent().contains(notAllowedString)) {

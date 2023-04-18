@@ -75,8 +75,8 @@ public class ClientWriteThread extends Thread {
                 //System.out.println("-- wir sind in ClientWriteThread run()");
                 if (text.trim().isEmpty()) {
                     System.out.println("Leere Texteingaben sind nicht erlaubt!");
-                } else{
-                    String message = timestamp+ ";"+text;
+                } else {
+                    String message = timestamp + ";" + text;
                     writer.println(message); // Nachricht senden
                 }
             } catch (IOException e) {

@@ -19,7 +19,7 @@ public class Server2 {
         int serverReceiverPort = 8991;
         int serverNummer = 2;
 
-            Server server = new Server(port, partnerServerPort, serverReceiverPort, serverNummer);
-            server.execute();
-        }
+        Server server = new Server(port, partnerServerPort, serverReceiverPort, serverNummer);
+        server.execute();
+    }
 }

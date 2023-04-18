@@ -46,9 +46,9 @@ public class ServerReceiverThread extends Thread {
                     try {
                         String response = reader.readLine();
                         System.out.println(response);
-                        if(Message.isClientMessage(response)){
+                        if (Message.isClientMessage(response)) {
                             sendMessageToServer(ClientMessage.toObject(response));
-                        }else{
+                        } else {
                             sendUserActivityToServer(ServerMessage.toObject(response));
                         }
                     } catch (IOException ex) {

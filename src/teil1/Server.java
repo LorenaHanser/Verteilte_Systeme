@@ -23,7 +23,7 @@ public class Server {
     public static final int LOGGED_IN = 1;
 
     public static final int NEW_MESSAGE = 0;
-    public  static final int NEW_MESSAGE_WITHOUT_TIMESTAMP = 1;
+    public static final int NEW_MESSAGE_WITHOUT_TIMESTAMP = 1;
 
     private int port;
     private FileHandler fileHandler;
@@ -123,7 +123,7 @@ public class Server {
             } else {
                 System.out.println(ANSI_YELLOW + "Der User ist gerade beschäftigt. Die Nachricht: " + ANSI_CYAN + clientMessage.getContent() + ANSI_YELLOW + " wird gespeichert!");
             }
-        } else if(userIsOnServer[clientMessage.getReceiverId()] < 1){
+        } else if (userIsOnServer[clientMessage.getReceiverId()] < 1) {
             System.out.println(ANSI_YELLOW + "Der User ist nicht online, die Nachricht: " + ANSI_CYAN + clientMessage.getContent() + ANSI_YELLOW + " wird aber für ihn gespeichert...");
         }
     }
@@ -190,24 +190,24 @@ public class Server {
 
     }
 
-    int getServerNumber(){
+    int getServerNumber() {
         return serverNumber;
     }
 
-    void setUserLoggedIn(int userID){
+    void setUserLoggedIn(int userID) {
         ServerMessage newActivity = new ServerMessage(userID, getServerNumber(), LOGGED_IN);
         syncThread.sendUserActivity(newActivity);
         changeUserActivity(newActivity);
     }
 
-    void setUserLoggedOut(int userID){
+    void setUserLoggedOut(int userID) {
         ServerMessage newActivity = new ServerMessage(userID, getServerNumber(), LOGGED_OUT);
         syncThread.sendUserActivity(newActivity);
         changeUserActivity(newActivity);
     }
 
-    void changeUserActivity(ServerMessage serverMessage){
-        if(serverMessage.getStatus() == LOGGED_IN){
+    void changeUserActivity(ServerMessage serverMessage) {
+        if (serverMessage.getStatus() == LOGGED_IN) {
             userIsOnServer[serverMessage.getUserId()] = serverMessage.getServerId();
         } else if (serverMessage.getStatus() == LOGGED_OUT) {
             userIsOnServer[serverMessage.getUserId()] = 0;
