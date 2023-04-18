@@ -47,38 +47,27 @@ public class ServerUserThread extends Thread {
             OutputStream output = socket.getOutputStream();
             writer = new PrintWriter(output, true);
 
-            // todo: wo clean coding??
-            writer.println(ANSI_PURPLE + "Please enter your name:" + ANSI_RESET);
+            // Authentifizierungsprozess
             boolean userSuccessfullyAuthenticated = false;
-            userName = getText(reader.readLine());
             String password;
-            if (server.checkUsernameExists(userName)) {
-                writer.println(ANSI_PURPLE + "Please insert Password:" + ANSI_RESET);
-                password = getText(reader.readLine());
-                if (server.checkPasswordValid(userName, password)) {
-                    userSuccessfullyAuthenticated = true;
-                }
-                if (server.getUserIsOnServer(server.askForID(userName)) != 0) { // User war noch nicht online
-                    writer.println(ANSI_RED + "Der User ist schon angemeldet. Melden Sie sich mit der anderen Verbindung ab." + ANSI_RESET);
-                    userSuccessfullyAuthenticated = false;
-                }
-            }
-            while (!userSuccessfullyAuthenticated) {
-                writer.println(ANSI_RED + "Password oder User falsch! Bitte versuch es nochmal" + ANSI_RESET);
+            do {
                 writer.println(ANSI_PURPLE + "Please enter your name:" + ANSI_RESET);
                 userName = getText(reader.readLine());
                 if (server.checkUsernameExists(userName)) {
                     writer.println(ANSI_PURPLE + "Please insert Password:" + ANSI_RESET);
                     password = getText(reader.readLine());
                     if (server.checkPasswordValid(userName, password)) {
-                        userSuccessfullyAuthenticated = true;
-                    }
-                    if (server.getUserIsOnServer(server.askForID(userName)) != 0) { // User war noch nicht online
-                        writer.println(ANSI_RED + "Der User ist schon angemeldet. Melden Sie sich mit der anderen Verbindung ab." + ANSI_RESET);
-                        userSuccessfullyAuthenticated = false;
+                        if (server.getUserIsOnServer(server.askForID(userName)) != 0) { // User war noch nicht online
+                            writer.println(ANSI_RED + "Der User ist schon angemeldet. Melden Sie sich bitte mit der anderen Verbindung ab." + ANSI_RESET);
+                        } else {
+                            userSuccessfullyAuthenticated = true;
+                        }
+                    } else {
+                        writer.println(ANSI_RED + "Password oder User falsch! Bitte versuch es nochmal" + ANSI_RESET);
                     }
                 }
-            }
+            } while (!userSuccessfullyAuthenticated);
+
             server.setThreadId(userName, this); //die Referenzvariable des Threads wird mit dem User verknüpft
             ownID = server.askForID(userName); // eigene ID wird gespeichert
             server.setUserLoggedIn(ownID);
@@ -93,6 +82,8 @@ public class ServerUserThread extends Thread {
                     writer.println(ANSI_PURPLE + "Alles klar, du wirst verbunden" + ANSI_RESET);
                     server.setChatPartner(ownID, chatPartnerID); //User geht in Chatraum
                     foundPartner = true;
+                } else {
+                    writer.println(ANSI_RED + "Der User ist nicht registriert. Bitte versuch es nochmal" + ANSI_RESET);
                 }
             }// ab hier weiß der User die ID seines Chatpartners
 
