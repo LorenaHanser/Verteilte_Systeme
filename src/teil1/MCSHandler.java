@@ -8,18 +8,6 @@ public class MCSHandler {
     public MCSHandler(){
     }
 
-    public void setServer1Online() {
-        isServer1Online = true;
-    }
-    public void setServer1Offline() {
-        isServer1Online = false;
-    }
-    public void setServer2Online() {
-        isServer2Online = true;
-    }
-    public void setServer2Offline() {
-        isServer2Online = false;
-    }
 
     public void setServerOnline(int ThreadNummer) {
 
@@ -53,5 +41,9 @@ public class MCSHandler {
             answer = false;
         }
         return answer;
+    }
+
+    public boolean isSyncThread1Connected() {
+        return isServer1Online;
     }
 }
