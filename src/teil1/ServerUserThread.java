@@ -114,16 +114,16 @@ public class ServerUserThread extends Thread {
 
             } while (!getText(serverMessage).equals(DISCONNECT) && !getText(serverMessage).equals((SHUTDOWN)));
 
-            server.removeUser(userName, this);
             serverMessage = ANSI_PURPLE + "Client: " + userName + " hat die Verbindung getrennt!" + ANSI_RESET;
-            server.setUserLoggedOut(ownID);
             server.sendMessageToServer(new ClientMessage(ownID, chatPartnerID, new Timestamp(System.currentTimeMillis()), 0, serverMessage));
             socket.close();
+            server.userConnectionReset(ownID, this);
 
         } catch (IOException ex) {
             System.out.println(ANSI_RED + "Error in UserThread: " + ex.getMessage() + ANSI_RESET);
             String serverMessage = ANSI_YELLOW + "Client: " + userName + " hat die Verbindung getrennt!" + ANSI_RESET;
             server.sendMessageToServer(new ClientMessage(ownID, chatPartnerID, new Timestamp(System.currentTimeMillis()), 0, serverMessage));
+            server.userConnectionReset(ownID, this);
         }
     }
 
