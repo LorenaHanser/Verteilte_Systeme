@@ -1,7 +1,10 @@
 package teil1;
 
 import java.io.*;
+import java.sql.Timestamp;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class FileHandler {
 
@@ -19,7 +22,7 @@ public class FileHandler {
     private final String[] FILENAMES = {"DanielDavid", "DanielLorena", "DavidLorena"};
     private final String ENDING = ".txt"; //Dateiendung der Textnachrichten
     private final String DIRECTORY_NAME = "Messages";
-    private static final SimpleDateFormat TIMESTAMP_FORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss:SSS");
+    private static final SimpleDateFormat TIMESTAMP_FORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss.SSS");
 
     private String serverDirectoryName;
     private int serverNumber;
@@ -87,7 +90,7 @@ public class FileHandler {
 
     // Methode, um eine neue Chatnachricht in der .txt Datei zu speichern
     // [06.04.2023 17:01:12] [Daniel]: Nachricht
-    public void write(ClientMessage clientMessage) {
+    public void writeOneNewMessage(ClientMessage clientMessage) {
         // todo: die Abfrage brauchen wir eigentlich mit dem neuen Protokoll nicht...
         String[] notAllowedColors = {ANSI_BLACK, ANSI_RED, ANSI_GREEN, ANSI_YELLOW, ANSI_BLUE, ANSI_PURPLE, ANSI_CYAN, ANSI_WHITE, "SHUTDOWN", "DISCONNECT"};
         boolean writingAllowed = true;
@@ -104,10 +107,13 @@ public class FileHandler {
             }
 
             if (writingAllowed) {
-                BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(path + getFilename(clientMessage.getUserId(), clientMessage.getReceiverId()) + ENDING, true));
+                String pathToFile = path + getFilename(clientMessage.getUserId(), clientMessage.getReceiverId()) + ENDING;
+                BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(pathToFile, true));
                 bufferedWriter.write("[" + TIMESTAMP_FORMAT.format(clientMessage.getTimestamp()) + "] [" + clientMessage.getUserName() + "]: " + clientMessage.getContent());
                 bufferedWriter.newLine();
                 bufferedWriter.close();
+
+                this.sortChatMessages(pathToFile);
             }
         } catch (IOException e) {
             System.out.println(ANSI_RED + "Fehler beim Speichern in der Datei: " + e.getMessage() + ANSI_RESET);
@@ -115,7 +121,7 @@ public class FileHandler {
     }
 
     // Methode, um alle Textnachrichten der Datei in die andere Datei zu übertragen
-    public void write(String message, String filename, String path) {
+    public void writeWholeChatfile(String message, String filename, String path) {
         try {
             BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(path + filename + ENDING, true));
             bufferedWriter.write(message.trim());
@@ -181,15 +187,58 @@ public class FileHandler {
                 if (currentFileServer1.lastModified() > currentFileServer2.lastModified()) {
                     System.out.println(ANSI_WHITE + "File: " + path1 + filename + " ist neuer als " + path2 + filename + ANSI_RESET);
                     System.out.println(ANSI_WHITE + "Die ältere Datei: " + filename + " wurde gelöscht: " + currentFileServer2.delete() + ANSI_RESET);
-                    write(contentServer1, filename, path2);
+                    writeWholeChatfile(contentServer1, filename, path2);
                 } else if (currentFileServer2.lastModified() > currentFileServer1.lastModified()) {
                     System.out.println(ANSI_WHITE + "File: " + path2 + filename + " ist neuer als " + path1 + filename + ANSI_RESET);
                     System.out.println(ANSI_WHITE + "Die ältere Datei: " + filename + " wurde gelöscht: " + currentFileServer1.delete() + ANSI_RESET);
-                    write(contentServer2, filename, path1);
+                    writeWholeChatfile(contentServer2, filename, path1);
                 } else {
                     System.out.println(ANSI_WHITE + "Beide Dateien haben das gleiche Änderungsdatum!" + ANSI_RESET);
                 }
             }
+        }
+    }
+
+    public void sortChatMessages(String pathToFile) {
+        try {
+            // Liste, um Daten aus Textdatei zu speichern
+            List<String> lines = new ArrayList<>();
+
+            // Lesen der Daten aus der Textdatei und Speichern in der Liste
+            BufferedReader reader = new BufferedReader(new FileReader(pathToFile));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                lines.add(line);
+            }
+            reader.close();
+
+            // Sortieren der Liste nach dem Timestamp
+            Collections.sort(lines, new Comparator<String>() {
+                public int compare(String line1, String line2) {
+                    int returnInt = 22;
+                    try {
+                        // Annahme: Der Timestamp befindet sich am Anfang jeder Zeile
+                        Timestamp timestampObject1 = new Timestamp((TIMESTAMP_FORMAT.parse(line1.substring(1).split("]")[0])).getTime());
+                        Timestamp timestampObject2 = new Timestamp((TIMESTAMP_FORMAT.parse(line2.substring(1).split("]")[0])).getTime());
+                        return timestampObject1.compareTo(timestampObject2);
+                    } catch (ParseException e) {
+                        System.out.println(ANSI_RED + "Fehler beim Sortieren der Nachrichten: " + e.getMessage() + ANSI_RESET);
+                    }
+                    return returnInt;
+                }
+            });
+
+            // Zurückschreiben der sortierten Daten in die Textdatei
+            BufferedWriter writer = new BufferedWriter(new FileWriter(pathToFile));
+            for (String sortedLine : lines) {
+                writer.write(sortedLine);
+                writer.newLine();
+            }
+            writer.close();
+
+            System.out.println(ANSI_WHITE + "Die Textdatei wurde erfolgreich nach dem Timestamp sortiert." + ANSI_RESET);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

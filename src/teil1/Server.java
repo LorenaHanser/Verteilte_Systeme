@@ -110,8 +110,7 @@ public class Server {
 
     void sendMessage(ClientMessage clientMessage) {
 
-        // Timestamp prüfen(?)
-        fileHandler.write(clientMessage); //todo:fileHandler anpassen und dann !auskommentieren.
+        fileHandler.writeOneNewMessage(clientMessage);
         // todo nur Nachrichten Typ 1 und 2 Sollen verarbeitet werden (stand 17.04.)
         if (userThreadRegister[clientMessage.getReceiverId()] != null) { //es wird geschaut, ob der User online ist (zum Vermeiden von Exception)
             System.out.println(ANSI_YELLOW + "Diese Nachricht wurde erhalten: " + ANSI_CYAN + clientMessage.toString() + ANSI_RESET);
