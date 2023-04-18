@@ -4,12 +4,6 @@ import java.io.*;
 import java.net.*;
 import java.sql.Timestamp;
 
-/**
- * This thread handles connection for each connected client, so the server
- * can handle multiple clients at the same time.
- *
- * @author www.codejava.net
- */
 public class ServerUserThread extends Thread {
 
     public static final String ANSI_RESET = "\u001B[0m";
@@ -124,9 +118,6 @@ public class ServerUserThread extends Thread {
         }
     }
 
-    /**
-     * Sends a message to the client.
-     */
     void sendMessage(String message) {
         writer.println(ANSI_CYAN + message + ANSI_RESET);
     }

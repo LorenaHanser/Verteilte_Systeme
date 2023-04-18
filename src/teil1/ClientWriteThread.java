@@ -4,13 +4,6 @@ import java.io.*;
 import java.net.*;
 import java.sql.Timestamp;
 
-/**
- * This thread is responsible for reading user's input and send it
- * to the server.
- * It runs in an infinite loop until the user types 'bye' to quit.
- *
- * @author www.codejava.net
- */
 public class ClientWriteThread extends Thread {
 
     public static final String ANSI_RESET = "\u001B[0m";

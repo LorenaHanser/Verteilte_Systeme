@@ -99,9 +99,6 @@ public class Server {
         server.execute();
     }
 
-    /**
-     * Delivers a message from one user to another
-     */
     void sendMessageToServer(ClientMessage clientMessage) {
         try {
             syncThread.sendMessageToOtherServer(clientMessage);
@@ -166,9 +163,8 @@ public class Server {
         }
     }
 
-    /**
-     * When a client is disconnected, removes the UserThread
-     */
+
+    // When a client is disconnected, removes the UserThread
     void removeUser(String userName, ServerUserThread aUser) { //noch von Tutorial
         userThreads.remove(aUser);
         System.out.println(ANSI_YELLOW + "The user " + userName + " quit." + ANSI_RESET);
@@ -213,6 +209,5 @@ public class Server {
             userIsOnServer[serverMessage.getUserId()] = 0;
         }
     }
-
 
 }

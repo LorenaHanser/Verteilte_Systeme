@@ -3,12 +3,6 @@ package teil1;
 import java.net.*;
 import java.io.*;
 
-/**
- * This is the chat client program.
- * Type 'bye' to terminte the program.
- *
- * @author www.codejava.net
- */
 public class Client {
 
     public static final String ANSI_RESET = "\u001B[0m";
