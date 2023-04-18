@@ -68,11 +68,19 @@ public class ServerConnectorThread extends Thread {
     // Senden einer ClientMessage zum anderen Server
     protected void sendMessageToOtherServer(ClientMessage clientMessage) {
         System.out.println("Message wird gesendet!");
-        writer.println(clientMessage.toString());
+        try {
+            writer.println(clientMessage.toString());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     protected void sendUserActivity(ServerMessage serverMessage){
-        writer.println(serverMessage.toString());
+        try {
+            writer.println(serverMessage.toString());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 }
 
