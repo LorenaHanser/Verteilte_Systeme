@@ -57,7 +57,7 @@ public class Server {
     private Set<ServerUserThread> userThreads = new HashSet<>(); //hier werden die Referenzvariabeln gespeichert (kann man das überarbeiten?) Vorsicht vor Garbagecollector
 
     // Konstruktor
-    public Server(int port, int partner1ServerPort, int partner2ServerPort, int serverReceiverPort, int serverNummer) {
+    public Server(int port, int partner1ServerPort, int partner2ServerPort, int serverReceiverPort, int serverNumber) {
         System.out.println(ANSI_YELLOW + "Server 1 wird gestartet" + ANSI_RESET);
         this.serverNumber = serverNumber;
         this.port = port;
