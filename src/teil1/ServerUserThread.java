@@ -63,8 +63,10 @@ public class ServerUserThread extends Thread {
                             userSuccessfullyAuthenticated = true;
                         }
                     } else {
-                        writer.println(ANSI_RED + "Password oder User falsch! Bitte versuch es nochmal" + ANSI_RESET);
+                        writer.println(ANSI_RED + "Benutzername oder Passwort ist falsch! Bitte versuch es erneut" + ANSI_RESET);
                     }
+                } else {
+                    writer.println(ANSI_RED + "Benutzername ist nicht registriert! Bitte versuch es erneut" + ANSI_RESET);
                 }
             } while (!userSuccessfullyAuthenticated);
 
