@@ -44,6 +44,8 @@ public class Server {
     private ServerConnectorThread syncThread1;
     private ServerConnectorThread syncThread2;
 
+    private MCSHandler mcsHandler;
+
     //Variablen für den eigenen Server
     private int serverReceiverPort;
     private ServerReceiverMainThread receiverSyncThread;
@@ -63,6 +65,7 @@ public class Server {
         this.partner1ServerPort = partner1ServerPort;
         this.partner2ServerPort = partner2ServerPort;
         this.serverReceiverPort = serverReceiverPort;
+        this.mcsHandler = new MCSHandler();
     }
 
     public void execute() {
@@ -75,8 +78,8 @@ public class Server {
 
             fileHandler.create();
 
-            syncThread1 = new ServerConnectorThread(partnerServerAdress, partner1ServerPort, this); // hier noch 2. Port anmelden
-            syncThread2 = new ServerConnectorThread(partnerServerAdress, partner2ServerPort, this); // hier noch 2. Port anmelden
+            syncThread1 = new ServerConnectorThread(partnerServerAdress, partner1ServerPort, this,mcsHandler,1); // hier noch 2. Port anmelden
+            syncThread2 = new ServerConnectorThread(partnerServerAdress, partner2ServerPort, this,mcsHandler,2); // hier noch 2. Port anmelden
             syncThread1.start();
             syncThread2.start();
 
@@ -109,6 +112,9 @@ public class Server {
      * Delivers a message from one user to another
      */
     void sendMessageToServer(ClientMessage clientMessage) {
+        if(!mcsHandler.isServerBlocked())
+        {
+
         try {
             syncThread1.sendMessageToOtherServer(clientMessage);
             syncThread2.sendMessageToOtherServer(clientMessage);
@@ -116,6 +122,10 @@ public class Server {
             System.out.println(ANSI_RED + "Sync Server nicht gefunden" + ANSI_RESET);
         }
         sendMessage(clientMessage);
+
+        }else {
+            System.out.println("=====================Server ist Blockiert Nachricht kann nicht zugestellt werden=================");
+        }
     }
 
     void sendMessage(ClientMessage clientMessage) {

@@ -1,8 +1,6 @@
 package teil1;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
@@ -23,11 +21,16 @@ public class ServerConnectorThread extends Thread {
     private Server server;
 
     private PrintWriter writer;
+    private BufferedReader reader;
+    private MCSHandler mcsHandler;
+    private int threadNumber;
 
-    public ServerConnectorThread(String hostname, int port, Server server) {
+    public ServerConnectorThread(String hostname, int port, Server server, MCSHandler mcsHandler, int threadNumber) {
         this.hostname = hostname;
         this.port = port;
         this.server = server;
+        this.mcsHandler = mcsHandler;
+        this.threadNumber = threadNumber;
 
     }
 
@@ -38,11 +41,23 @@ public class ServerConnectorThread extends Thread {
                 Socket socket = new Socket(hostname, port);
                 OutputStream output = socket.getOutputStream();
                 writer = new PrintWriter(output, true);
+                InputStream input = socket.getInputStream();
+                reader = new BufferedReader(new InputStreamReader(input));
                 System.out.println(ANSI_YELLOW + "Sync Server verbunden" + ANSI_RESET);
-                while (socket.isConnected()) {
+                mcsHandler.setServerOnline(threadNumber);
 
+                while (socket.isConnected()) {
+                    try {
+                        String response = reader.readLine();
+                        System.out.println(response);
+
+                    } catch (IOException ex) {
+                        System.out.println(ANSI_PURPLE + "Verbindung getrennt " + ex.getMessage() + ANSI_RESET);
+                        break;
+                    }
                 }
                 System.out.println(ANSI_RED + "Verbindung verloren" + ANSI_RESET);
+                mcsHandler.setServerOffline(threadNumber);
 
             } catch (UnknownHostException ex) {
             } catch (IOException ex) {
