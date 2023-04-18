@@ -21,11 +21,15 @@ public class ServerReceiverThread extends Thread {
     private Socket socket;
     private Server server;
     private BufferedReader reader;
+    private ServerReceiverMainThread serverReceiverMainThread;
+    private int threadNumber;
 
 
-    public ServerReceiverThread(Socket socket, Server server){
+    public ServerReceiverThread(Socket socket, Server server, ServerReceiverMainThread serverReceiverMainThread, int threadNumber){
         this.socket = socket;
         this.server = server;
+        this.serverReceiverMainThread = serverReceiverMainThread;
+        this.threadNumber = threadNumber;
 
     }
 
@@ -34,7 +38,7 @@ public class ServerReceiverThread extends Thread {
         try {
             while (true) {
 
-                System.out.println(ANSI_YELLOW + "Sync Server verbunden" + ANSI_RESET);
+                System.out.println(ANSI_YELLOW + "Sync Server hat sich verbunden" + ANSI_RESET);
                 InputStream input = socket.getInputStream();
                 reader = new BufferedReader(new InputStreamReader(input));
                 do {
@@ -52,7 +56,9 @@ public class ServerReceiverThread extends Thread {
                         break;
                     }
                 } while (socket.isConnected());
-                System.out.println(ANSI_RED + "Sync Server Verbindung verloren" + ANSI_RESET);
+                System.out.println(ANSI_RED + "Sync Server Verbindung zu Connector verloren" + ANSI_RESET);
+                serverReceiverMainThread.resetThread(threadNumber);
+                break;
             }
         } catch (IOException e) {
             throw new RuntimeException(e);

@@ -33,11 +33,11 @@ public class ServerReceiverMainThread extends Thread {
                 socket = syncServerSocket.accept();
                 System.out.println("Sync Server versucht sich zu verbinden");
                 if(thread1 == null){
-                    thread1 = new ServerReceiverThread(socket, server);//Server ist der Hauptserver
+                    thread1 = new ServerReceiverThread(socket, server, this, 1);//Server ist der Hauptserver
                     thread1.start();
                     System.out.println("Sync Server1 verbunden");
                 } else if (thread2 == null) {
-                    thread2 = new ServerReceiverThread(socket, server);//Server ist der Hauptserver
+                    thread2 = new ServerReceiverThread(socket, server, this, 2);//Server ist der Hauptserver
                     thread2.start();
                     System.out.println("Sync Server2 verbunden");
                 }else{
@@ -49,5 +49,15 @@ public class ServerReceiverMainThread extends Thread {
             throw new RuntimeException(e);
         }
 
+    }
+
+    protected void resetThread(int threadNumber){
+        if(threadNumber == 1){
+            thread1 = null;
+        } else if (threadNumber == 2) {
+            thread2 = null;
+        }else {
+            System.out.println("ERROR bei Resetten von Thread");
+        }
     }
 }

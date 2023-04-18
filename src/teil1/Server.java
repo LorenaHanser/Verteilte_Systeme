@@ -47,7 +47,6 @@ public class Server {
     //Variablen für den eigenen Server
     private int serverReceiverPort;
     private ServerReceiverMainThread receiverSyncThread;
-    private MCS uhr;
 
 
     private int[] userIsOnServer = new int[3]; //evtl muss auf protected oder public
@@ -64,7 +63,6 @@ public class Server {
         this.partner1ServerPort = partner1ServerPort;
         this.partner2ServerPort = partner2ServerPort;
         this.serverReceiverPort = serverReceiverPort;
-        this.uhr = new MCS();
     }
 
     public void execute() {
