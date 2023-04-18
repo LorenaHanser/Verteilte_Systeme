@@ -103,6 +103,9 @@ public class ServerUserThread extends Thread {
 
             do {
                 serverMessage = reader.readLine();
+                if(server.mcsHandler.isServerBlocked()){
+                    writer.println("Es tut uns sehr leid, aber leider haben wir ein Technisches Problem.\n Die Nachricht kann nicht zugestellt werden \n Bitte versuchen Sie es später erneut! Sollte dieses Problem weiterhin bestehen, wenden Sie sich bitte an den Support!");
+                }
                 if(serverMessage != null) {
                     server.sendMessageToServer(new ClientMessage(serverMessage, ownID, chatPartnerID));
                 }else{

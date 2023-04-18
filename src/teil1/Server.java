@@ -44,7 +44,7 @@ public class Server {
     private ServerConnectorThread syncThread1;
     private ServerConnectorThread syncThread2;
 
-    private MCSHandler mcsHandler;
+    protected MCSHandler mcsHandler;
 
     //Variablen für den eigenen Server
     private int serverReceiverPort;
@@ -124,7 +124,7 @@ public class Server {
         sendMessage(clientMessage);
 
         }else {
-            System.out.println("=====================Server ist Blockiert Nachricht kann nicht zugestellt werden=================");
+            System.out.println(ANSI_RED+"Server ist Blockiert Nachricht kann nicht zugestellt werden!!!"+ANSI_RESET);
         }
     }
 
