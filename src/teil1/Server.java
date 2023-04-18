@@ -209,4 +209,11 @@ public class Server {
         }
     }
 
+    public int getUserIsOnServer(int index) {
+        return userIsOnServer[index];
+    }
+
+    public void setUserIsOnServer(int index, int userIsOnServer) {
+        this.userIsOnServer[index] = userIsOnServer;
+    }
 }

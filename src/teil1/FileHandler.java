@@ -61,13 +61,13 @@ public class FileHandler {
         } catch (IOException e) {
             System.out.println(ANSI_RED + "Fehler bei der Erstellung der Dateien: " + e.getMessage() + ANSI_RESET);
         }
-        this.synchronize();
     }
 
     // Methode, um eine Chatdatei zu lesen und in der Konsole anzeigen zu lassen
     // zum Aufrufen von außerhalb der Klasse
     public String readWholeChatFile(int ownID, int chatPartnerID) {
         this.synchronize();
+        this.sortChatMessages(this.path + this.getFilename(ownID, chatPartnerID) + ENDING);
         return ANSI_PURPLE + "Bisheriger Chat:\n" + ANSI_BLUE + this.readWholeChatFile(path, this.getFilename(ownID, chatPartnerID)) + ANSI_RESET;
     }
 
