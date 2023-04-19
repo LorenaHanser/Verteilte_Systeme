@@ -45,6 +45,7 @@ public class ServerReceiverThread extends Thread {
                     try {
                         String response = reader.readLine();
                         if (Message.isClientMessage(response)) {
+                            System.out.println("Ist eine clientmessage " + response);
                             sendMessageToServer(ClientMessage.toObject(response));
                         } else {
                             sendUserActivityToServer(ServerMessage.toObject(response));
@@ -76,7 +77,9 @@ public class ServerReceiverThread extends Thread {
         }
         */
         if (clientMessage.getType() == Server.SYNC_REQUEST) {
+            System.out.println("Datei wird übertragen!");
             writer.println(server.receiveSynchronization(clientMessage).toString());
+            System.out.println("Datei wurde erfolgreich übertragen!");
         } else if (clientMessage.getType() == Server.NEW_MESSAGE | clientMessage.getType() == Server.NEW_MESSAGE_WITHOUT_TIMESTAMP) {
             server.sendMessage(clientMessage);
         }

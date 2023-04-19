@@ -47,6 +47,7 @@ public class ServerConnectorThread extends Thread {
                 while (socket.isConnected()) {
                     try {
                         response = reader.readLine();
+                        System.out.println("Bin im ServerConnector " + response);
                         answerIsThere = true;
                     } catch (IOException ex) {
                         System.out.println(ANSI_PURPLE + "Verbindung getrennt " + ex.getMessage() + ANSI_RESET);

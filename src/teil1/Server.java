@@ -132,6 +132,7 @@ public class Server {
     }
 
     ClientMessage receiveSynchronization(ClientMessage receivedClientMessage){
+        System.out.println("Bin jetzt in Server bei receiveSynchronization " + receivedClientMessage.getType());
         return fileHandler.synchronize(receivedClientMessage);
     }
 
@@ -172,9 +173,6 @@ public class Server {
             }
         }
     }
-
-
-
 
     int askForID(String username) { //Es wird geschaut, welche Id der User hat (Index von userNameRegister)
         int answer = -1;

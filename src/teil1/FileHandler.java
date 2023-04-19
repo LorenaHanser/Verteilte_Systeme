@@ -32,6 +32,7 @@ public class FileHandler {
         this.serverNumber = serverNumber;
         this.serverDirectoryName = DIRECTORY_NAME + serverNumber;
         this.path = this.getPath(serverNumber);
+        this.server = server;
     }
 
     // Methode zur Erstellung von Messages-Ordner und Chatfiles
@@ -222,12 +223,15 @@ public class FileHandler {
         } else if (ownLastModified > otherLastModified) {
             System.out.println("Die eigene Datei ist neuer.");
             syncResponse.setContent(this.readWholeChatFile(ownPath, ownFilename));
+            System.out.println("Die eigene Datei wurde an Partner gesendet!");
 
         } else if (otherLastModified > ownLastModified) {
             System.out.println("Die andere Datei ist neuer.");
             this.writeWholeChatfile(otherContent, ownFilename, ownPath);
+            System.out.println("Die eigene Datei wurde ordentlich beschrieben!");
             syncResponse.setContent(Server.OK);
         }
+        System.out.println("Hier müsste entweder ok oder der fileinhalt stehen: " + syncResponse.getContent());
         return syncResponse;
     }
 
@@ -273,21 +277,31 @@ public class FileHandler {
             e.printStackTrace();
         }
     }
+
     private void askForSynchronization(int ownID, int chatPartnerID) {
+
+        String ownPath = this.path;
+        String ownFilename = this.getFilename(ownID, chatPartnerID);
+
+        String contentServer1 = readWholeChatFile(ownPath, ownFilename);
+
+        File ownServerFile = new File(ownPath + ownFilename + ENDING);
+
+        long ownLastModified = ownServerFile.lastModified();
+        Timestamp ownTimestamp = new Timestamp(ownLastModified);
 
         // trigger receiver to synchronzie with synchronize
 
-        ClientMessage triggerSync = new ClientMessage(ownID, chatPartnerID, null);
-        triggerSync.setType(Server.SYNC_REQUEST);
+        ClientMessage triggerSync = new ClientMessage(ownID, chatPartnerID, ownTimestamp, Server.SYNC_REQUEST, contentServer1);
 
-        ClientMessage  response = server.requestSynchronization(triggerSync);
+        ClientMessage response = server.requestSynchronization(triggerSync);
 
         // Auswerten der Antwort
-        if(response.getContent().equals(Server.OK)){
+        if (response.getContent().equals(Server.OK)) {
             System.out.println("Sync war nicht nötig! Alles ist gut gelaufen.");
         } else {
             String synchronizedFileContent = response.getContent();
-            writeWholeChatfile(synchronizedFileContent,this.getFilename(response.getUserId(), response.getReceiverId()),this.path);
+            writeWholeChatfile(synchronizedFileContent, this.getFilename(response.getUserId(), response.getReceiverId()), this.path);
         }
     }
 }
