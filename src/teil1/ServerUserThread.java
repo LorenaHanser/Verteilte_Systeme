@@ -29,10 +29,10 @@ public class ServerUserThread extends Thread {
 
     // Konstruktor
 
-    public ServerUserThread(Socket socket, Server server, int serverNummer) {
+    public ServerUserThread(Socket socket, Server server, int serverNummer, FileHandler fileHandler) {
         this.socket = socket;
         this.server = server;
-        this.fileHandler = new FileHandler(serverNummer);
+        this.fileHandler = fileHandler;
     }
 
     public void run() {

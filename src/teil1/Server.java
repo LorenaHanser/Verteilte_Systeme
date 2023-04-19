@@ -64,7 +64,7 @@ public class Server {
     }
 
     public void execute() {
-        fileHandler = new FileHandler(serverNumber);
+        fileHandler = new FileHandler(this, serverNumber);
         receiverSyncThread = new ServerReceiverThread(this, serverReceiverPort);
         receiverSyncThread.start();
         System.out.println(ANSI_YELLOW + "Sync ServerThread gestartet" + ANSI_RESET);
@@ -82,7 +82,7 @@ public class Server {
             while (true) {
                 Socket socket = serverSocket.accept();
                 System.out.println(ANSI_YELLOW + "New user connected" + ANSI_YELLOW);
-                ServerUserThread newUser = new ServerUserThread(socket, this, serverNumber);
+                ServerUserThread newUser = new ServerUserThread(socket, this, serverNumber, fileHandler);
                 userThreads.add(newUser);
                 newUser.start(); //Thread startet mit User → Name unbekannt deswegen noch kein Eintrag in das userThreadRegister Array
 
@@ -135,8 +135,8 @@ public class Server {
         return fileHandler.synchronize(receivedClientMessage);
     }
 
-    void sendSynchronization(ClientMessage sendClientMessage){
-       syncThread.sendMessageToOtherServer(sendClientMessage);
+    ClientMessage requestSynchronization(ClientMessage sendClientMessage){
+       return syncThread.requestSynchronization(sendClientMessage);
     }
 
     boolean checkUsernameExists(String userName) { //überprüft, ob der User existiert

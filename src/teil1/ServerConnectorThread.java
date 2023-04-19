@@ -22,6 +22,10 @@ public class ServerConnectorThread extends Thread {
 
     private PrintWriter writer;
     private BufferedReader reader;
+    private Socket socket;
+
+    private String response;
+    private boolean answerIsThere;
 
     public ServerConnectorThread(String hostname, int port, Server server) {
         this.hostname = hostname;
@@ -34,7 +38,7 @@ public class ServerConnectorThread extends Thread {
         while (true) {
 
             try {
-                Socket socket = new Socket(hostname, port);
+                socket = new Socket(hostname, port);
                 OutputStream output = socket.getOutputStream();
                 writer = new PrintWriter(output, true);
                 InputStream input = socket.getInputStream();
@@ -42,9 +46,8 @@ public class ServerConnectorThread extends Thread {
                 System.out.println(ANSI_YELLOW + "Sync Server verbunden" + ANSI_RESET);
                 while (socket.isConnected()) {
                     try {
-                        String response = reader.readLine();
-                        sendSyncResponseToServer(ClientMessage.toObject(response));
-
+                        response = reader.readLine();
+                        answerIsThere = true;
                     } catch (IOException ex) {
                         System.out.println(ANSI_PURPLE + "Verbindung getrennt " + ex.getMessage() + ANSI_RESET);
                         break;
@@ -62,12 +65,19 @@ public class ServerConnectorThread extends Thread {
     return clientMessage;//ist kaputt
     }
 
-    private void sendSyncRequestToServer(ClientMessage clientMessage){
+    protected ClientMessage requestSynchronization(ClientMessage clientMessage){
+        ClientMessage answer = null;
         try {
+            answerIsThere = false;
             writer.println(clientMessage.toString());
+            while(!answerIsThere){
+                //Wartet, bis eine Antwort eintrifft, hier muss man das Timeout reinbauen
+            }
+            answer = ClientMessage.toObject(response);
         }catch (Exception e){
             e.printStackTrace();
         }
+        return answer;
     }
 
     // Senden einer ClientMessage zum anderen Server

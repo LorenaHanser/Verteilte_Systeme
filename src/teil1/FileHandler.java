@@ -26,8 +26,9 @@ public class FileHandler {
 
     private String serverDirectoryName;
     private int serverNumber;
+    private Server server;
 
-    public FileHandler(int serverNumber) {
+    public FileHandler(Server server, int serverNumber) {
         this.serverNumber = serverNumber;
         this.serverDirectoryName = DIRECTORY_NAME + serverNumber;
         this.path = this.getPath(serverNumber);
@@ -67,7 +68,7 @@ public class FileHandler {
     // zum Aufrufen von außerhalb der Klasse
     // todo: public String readWholeChatFile(ClientMessage clientMessage)
     public String readWholeChatFile(int ownID, int chatPartnerID) {
-       // this.askForSynchronization();
+        this.askForSynchronization(ownID, chatPartnerID);
         this.sortChatMessages(this.path + this.getFilename(ownID, chatPartnerID) + ENDING);
         return ANSI_PURPLE + "Bisheriger Chat:\n" + ANSI_BLUE + this.readWholeChatFile(path, this.getFilename(ownID, chatPartnerID)) + ANSI_RESET;
     }
@@ -272,15 +273,14 @@ public class FileHandler {
             e.printStackTrace();
         }
     }
-    private void askForSynchronization(ClientMessage response) {
+    private void askForSynchronization(int ownID, int chatPartnerID) {
 
         // trigger receiver to synchronzie with synchronize
 
-        ClientMessage triggerSync = new ClientMessage(response.getUserId(), response.getReceiverId(), null);
+        ClientMessage triggerSync = new ClientMessage(ownID, chatPartnerID, null);
         triggerSync.setType(Server.SYNC_REQUEST);
 
-       // Server.sendSynchronization();
-      //  Server.receiveSynchronization();
+        ClientMessage  response = server.requestSynchronization(triggerSync);
 
         // Auswerten der Antwort
         if(response.getContent().equals(Server.OK)){
