@@ -43,7 +43,7 @@ public class ServerConnectorThread extends Thread {
                 while (socket.isConnected()) {
                     try {
                         String response = reader.readLine();
-                        System.out.println(response);
+                        sendSyncResponseToServer(ClientMessage.toObject(response));
 
                     } catch (IOException ex) {
                         System.out.println(ANSI_PURPLE + "Verbindung getrennt " + ex.getMessage() + ANSI_RESET);
@@ -56,6 +56,10 @@ public class ServerConnectorThread extends Thread {
             } catch (IOException ex) {
             }
         }
+    }
+    private ClientMessage sendSyncResponseToServer(ClientMessage clientMessage){
+        //if(clientMessage.getType() == Server.)
+    return clientMessage;//ist kaputt
     }
 
     // Senden einer ClientMessage zum anderen Server

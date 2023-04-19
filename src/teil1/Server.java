@@ -24,6 +24,7 @@ public class Server {
 
     public static final int NEW_MESSAGE = 0;
     public static final int NEW_MESSAGE_WITHOUT_TIMESTAMP = 1;
+    public static final int SYNC_REQUEST = 2;
 
     public static final String OK = "OK";
 
@@ -130,6 +131,10 @@ public class Server {
         userThreadRegister[ownID].sendMessage(message); //nachricht wird an den User gesendet
     }
 
+    ClientMessage receiveSynchronization(ClientMessage receivedClientMessage){
+        return fileHandler.synchronize(receivedClientMessage);
+    }
+
     boolean checkUsernameExists(String userName) { //überprüft, ob der User existiert
         boolean usernameValid = false;
         for (int i = 0; i < USER_NAME_REGISTER.length; i++) {
@@ -165,19 +170,7 @@ public class Server {
     }
 
 
-    // When a client is disconnected, removes the UserThread
-    void removeUser(String userName, ServerUserThread aUser) { //noch von Tutorial
-        userThreads.remove(aUser);
-        System.out.println(ANSI_YELLOW + "The user " + userName + " quit." + ANSI_RESET);
-    }
-    void removeUser( ServerUserThread aUser) { //noch von Tutorial
-        userThreads.remove(aUser);
-        }
-    void removeUserThread(int userID, ServerUserThread serverUserThread){
-        removeUser(serverUserThread);
-        userThreadRegister[userID] = null;
 
-    }
 
     int askForID(String username) { //Es wird geschaut, welche Id der User hat (Index von userNameRegister)
         int answer = -1;
@@ -196,6 +189,19 @@ public class Server {
     }
     void removeChatPartner(int user) { //der ChatPartner bzw. der Chatraum wird für den User gesetzt (ab jetzt kann er Nachrichten empfangen, aber nur von dem Partner)
         userChattetWith[user] = -1;
+
+    }
+    // When a client is disconnected, removes the UserThread
+    void removeUser(String userName, ServerUserThread aUser) { //noch von Tutorial
+        userThreads.remove(aUser);
+        System.out.println(ANSI_YELLOW + "The user " + userName + " quit." + ANSI_RESET);
+    }
+    void removeUser( ServerUserThread aUser) { //noch von Tutorial
+        userThreads.remove(aUser);
+    }
+    void removeUserThread(int userID, ServerUserThread serverUserThread){
+        removeUser(serverUserThread);
+        userThreadRegister[userID] = null;
 
     }
 

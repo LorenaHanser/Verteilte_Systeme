@@ -1,9 +1,6 @@
 package teil1;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -24,6 +21,7 @@ public class ServerReceiverThread extends Thread {
 
     private int port;
     private BufferedReader reader;
+    private PrintWriter writer;
 
     public ServerReceiverThread(Server server, int port) {
         this.server = server;
@@ -39,7 +37,8 @@ public class ServerReceiverThread extends Thread {
             while (true) {
                 socket = syncServerSocket.accept();
                 System.out.println(ANSI_YELLOW + "Sync Server verbunden" + ANSI_RESET);
-
+                OutputStream output = socket.getOutputStream();
+                writer = new PrintWriter(output, true);
                 InputStream input = socket.getInputStream();
                 reader = new BufferedReader(new InputStreamReader(input));
                 do {
@@ -75,8 +74,11 @@ public class ServerReceiverThread extends Thread {
         } catch (Exception e) {
             System.out.println(ANSI_RED + "Fehler beim Schlafen: " + e.getMessage() + ANSI_RESET);
         }
-        */
-        server.sendMessage(clientMessage);
+        */if(clientMessage.getType() == Server.SYNC_REQUEST){
+            writer.println(server.receiveSynchronization(clientMessage).toString());
+        }else if(clientMessage.getType() == Server.NEW_MESSAGE | clientMessage.getType() == Server.NEW_MESSAGE_WITHOUT_TIMESTAMP){
+            server.sendMessage(clientMessage);
+        }
     }
 
     private void sendUserActivityToServer(ServerMessage serverMessage) {
