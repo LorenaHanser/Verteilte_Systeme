@@ -201,7 +201,7 @@ public class FileHandler {
         }
     }
 
-    // Methode, um zwei Dateien statisch auf BS-Ebene zu synchronisieren
+    // Methode, um zwei Dateien wirklich verteilt zu synchronisieren
     public void synchronize(ClientMessage clientMessage) {
 
     }
