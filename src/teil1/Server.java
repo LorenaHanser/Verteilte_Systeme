@@ -25,6 +25,8 @@ public class Server {
     public static final int NEW_MESSAGE = 0;
     public static final int NEW_MESSAGE_WITHOUT_TIMESTAMP = 1;
 
+    public static final String OK = "OK";
+
     private int port;
     private FileHandler fileHandler;
 

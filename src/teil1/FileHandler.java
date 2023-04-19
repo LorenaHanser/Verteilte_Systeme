@@ -65,8 +65,8 @@ public class FileHandler {
 
     // Methode, um eine Chatdatei zu lesen und in der Konsole anzeigen zu lassen
     // zum Aufrufen von außerhalb der Klasse
+    // todo: public String readWholeChatFile(ClientMessage clientMessage)
     public String readWholeChatFile(int ownID, int chatPartnerID) {
-        this.synchronize();
         this.sortChatMessages(this.path + this.getFilename(ownID, chatPartnerID) + ENDING);
         return ANSI_PURPLE + "Bisheriger Chat:\n" + ANSI_BLUE + this.readWholeChatFile(path, this.getFilename(ownID, chatPartnerID)) + ANSI_RESET;
     }
@@ -189,11 +189,11 @@ public class FileHandler {
                 if (currentFileServer1.lastModified() > currentFileServer2.lastModified()) {
                     System.out.println(ANSI_WHITE + "File: " + path1 + filename + " ist neuer als " + path2 + filename + ANSI_RESET);
                     System.out.println(ANSI_WHITE + "Die ältere Datei: " + filename + " wurde gelöscht: " + currentFileServer2.delete() + ANSI_RESET);
-                    writeWholeChatfile(contentServer1, filename, path2);
+                    this.writeWholeChatfile(contentServer1, filename, path2);
                 } else if (currentFileServer2.lastModified() > currentFileServer1.lastModified()) {
                     System.out.println(ANSI_WHITE + "File: " + path2 + filename + " ist neuer als " + path1 + filename + ANSI_RESET);
                     System.out.println(ANSI_WHITE + "Die ältere Datei: " + filename + " wurde gelöscht: " + currentFileServer1.delete() + ANSI_RESET);
-                    writeWholeChatfile(contentServer2, filename, path1);
+                    this.writeWholeChatfile(contentServer2, filename, path1);
                 } else {
                     System.out.println(ANSI_WHITE + "Beide Dateien haben das gleiche Änderungsdatum!" + ANSI_RESET);
                 }
@@ -202,37 +202,31 @@ public class FileHandler {
     }
 
     // Methode, um zwei Dateien wirklich verteilt zu synchronisieren
-    public void synchronize(ClientMessage clientMessage) {
+    public ClientMessage synchronize(ClientMessage otherServerFile) {
+        String otherContent = otherServerFile.getContent();                                                    // ganzer Inhalt der Datei
+        Timestamp otherTimestamp = otherServerFile.getTimestamp();                                             // Änderungsdatum der Datei
+        long otherLastModified = otherTimestamp.getTime();
 
+        String ownFilename = this.getFilename(otherServerFile.getUserId(), otherServerFile.getReceiverId());
+        String ownPath = this.path;
+        File ownServerFile = new File(ownPath + ownFilename + ENDING);
+        long ownLastModified = ownServerFile.lastModified();
 
-        // clientMessage wird erzeugt mit eigen änderungsdatum
-        // sendClientMessage
+        ClientMessage syncResponse = new ClientMessage(otherServerFile.getUserId(), otherServerFile.getReceiverId(), null);
+        if (ownLastModified == otherLastModified) {
+            System.out.println("Beide Dateien sind gleich neu.");
+            syncResponse.setContent(Server.OK);
 
-        // also basically synchronize quatsch
-        /*
+        } else if (ownLastModified > otherLastModified) {
+            System.out.println("Die eigene Datei ist neuer.");
+            syncResponse.setContent(this.readWholeChatFile(ownPath, ownFilename));
 
-       String message = clientMessage.getContent();
-
-       message.lastModified() <-- Änderungsdatum
-       message.contentWholeChatFile <-- kompletter inhalt der datei
-
-        if (clientMessage.contentServer1.equals(contentServer2)) {
-                System.out.println(ANSI_WHITE + "Die beiden Dateien " + filename + " sind identisch." + ANSI_RESET);
-            } else {
-                System.out.println(ANSI_WHITE + "Die beiden Dateien " + filename + " sind unterschiedlich." + ANSI_RESET);
-                if (CLIENTMESSAGE.currentFileServer1.lastModified() > currentFileServer2.lastModified()) {
-                    System.out.println(ANSI_WHITE + "File: " + path1 + filename + " ist neuer als " + path2 + filename + ANSI_RESET);
-                    System.out.println(ANSI_WHITE + "Die ältere Datei: " + filename + " wurde gelöscht: " + currentFileServer2.delete() + ANSI_RESET);
-                    writeWholeChatfile(contentServer1, filename, path2);                                               <-- Sende message mit neuerem Content zurück an Server1 und sag ihm das er veraltet ist
-                } else if (currentFileServer2.lastModified() > CLIENTMESSAGE.currentFileServer1.lastModified()) {
-                    System.out.println(ANSI_WHITE + "File: " + path2 + filename + " ist neuer als " + path1 + filename + ANSI_RESET);
-                    System.out.println(ANSI_WHITE + "Die ältere Datei: " + filename + " wurde gelöscht: " + currentFileServer1.delete() + ANSI_RESET);
-                    writeWholeChatfile(contentServer2, filename, path1);                                               <--  geschickten content in eigene datei übertragen WRITEWHOLECHATFILE von server2 machen
-                } else {
-                    System.out.println(ANSI_WHITE + "Beide Dateien haben das gleiche Änderungsdatum!" + ANSI_RESET);
-                }
-         */
-
+        } else if (otherLastModified > ownLastModified) {
+            System.out.println("Die andere Datei ist neuer.");
+            this.writeWholeChatfile(otherContent, ownFilename, ownPath);
+            syncResponse.setContent(Server.OK);
+        }
+        return syncResponse;
     }
 
     public void sortChatMessages(String pathToFile) {
