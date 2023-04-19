@@ -168,7 +168,9 @@ public class FileHandler {
         return filename;
     }
 
+    // Methode, um zwei Dateien statisch auf BS-Ebene zu synchronisieren
     public void synchronize() {
+
         // todo: Methode dynamisch machen
         for (String filename : FILENAMES) {
             String path1 = this.getPath(1);
@@ -197,6 +199,11 @@ public class FileHandler {
                 }
             }
         }
+    }
+
+    // Methode, um zwei Dateien statisch auf BS-Ebene zu synchronisieren
+    public void synchronize(ClientMessage clientMessage) {
+
     }
 
     public void sortChatMessages(String pathToFile) {
