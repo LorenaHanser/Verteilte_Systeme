@@ -74,9 +74,10 @@ public class ServerReceiverThread extends Thread {
         } catch (Exception e) {
             System.out.println(ANSI_RED + "Fehler beim Schlafen: " + e.getMessage() + ANSI_RESET);
         }
-        */if(clientMessage.getType() == Server.SYNC_REQUEST){
+        */
+        if (clientMessage.getType() == Server.SYNC_REQUEST) {
             writer.println(server.receiveSynchronization(clientMessage).toString());
-        }else if(clientMessage.getType() == Server.NEW_MESSAGE | clientMessage.getType() == Server.NEW_MESSAGE_WITHOUT_TIMESTAMP){
+        } else if (clientMessage.getType() == Server.NEW_MESSAGE | clientMessage.getType() == Server.NEW_MESSAGE_WITHOUT_TIMESTAMP) {
             server.sendMessage(clientMessage);
         }
     }

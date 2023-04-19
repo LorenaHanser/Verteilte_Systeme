@@ -62,6 +62,14 @@ public class ServerConnectorThread extends Thread {
     return clientMessage;//ist kaputt
     }
 
+    private void sendSyncRequestToServer(ClientMessage clientMessage){
+        try {
+            writer.println(clientMessage.toString());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
     // Senden einer ClientMessage zum anderen Server
     protected void sendMessageToOtherServer(ClientMessage clientMessage) {
         try {

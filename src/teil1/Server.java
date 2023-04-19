@@ -135,6 +135,10 @@ public class Server {
         return fileHandler.synchronize(receivedClientMessage);
     }
 
+    void sendSynchronization(ClientMessage sendClientMessage){
+       syncThread.sendMessageToOtherServer(sendClientMessage);
+    }
+
     boolean checkUsernameExists(String userName) { //überprüft, ob der User existiert
         boolean usernameValid = false;
         for (int i = 0; i < USER_NAME_REGISTER.length; i++) {

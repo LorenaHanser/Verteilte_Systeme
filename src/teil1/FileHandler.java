@@ -67,6 +67,7 @@ public class FileHandler {
     // zum Aufrufen von außerhalb der Klasse
     // todo: public String readWholeChatFile(ClientMessage clientMessage)
     public String readWholeChatFile(int ownID, int chatPartnerID) {
+       // this.askForSynchronization();
         this.sortChatMessages(this.path + this.getFilename(ownID, chatPartnerID) + ENDING);
         return ANSI_PURPLE + "Bisheriger Chat:\n" + ANSI_BLUE + this.readWholeChatFile(path, this.getFilename(ownID, chatPartnerID)) + ANSI_RESET;
     }
@@ -269,6 +270,24 @@ public class FileHandler {
             System.out.println(ANSI_WHITE + "Die Textdatei wurde erfolgreich nach dem Timestamp sortiert." + ANSI_RESET);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+    private void askForSynchronization(ClientMessage response) {
+
+        // trigger receiver to synchronzie with synchronize
+
+        ClientMessage triggerSync = new ClientMessage(response.getUserId(), response.getReceiverId(), null);
+        triggerSync.setType(Server.SYNC_REQUEST);
+
+       // Server.sendSynchronization();
+      //  Server.receiveSynchronization();
+
+        // Auswerten der Antwort
+        if(response.getContent().equals(Server.OK)){
+            System.out.println("Sync war nicht nötig! Alles ist gut gelaufen.");
+        } else {
+            String synchronizedFileContent = response.getContent();
+            writeWholeChatfile(synchronizedFileContent,this.getFilename(response.getUserId(), response.getReceiverId()),this.path);
         }
     }
 }
