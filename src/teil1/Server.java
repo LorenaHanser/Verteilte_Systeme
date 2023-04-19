@@ -17,7 +17,7 @@ public class Server {
     public static final String ANSI_WHITE = "\u001B[37m";
 
     //Für das Protokoll
-    //public static final int USER_AKTIVITY = 0;
+    //public static final int USER_ACTIVITY = 0;
     //public static final int MESSAGE = 1;
     public static final int LOGGED_OUT = 0;
     public static final int LOGGED_IN = 1;
@@ -39,7 +39,7 @@ public class Server {
 
     //Variablen für den anderen Server
     private int partnerServerPort; //Port des Partnerservers (Port für Serverkommunikation)
-    private String partnerServerAdress = "localhost"; //hier die Adresse des anderen Server eintragen.
+    private String partnerServerAddress = "localhost"; //hier die Adresse des anderen Server eintragen.
     private ServerConnectorThread syncThread;
 
     //Variablen für den eigenen Server
@@ -49,7 +49,7 @@ public class Server {
     private int[] userChattetWith = new int[3]; //Speichert, wer sich aktuell mit wem im Chat befindet (damit man nicht mit einer Person chatten kann, die gerade mit wem anders chattet)
     private ServerUserThread[] userThreadRegister = new ServerUserThread[3];//Speichert die Referenzvariable des Threads auf dem der User (wenn er online ist) läuft. Der Index für das Feld ist, dabei die ID des Users
 
-    private Set<ServerUserThread> userThreads = new HashSet<>(); //hier werden die Referenzvariabeln gespeichert (kann man das überarbeiten?) Vorsicht vor Garbagecollector
+    private Set<ServerUserThread> userThreads = new HashSet<>(); //hier werden die Referenzvariablen gespeichert (kann man das überarbeiten?) Vorsicht vor Garbage Collector
 
     // Konstruktor
     public Server(int port, int partnerServerPort, int serverReceiverPort, int serverNumber) {
@@ -71,7 +71,7 @@ public class Server {
 
             fileHandler.create();
 
-            syncThread = new ServerConnectorThread(partnerServerAdress, partnerServerPort, this);
+            syncThread = new ServerConnectorThread(partnerServerAddress, partnerServerPort, this);
             syncThread.start();
 
             // Endlosschleife
