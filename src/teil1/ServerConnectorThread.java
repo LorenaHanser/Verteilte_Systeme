@@ -1,8 +1,6 @@
 package teil1;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
@@ -23,6 +21,7 @@ public class ServerConnectorThread extends Thread {
     private Server server;
 
     private PrintWriter writer;
+    private BufferedReader reader;
 
     public ServerConnectorThread(String hostname, int port, Server server) {
         this.hostname = hostname;
@@ -38,9 +37,18 @@ public class ServerConnectorThread extends Thread {
                 Socket socket = new Socket(hostname, port);
                 OutputStream output = socket.getOutputStream();
                 writer = new PrintWriter(output, true);
+                InputStream input = socket.getInputStream();
+                reader = new BufferedReader(new InputStreamReader(input));
                 System.out.println(ANSI_YELLOW + "Sync Server verbunden" + ANSI_RESET);
                 while (socket.isConnected()) {
+                    try {
+                        String response = reader.readLine();
+                        System.out.println(response);
 
+                    } catch (IOException ex) {
+                        System.out.println(ANSI_PURPLE + "Verbindung getrennt " + ex.getMessage() + ANSI_RESET);
+                        break;
+                    }
                 }
                 System.out.println(ANSI_RED + "Verbindung verloren" + ANSI_RESET);
 
@@ -52,8 +60,11 @@ public class ServerConnectorThread extends Thread {
 
     // Senden einer ClientMessage zum anderen Server
     protected void sendMessageToOtherServer(ClientMessage clientMessage) {
-        System.out.println("Message wird gesendet!");
-        writer.println(clientMessage.toString());
+        try {
+            writer.println(clientMessage.toString());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     protected void sendUserActivity(ServerMessage serverMessage) {

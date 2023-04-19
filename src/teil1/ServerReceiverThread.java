@@ -38,14 +38,13 @@ public class ServerReceiverThread extends Thread {
 
             while (true) {
                 socket = syncServerSocket.accept();
-                System.out.println(ANSI_YELLOW + "Sync Server verbunden" + ANSI_RESET)
-                ;
+                System.out.println(ANSI_YELLOW + "Sync Server verbunden" + ANSI_RESET);
+
                 InputStream input = socket.getInputStream();
                 reader = new BufferedReader(new InputStreamReader(input));
                 do {
                     try {
                         String response = reader.readLine();
-                        System.out.println(response);
                         if (Message.isClientMessage(response)) {
                             sendMessageToServer(ClientMessage.toObject(response));
                         } else {

@@ -168,6 +168,14 @@ public class Server {
         userThreads.remove(aUser);
         System.out.println(ANSI_YELLOW + "The user " + userName + " quit." + ANSI_RESET);
     }
+    void removeUser( ServerUserThread aUser) { //noch von Tutorial
+        userThreads.remove(aUser);
+        }
+    void removeUserThread(int userID, ServerUserThread serverUserThread){
+        removeUser(serverUserThread);
+        userThreadRegister[userID] = null;
+
+    }
 
     int askForID(String username) { //Es wird geschaut, welche Id der User hat (Index von userNameRegister)
         int answer = -1;
@@ -182,6 +190,10 @@ public class Server {
 
     void setChatPartner(int user, int chatPartner) { //der ChatPartner bzw. der Chatraum wird für den User gesetzt (ab jetzt kann er Nachrichten empfangen, aber nur von dem Partner)
         userChattetWith[user] = chatPartner;
+
+    }
+    void removeChatPartner(int user) { //der ChatPartner bzw. der Chatraum wird für den User gesetzt (ab jetzt kann er Nachrichten empfangen, aber nur von dem Partner)
+        userChattetWith[user] = -1;
 
     }
 
@@ -213,7 +225,12 @@ public class Server {
         return userIsOnServer[index];
     }
 
-    public void setUserIsOnServer(int index, int userIsOnServer) {
-        this.userIsOnServer[index] = userIsOnServer;
+    void userConnectionReset(int userID, ServerUserThread serverUserThread){
+        setUserLoggedOut(userID);
+        removeChatPartner(userID);
+        removeUserThread(userID, serverUserThread);
+        System.out.println(ANSI_YELLOW + "User wurde Erfolgreich abgemeldet!" + ANSI_RESET);
     }
+
+
 }
