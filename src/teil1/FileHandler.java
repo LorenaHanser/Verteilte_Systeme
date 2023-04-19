@@ -66,6 +66,7 @@ public class FileHandler {
     // Methode, um eine Chatdatei zu lesen und in der Konsole anzeigen zu lassen
     // zum Aufrufen von außerhalb der Klasse
     public String readWholeChatFile(int ownID, int chatPartnerID) {
+        // schicke sync server die komplette datei und änderungs
         this.synchronize();
         this.sortChatMessages(this.path + this.getFilename(ownID, chatPartnerID) + ENDING);
         return ANSI_PURPLE + "Bisheriger Chat:\n" + ANSI_BLUE + this.readWholeChatFile(path, this.getFilename(ownID, chatPartnerID)) + ANSI_RESET;

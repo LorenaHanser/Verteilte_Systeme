@@ -66,7 +66,7 @@ public class ServerReceiverThread extends Thread {
 
     private void sendMessageToServer(ClientMessage clientMessage) {
         // todo nur Nachrichten Typ 1 und 2 sollen in sendMessage verarbeitet werden (stand 17.04.) (rest war für Sync gedacht)
-        /*
+
         // todo: einkommentieren, um einen Delay zwischen den Servern zu simulieren
         try {
             System.out.println("Delay Anfang --- Thread schläft");
@@ -75,7 +75,7 @@ public class ServerReceiverThread extends Thread {
         } catch (Exception e) {
             System.out.println(ANSI_RED + "Fehler beim Schlafen: " + e.getMessage() + ANSI_RESET);
         }
-        */
+
         server.sendMessage(clientMessage);
     }
 
