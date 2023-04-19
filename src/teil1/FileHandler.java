@@ -204,6 +204,35 @@ public class FileHandler {
     // Methode, um zwei Dateien wirklich verteilt zu synchronisieren
     public void synchronize(ClientMessage clientMessage) {
 
+
+        // clientMessage wird erzeugt mit eigen änderungsdatum
+        // sendClientMessage
+
+        // also basically synchronize quatsch
+        /*
+
+       String message = clientMessage.getContent();
+
+       message.lastModified() <-- Änderungsdatum
+       message.contentWholeChatFile <-- kompletter inhalt der datei
+
+        if (clientMessage.contentServer1.equals(contentServer2)) {
+                System.out.println(ANSI_WHITE + "Die beiden Dateien " + filename + " sind identisch." + ANSI_RESET);
+            } else {
+                System.out.println(ANSI_WHITE + "Die beiden Dateien " + filename + " sind unterschiedlich." + ANSI_RESET);
+                if (CLIENTMESSAGE.currentFileServer1.lastModified() > currentFileServer2.lastModified()) {
+                    System.out.println(ANSI_WHITE + "File: " + path1 + filename + " ist neuer als " + path2 + filename + ANSI_RESET);
+                    System.out.println(ANSI_WHITE + "Die ältere Datei: " + filename + " wurde gelöscht: " + currentFileServer2.delete() + ANSI_RESET);
+                    writeWholeChatfile(contentServer1, filename, path2);                                               <-- Sende message mit neuerem Content zurück an Server1 und sag ihm das er veraltet ist
+                } else if (currentFileServer2.lastModified() > CLIENTMESSAGE.currentFileServer1.lastModified()) {
+                    System.out.println(ANSI_WHITE + "File: " + path2 + filename + " ist neuer als " + path1 + filename + ANSI_RESET);
+                    System.out.println(ANSI_WHITE + "Die ältere Datei: " + filename + " wurde gelöscht: " + currentFileServer1.delete() + ANSI_RESET);
+                    writeWholeChatfile(contentServer2, filename, path1);                                               <--  geschickten content in eigene datei übertragen WRITEWHOLECHATFILE von server2 machen
+                } else {
+                    System.out.println(ANSI_WHITE + "Beide Dateien haben das gleiche Änderungsdatum!" + ANSI_RESET);
+                }
+         */
+
     }
 
     public void sortChatMessages(String pathToFile) {
