@@ -25,6 +25,7 @@ public class Server {
     public static final int NEW_MESSAGE = 0;
     public static final int NEW_MESSAGE_WITHOUT_TIMESTAMP = 1;
     public static final int SYNC_REQUEST = 2;
+    public static final int SYNC_RESPONSE = 3;
 
     public static final String OK = "OK";
 

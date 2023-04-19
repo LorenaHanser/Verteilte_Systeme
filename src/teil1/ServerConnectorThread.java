@@ -69,11 +69,14 @@ public class ServerConnectorThread extends Thread {
     protected ClientMessage requestSynchronization(ClientMessage clientMessage){
         ClientMessage answer = null;
         try {
+            System.out.println("=========== Setzte answerIsThere -> true ===========");
             answerIsThere = false;
             writer.println(clientMessage.toString());
+            System.out.println("====== In der Schliefe drinnen ===========");
             while(!answerIsThere){
                 //Wartet, bis eine Antwort eintrifft, hier muss man das Timeout reinbauen
             }
+            System.out.println("====== Aus der Schliefe draußen ===========");
             answer = ClientMessage.toObject(response);
         }catch (Exception e){
             e.printStackTrace();

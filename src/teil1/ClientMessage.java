@@ -29,6 +29,13 @@ public class ClientMessage extends Message {
         this.setContent(content);
     }
 
+    public ClientMessage(int userId, int receiverId, int type, String content) {
+        this.setUserId(userId);
+        this.setReceiverId(receiverId);
+        this.setType(type);
+        this.setContent(content);
+    }
+
     public ClientMessage(String clientResponse, int userId, int receiverId) {
         String[] clientResponseSplit = clientResponse.split(";", 2);
         this.setUserId(userId);

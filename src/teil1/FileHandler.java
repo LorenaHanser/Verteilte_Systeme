@@ -215,7 +215,7 @@ public class FileHandler {
         File ownServerFile = new File(ownPath + ownFilename + ENDING);
         long ownLastModified = ownServerFile.lastModified();
 
-        ClientMessage syncResponse = new ClientMessage(otherServerFile.getUserId(), otherServerFile.getReceiverId(), null);
+        ClientMessage syncResponse = new ClientMessage(otherServerFile.getUserId(), otherServerFile.getReceiverId(), Server.SYNC_RESPONSE, null);
         if (ownLastModified == otherLastModified) {
             System.out.println("Beide Dateien sind gleich neu.");
             syncResponse.setContent(Server.OK);
@@ -295,7 +295,7 @@ public class FileHandler {
         ClientMessage triggerSync = new ClientMessage(ownID, chatPartnerID, ownTimestamp, Server.SYNC_REQUEST, contentServer1);
 
         ClientMessage response = server.requestSynchronization(triggerSync);
-
+        System.out.println("Wir sind jetzt im Filehandler: "+response.toString());
         // Auswerten der Antwort
         if (response.getContent().equals(Server.OK)) {
             System.out.println("Sync war nicht nötig! Alles ist gut gelaufen.");

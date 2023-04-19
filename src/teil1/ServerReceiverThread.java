@@ -44,8 +44,9 @@ public class ServerReceiverThread extends Thread {
                 do {
                     try {
                         String response = reader.readLine();
+                        System.out.println("Bin im Receiver " + response);
                         if (Message.isClientMessage(response)) {
-                            System.out.println("Ist eine clientmessage " + response);
+
                             sendMessageToServer(ClientMessage.toObject(response));
                         } else {
                             sendUserActivityToServer(ServerMessage.toObject(response));
