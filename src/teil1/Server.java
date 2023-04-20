@@ -250,6 +250,10 @@ public class Server {
         removeUserThread(userID, serverUserThread);
         System.out.println(ANSI_YELLOW + "User wurde Erfolgreich abgemeldet!" + ANSI_RESET);
     }
+    public ServerMessage getUserIsOnServerArrayAsServerMessage(){
+        ServerMessage answer = new ServerMessage(7,1,userIsOnServer);
+        return answer;
+    }
 
     void getUserStatusFromOtherServer(String hostname, int port) throws IOException {
         Socket socket = new Socket(hostname, port);
@@ -258,13 +262,23 @@ public class Server {
         InputStream input = socket.getInputStream();
         BufferedReader reader = new BufferedReader(new InputStreamReader(input));
         System.out.println(ANSI_YELLOW + "Sync Server verbunden" + ANSI_RESET);
-        writer.println("Ich will deine Daten haben");
+        ServerMessage syncUserDataRequest = new ServerMessage(7,1,0);
+        writer.println(syncUserDataRequest.toString());
         String response = reader.readLine();
+        System.out.println("Die Antwort gab es:"+ response);
         handleUserStatusSync(response);
         //jetzt muss der Connector Thread, mit einem anderen Konstrucktor gebaut werden
     }
     void handleUserStatusSync(String response){
+        ServerMessage reponseAsObject = ServerMessage.toObject(response);
         // hier sollen dann der String dann ausgwertet werden!!!
+        System.out.println("===========================Antwort erhalten==================");
+        System.out.println(reponseAsObject.toString());
+        int[] responseArray = reponseAsObject.getUserIsOnServer();
+        for (int i = 0; i < 3; i++) {
+            userIsOnServer[i] = responseArray[2*i+1];
+        }
+        //System.out.println("Das ist das Ergebnis: "+ userIsOnServer);
     }
 
 
