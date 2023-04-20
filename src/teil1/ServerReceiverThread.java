@@ -70,16 +70,16 @@ public class ServerReceiverThread extends Thread {
 
     private void sendMessageToServer(ClientMessage clientMessage) {
         // todo nur Nachrichten Typ 1 und 2 sollen in sendMessage verarbeitet werden (stand 17.04.) (rest war für Sync gedacht)
-        /*
+
         // todo: einkommentieren, um einen Delay zwischen den Servern zu simulieren
         try {
             System.out.println("Delay Anfang --- Thread schläft");
             Thread.sleep(10000);
             System.out.println("Delay Ende --- Thread ist aufgewacht");
         } catch (Exception e) {
-            System.out.println(ANSI_RED + "Fehler beim Schlafen: " + e.getMessage() + ANSI_RESET);
+            System.out.println(Server.ANSI_RED + "Fehler beim Schlafen: " + e.getMessage() + Server.ANSI_RESET);
         }
-        */
+
         if (clientMessage.getType() == Server.SYNC_REQUEST) {
             System.out.println("Datei wird übertragen!");
             writer.println(server.receiveSynchronization(clientMessage).toString());
