@@ -3,6 +3,7 @@ package teil1;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.stream.Collectors;
 
 public class ServerReceiverThread extends Thread {
 
@@ -42,19 +43,32 @@ public class ServerReceiverThread extends Thread {
                 InputStream input = socket.getInputStream();
                 reader = new BufferedReader(new InputStreamReader(input));
                 do {
-                    try {
-                        String response = reader.readLine();
-                        System.out.println("Bin im Receiver " + response);
-                        if (Message.isClientMessage(response)) {
+                    //System.out.println("=================================================");
+                    String response =  reader.readLine();
+                    String fullresponse = response;
+                    fullresponse += '\n';
+                    System.out.println(response);
+                    while(response != null & !response.contains("*")){
+                        //System.out.println("Nachricht noch nicht am Ende");
 
-                            sendMessageToServer(ClientMessage.toObject(response));
-                        } else {
-                            sendUserActivityToServer(ServerMessage.toObject(response));
+                        response = reader.readLine();
+                        if(response != null & !response.contains("*")) {
+                            fullresponse += response;
+                            fullresponse += '\n';
+                            //System.out.println(response);
                         }
-                    } catch (IOException ex) {
-                        System.out.println(ANSI_RED + "Error reading from server: " + ex.getMessage() + ANSI_RESET);
-                        ex.printStackTrace();
-                        break;
+                    }
+                    //System.out.println("=================================================");
+                    //System.out.println("Bin im Receiver " + fullresponse);
+                    if(fullresponse.contains(";")) {
+                        if (Message.isClientMessage(fullresponse)) {
+
+                            sendMessageToServer(ClientMessage.toObject(fullresponse));
+                        } else {
+                            sendUserActivityToServer(ServerMessage.toObject(fullresponse));
+                        }
+                    }else{
+                        System.out.println("Und wieder gibt es einen ERROR in der Nachricht: "+fullresponse);
                     }
                 } while (socket.isConnected());
                 System.out.println(ANSI_RED + "Sync Server Verbindung verloren" + ANSI_RESET);

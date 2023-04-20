@@ -133,12 +133,15 @@ public class Server {
     }
 
     ClientMessage receiveSynchronization(ClientMessage receivedClientMessage){
-        System.out.println("Bin jetzt in Server bei receiveSynchronization " + receivedClientMessage.getType());
+        //System.out.println("Bin jetzt in Server bei receiveSynchronization " + receivedClientMessage);
         return fileHandler.synchronize(receivedClientMessage);
     }
 
     ClientMessage requestSynchronization(ClientMessage sendClientMessage){
-       return syncThread.requestSynchronization(sendClientMessage);
+        ClientMessage message = syncThread.requestSynchronization(sendClientMessage);
+        System.out.println("============================= Antwort ist da ======================");
+        System.out.println(message.toString());
+       return message;
     }
 
     boolean checkUsernameExists(String userName) { //überprüft, ob der User existiert

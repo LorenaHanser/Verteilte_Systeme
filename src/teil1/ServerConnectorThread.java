@@ -25,7 +25,9 @@ public class ServerConnectorThread extends Thread {
     private Socket socket;
 
     private String response;
+    private String fullresponse;
     private boolean answerIsThere;
+    private boolean answerIsPicked;
 
     public ServerConnectorThread(String hostname, int port, Server server) {
         this.hostname = hostname;
@@ -46,9 +48,30 @@ public class ServerConnectorThread extends Thread {
                 System.out.println(ANSI_YELLOW + "Sync Server verbunden" + ANSI_RESET);
                 while (socket.isConnected()) {
                     try {
-                        response = reader.readLine();
-                        System.out.println("Bin im ServerConnector " + response);
+                        answerIsPicked = false;
+                        //System.out.println("=================================================");
+                        String response =  reader.readLine();
+                        fullresponse = response;
+                        fullresponse += '\n';
+                        System.out.println(response);
+                        while(response != null & !response.contains("*")){
+                            //System.out.println("Nachricht noch nicht am Ende");
+
+                            response = reader.readLine();
+                            if(response != null & !response.contains("*")) {
+                                fullresponse += response;
+                                fullresponse += '\n';
+                                System.out.println(response);
+                            }
+                        }
+                        //System.out.println("=================================================");
+                        //System.out.println("Bin im Receiver " + fullresponse);;
                         answerIsThere = true;
+                        System.out.println(Server.ANSI_RED+"answerIsThere = true"+Server.ANSI_RESET);
+                        while(!answerIsPicked){
+
+                        }
+                        System.out.println("Fertig ist fertig");
                     } catch (IOException ex) {
                         System.out.println(ANSI_PURPLE + "Verbindung getrennt " + ex.getMessage() + ANSI_RESET);
                         break;
@@ -69,15 +92,18 @@ public class ServerConnectorThread extends Thread {
     protected ClientMessage requestSynchronization(ClientMessage clientMessage){
         ClientMessage answer = null;
         try {
-            System.out.println("=========== Setzte answerIsThere -> true ===========");
+            System.out.println("=========== Setzte answerIsThere -> false ===========");
             answerIsThere = false;
             writer.println(clientMessage.toString());
             System.out.println("====== In der Schliefe drinnen ===========");
             while(!answerIsThere){
                 //Wartet, bis eine Antwort eintrifft, hier muss man das Timeout reinbauen
+                System.out.println("warte");
+                Thread.sleep(1000);
             }
             System.out.println("====== Aus der Schliefe draußen ===========");
-            answer = ClientMessage.toObject(response);
+            answerIsPicked = true;
+            answer = ClientMessage.toObject(fullresponse);
         }catch (Exception e){
             e.printStackTrace();
         }

@@ -32,11 +32,13 @@ public class ServerMessage extends Message {
     // Methoden
     @Override
     public String toString() {
-        return this.getUserId() + getSplitSymbol() + this.getServerId() + getSplitSymbol() + this.getStatus();
+        return this.getUserId() + getSplitSymbol() + this.getServerId() + getSplitSymbol() + this.getStatus() + "*";
     }
 
     public static ServerMessage toObject(String string) {
-        String[] attributes = string.split(Message.getSplitSymbol(), 3);
+        string = string.replace("*", "");
+        string = string.replace("\n", "");
+        String[] attributes = string.split(Message.getSplitSymbol(), 5);
 
         int userId = Integer.parseInt(attributes[0]);
         int serverId = Integer.parseInt(attributes[1]);

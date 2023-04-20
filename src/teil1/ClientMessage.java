@@ -109,10 +109,11 @@ public class ClientMessage extends Message {
     // Methoden
     @Override
     public String toString() {
-        return this.getUserId() + getSplitSymbol() + this.getReceiverId() + getSplitSymbol() + this.getTimestamp() + getSplitSymbol() + this.getType() + getSplitSymbol() + this.getContent();
+        return this.getUserId() + getSplitSymbol() + this.getReceiverId() + getSplitSymbol() + this.getTimestamp() + getSplitSymbol() + this.getType() + getSplitSymbol() + this.getContent() + "*";
     }
 
     public static ClientMessage toObject(String string) {
+        string = string.replace("*", "");
         String[] attributes = string.split(Message.getSplitSymbol(), 5);
 
         int userId = Integer.parseInt(attributes[0]);
