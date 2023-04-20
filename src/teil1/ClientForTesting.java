@@ -4,12 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-/**
- * This is the chat client program.
- * Type 'bye' to terminte the program.
- *
- * @author www.codejava.net
- */
 public class ClientForTesting {
     public static void main(String[] args) {
         try {
@@ -23,7 +17,7 @@ public class ClientForTesting {
                 port = Integer.parseInt(answer);
                 if (port <= 8990 && port >= 8988) {
                     portFound = true;
-                }else{
+                } else {
                     System.out.println("Leider ist die Eingabe nicht korrekt");
                 }
             }

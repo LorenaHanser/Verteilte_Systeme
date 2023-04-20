@@ -3,12 +3,6 @@ package teil1;
 import java.net.*;
 import java.io.*;
 
-/**
- * This is the chat client program.
- * Type 'bye' to terminte the program.
- *
- * @author www.codejava.net
- */
 public class Client {
 
     public static final String ANSI_RESET = "\u001B[0m";
@@ -60,8 +54,8 @@ public class Client {
     public static void main(String[] args) {
 
         String hostname = "localhost";//args[0];
-        int port = 8989;                                    // Server 1 hat immer Port 8989 Server 2 8990
-        int randomNumber = (int) (Math.random() * 2);       // Lastverteilung mit Math.random()
+        int port = 8988;                                    // Server 1 hat immer Port 8988 Server 2 8989 und Server 3 8990
+        int randomNumber = (int) (Math.random() * 3);       // Lastverteilung mit Math.random()
         port = port + randomNumber;
 
         Client client = new Client(hostname, port);

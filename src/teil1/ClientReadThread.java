@@ -40,9 +40,9 @@ public class ClientReadThread extends Thread {
         while (socket.isBound()) {
             try {
                 String response = reader.readLine();
-                //System.out.println("-- wir sind in ClientReadThread run()");
-                System.out.println(response);
-
+                if (!response.contains("SHUTDOWN") && !response.contains("DISCONNECT")) {
+                    System.out.println(response);
+                }
             } catch (IOException ex) {
                 System.out.println(ANSI_PURPLE + "Die Verbindung zum Server wurde getrennt: " + ex.getMessage() + ANSI_RESET);
                 break;
@@ -50,4 +50,3 @@ public class ClientReadThread extends Thread {
         }
     }
 }
-

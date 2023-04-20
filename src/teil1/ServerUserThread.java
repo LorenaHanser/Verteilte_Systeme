@@ -4,12 +4,6 @@ import java.io.*;
 import java.net.*;
 import java.sql.Timestamp;
 
-/**
- * This thread handles connection for each connected client, so the server
- * can handle multiple clients at the same time.
- *
- * @author www.codejava.net
- */
 public class ServerUserThread extends Thread {
 
     public static final String ANSI_RESET = "\u001B[0m";
@@ -53,29 +47,29 @@ public class ServerUserThread extends Thread {
             OutputStream output = socket.getOutputStream();
             writer = new PrintWriter(output, true);
 
-            writer.println(ANSI_PURPLE + "Please enter your name:" + ANSI_RESET);
-            boolean userSuccessfullAuthenticated = false;
-            userName = getText(reader.readLine());
+            // Authentifizierungsprozess
+            boolean userSuccessfullyAuthenticated = false;
             String password;
-            if (server.checkUsernameExists(userName)) {
-                writer.println(ANSI_PURPLE + "Please insert Password:" + ANSI_RESET);
-                password = getText(reader.readLine());
-                if (server.checkPasswordValid(userName, password)) {
-                    userSuccessfullAuthenticated = true;
-                }
-            }
-            while (!userSuccessfullAuthenticated) {
-                writer.println(ANSI_RED + "Password oder User falsch! Bitte versuch es nochmal" + ANSI_RESET);
+            do {
                 writer.println(ANSI_PURPLE + "Please enter your name:" + ANSI_RESET);
                 userName = getText(reader.readLine());
                 if (server.checkUsernameExists(userName)) {
                     writer.println(ANSI_PURPLE + "Please insert Password:" + ANSI_RESET);
                     password = getText(reader.readLine());
                     if (server.checkPasswordValid(userName, password)) {
-                        userSuccessfullAuthenticated = true;
+                        if (server.getUserIsOnServer(server.askForID(userName)) != 0) { // User war noch nicht online
+                            writer.println(ANSI_RED + "Der User ist schon angemeldet. Melden Sie sich bitte mit der anderen Verbindung ab." + ANSI_RESET);
+                        } else {
+                            userSuccessfullyAuthenticated = true;
+                        }
+                    } else {
+                        writer.println(ANSI_RED + "Passwort ist falsch! Bitte versuch es erneut" + ANSI_RESET);
                     }
+                } else {
+                    writer.println(ANSI_RED + "Benutzername ist nicht registriert! Bitte versuch es erneut" + ANSI_RESET);
                 }
-            }
+            } while (!userSuccessfullyAuthenticated);
+
             server.setThreadId(userName, this); //die Referenzvariable des Threads wird mit dem User verknüpft
             ownID = server.askForID(userName); // eigene ID wird gespeichert
             server.setUserLoggedIn(ownID);
@@ -90,6 +84,8 @@ public class ServerUserThread extends Thread {
                     writer.println(ANSI_PURPLE + "Alles klar, du wirst verbunden" + ANSI_RESET);
                     server.setChatPartner(ownID, chatPartnerID); //User geht in Chatraum
                     foundPartner = true;
+                } else {
+                    writer.println(ANSI_RED + "Der User ist nicht registriert. Bitte versuch es nochmal" + ANSI_RESET);
                 }
             }// ab hier weiß der User die ID seines Chatpartners
 
@@ -103,12 +99,12 @@ public class ServerUserThread extends Thread {
 
             do {
                 serverMessage = reader.readLine();
-                if(server.mcsHandler.isServerBlocked()){
+                if (server.mcsHandler.isServerBlocked()) {
                     writer.println("Es tut uns sehr leid, aber leider haben wir ein Technisches Problem.\n Die Nachricht kann nicht zugestellt werden \n Bitte versuchen Sie es später erneut! Sollte dieses Problem weiterhin bestehen, wenden Sie sich bitte an den Support!");
                 }
-                if(serverMessage != null) {
+                if (serverMessage != null) {
                     server.sendMessageToServer(new ClientMessage(serverMessage, ownID, chatPartnerID));
-                }else{
+                } else {
                     System.out.println(ANSI_RED+"Servermessage ist null"+ANSI_RESET);
                 }
 
@@ -127,15 +123,13 @@ public class ServerUserThread extends Thread {
         }
     }
 
-    /**
-     * Sends a message to the client.
-     */
     void sendMessage(String message) {
         writer.println(ANSI_CYAN + message + ANSI_RESET);
     }
-    private String getText(String message){
+
+    private String getText(String message) {
         String[] messageSplit = message.split(";", 2);
-        return messageSplit[messageSplit.length-1]; //gibt Message von User in jedem Fall zurück
+        return messageSplit[messageSplit.length - 1]; //gibt Message von User in jedem Fall zurück
     }
 
 }

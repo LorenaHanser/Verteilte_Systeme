@@ -3,10 +3,10 @@ package teil1;
 public class Message {
     private static final String SPLIT_SYMBOL = ";";
 
-    public static boolean isClientMessage (String message){
+    public static boolean isClientMessage(String message) {
         String[] splitResponse = message.split(SPLIT_SYMBOL, 3);
         boolean answer = false;
-        if(Integer.parseInt(splitResponse[1])>=0){
+        if (Integer.parseInt(splitResponse[1]) >= 0) {
             answer = true;
         }
         return answer;

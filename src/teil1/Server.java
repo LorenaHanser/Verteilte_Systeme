@@ -17,13 +17,13 @@ public class Server {
     public static final String ANSI_WHITE = "\u001B[37m";
 
     //Für das Protokoll
-    //public static final int USER_AKTIVITY = 0;
+    //public static final int USER_ACTIVITY = 0;
     //public static final int MESSAGE = 1;
     public static final int LOGGED_OUT = 0;
     public static final int LOGGED_IN = 1;
 
     public static final int NEW_MESSAGE = 0;
-    public  static final int NEW_MESSAGE_WITHOUT_TIMESTAMP = 1;
+    public static final int NEW_MESSAGE_WITHOUT_TIMESTAMP = 1;
 
     private int port;
     private FileHandler fileHandler;
@@ -55,7 +55,7 @@ public class Server {
     private int[] userChattetWith = new int[3]; //Speichert, wer sich aktuell mit wem im Chat befindet (damit man nicht mit einer Person chatten kann, die gerade mit wem anders chattet)
     private ServerUserThread[] userThreadRegister = new ServerUserThread[3];//Speichert die Referenzvariable des Threads auf dem der User (wenn er online ist) läuft. Der Index für das Feld ist, dabei die ID des Users
 
-    private Set<ServerUserThread> userThreads = new HashSet<>(); //hier werden die Referenzvariabeln gespeichert (kann man das überarbeiten?) Vorsicht vor Garbagecollector
+    private Set<ServerUserThread> userThreads = new HashSet<>(); //hier werden die Referenzvariablen gespeichert (kann man das überarbeiten?) Vorsicht vor Garbage Collector
 
     // Konstruktor
     public Server(int port, int partner1ServerPort, int partner2ServerPort, int serverReceiverPort, int serverNumber) {
@@ -74,6 +74,7 @@ public class Server {
         receiverSyncThread.start();
         System.out.println(ANSI_YELLOW + "Sync ServerThread gestartet" + ANSI_RESET);
         try (ServerSocket serverSocket = new ServerSocket(port)) {
+
             System.out.println(ANSI_YELLOW + "Chat Server is listening on port " + port + ANSI_YELLOW);
 
             fileHandler.create();
@@ -91,6 +92,7 @@ public class Server {
                 ServerUserThread newUser = new ServerUserThread(socket, this, serverNumber);
                 userThreads.add(newUser);
                 newUser.start(); //Thread startet mit User → Name unbekannt deswegen noch kein Eintrag in das userThreadRegister Array
+
             }
 
         } catch (IOException ex) {
@@ -108,9 +110,6 @@ public class Server {
         server.execute();
     }
 
-    /**
-     * Delivers a message from one user to another
-     */
     void sendMessageToServer(ClientMessage clientMessage) {
         if(!mcsHandler.isServerBlocked())
         {
@@ -130,8 +129,7 @@ public class Server {
 
     void sendMessage(ClientMessage clientMessage) {
 
-        // Timestamp prüfen(?)
-        fileHandler.write(clientMessage); //todo:fileHandler anpassen und dann !auskommentieren.
+        fileHandler.writeOneNewMessage(clientMessage);
         // todo nur Nachrichten Typ 1 und 2 Sollen verarbeitet werden (stand 17.04.)
         if (userThreadRegister[clientMessage.getReceiverId()] != null) { //es wird geschaut, ob der User online ist (zum Vermeiden von Exception)
             System.out.println(ANSI_YELLOW + "Diese Nachricht wurde erhalten: " + ANSI_CYAN + clientMessage.toString() + ANSI_RESET);
@@ -140,7 +138,7 @@ public class Server {
             } else {
                 System.out.println(ANSI_YELLOW + "Der User ist gerade beschäftigt. Die Nachricht: " + ANSI_CYAN + clientMessage.getContent() + ANSI_YELLOW + " wird gespeichert!");
             }
-        } else {
+        } else if (userIsOnServer[clientMessage.getReceiverId()] < 1) {
             System.out.println(ANSI_YELLOW + "Der User ist nicht online, die Nachricht: " + ANSI_CYAN + clientMessage.getContent() + ANSI_YELLOW + " wird aber für ihn gespeichert...");
         }
     }
@@ -183,9 +181,8 @@ public class Server {
         }
     }
 
-    /**
-     * When a client is disconnected, removes the UserThread
-     */
+
+    // When a client is disconnected, removes the UserThread
     void removeUser(String userName, ServerUserThread aUser) { //noch von Tutorial
         userThreads.remove(aUser);
         System.out.println(ANSI_YELLOW + "The user " + userName + " quit." + ANSI_RESET);
@@ -219,37 +216,41 @@ public class Server {
 
     }
 
-    int getServerNumber(){
+    int getServerNumber() {
         return serverNumber;
     }
 
-    void setUserLoggedIn(int userID){
+    void setUserLoggedIn(int userID) {
         ServerMessage newActivity = new ServerMessage(userID, getServerNumber(), LOGGED_IN);
         syncThread1.sendUserActivity(newActivity);
         syncThread2.sendUserActivity(newActivity);
         changeUserActivity(newActivity);
     }
 
-    void setUserLoggedOut(int userID){
+    void setUserLoggedOut(int userID) {
         ServerMessage newActivity = new ServerMessage(userID, getServerNumber(), LOGGED_OUT);
         syncThread1.sendUserActivity(newActivity);
         syncThread2.sendUserActivity(newActivity);
         changeUserActivity(newActivity);
     }
 
-    void changeUserActivity(ServerMessage serverMessage){
-        if(serverMessage.getStatus() == LOGGED_IN){
+    void changeUserActivity(ServerMessage serverMessage) {
+        if (serverMessage.getStatus() == LOGGED_IN) {
             userIsOnServer[serverMessage.getUserId()] = serverMessage.getServerId();
         } else if (serverMessage.getStatus() == LOGGED_OUT) {
             userIsOnServer[serverMessage.getUserId()] = 0;
         }
     }
 
+    public int getUserIsOnServer(int index) {
+        return userIsOnServer[index];
+    }
+
     void userConnectionReset(int userID, ServerUserThread serverUserThread){
         setUserLoggedOut(userID);
         removeChatPartner(userID);
         removeUserThread(userID, serverUserThread);
-        System.out.println("User wurde Erfolgreich abgemeldet!");
+        System.out.println(ANSI_YELLOW + "User wurde Erfolgreich abgemeldet!" + ANSI_RESET);
     }
 
 
