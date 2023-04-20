@@ -50,6 +50,7 @@ public class Server {
     private int serverReceiverPort;
     private ServerReceiverThread receiverSyncThread;
     private int[] userIsOnServer = new int[3];
+    private boolean syncThreadActive = false;
     private int[] userChattetWith = new int[3]; //Speichert, wer sich aktuell mit wem im Chat befindet (damit man nicht mit einer Person chatten kann, die gerade mit wem anders chattet)
     private ServerUserThread[] userThreadRegister = new ServerUserThread[3];//Speichert die Referenzvariable des Threads auf dem der User (wenn er online ist) läuft. Der Index für das Feld ist, dabei die ID des Users
 
@@ -65,21 +66,25 @@ public class Server {
     }
 
     public void execute() {
+        System.out.println(ANSI_YELLOW + "Server wird gebootet" + ANSI_RESET);
         fileHandler = new FileHandler(this, serverNumber);
+        System.out.println(ANSI_YELLOW + "Sync ServerThread gestartet" + ANSI_RESET);
+        try {
+            this.getUserStatusFromOtherServer(partnerServerAddress, partnerServerPort);
+        } catch (Exception e) {
+            syncThread = new ServerConnectorThread(partnerServerAddress, partnerServerPort, this);
+            syncThread.start();
+        }
         receiverSyncThread = new ServerReceiverThread(this, serverReceiverPort);
         receiverSyncThread.start();
-        System.out.println(ANSI_YELLOW + "Sync ServerThread gestartet" + ANSI_RESET);
         try (ServerSocket serverSocket = new ServerSocket(port)) {
 
             System.out.println(ANSI_YELLOW + "Chat Server is listening on port " + port + ANSI_YELLOW);
 
             fileHandler.create();
 
-            syncThread = new ServerConnectorThread(partnerServerAddress, partnerServerPort, this);
-            syncThread.start();
-
             // Endlosschleife
-
+            System.out.println(ANSI_YELLOW + "Server ist online" + ANSI_RESET);
             while (true) {
                 Socket socket = serverSocket.accept();
                 System.out.println(ANSI_YELLOW + "New user connected" + ANSI_YELLOW);
@@ -244,6 +249,22 @@ public class Server {
         removeChatPartner(userID);
         removeUserThread(userID, serverUserThread);
         System.out.println(ANSI_YELLOW + "User wurde Erfolgreich abgemeldet!" + ANSI_RESET);
+    }
+
+    void getUserStatusFromOtherServer(String hostname, int port) throws IOException {
+        Socket socket = new Socket(hostname, port);
+        OutputStream output = socket.getOutputStream();
+        PrintWriter writer = new PrintWriter(output, true);
+        InputStream input = socket.getInputStream();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+        System.out.println(ANSI_YELLOW + "Sync Server verbunden" + ANSI_RESET);
+        writer.println("Ich will deine Daten haben");
+        String response = reader.readLine();
+        handleUserStatusSync(response);
+        //jetzt muss der Connector Thread, mit einem anderen Konstrucktor gebaut werden
+    }
+    void handleUserStatusSync(String response){
+        // hier sollen dann der String dann ausgwertet werden!!!
     }
 
 
