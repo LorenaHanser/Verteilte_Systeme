@@ -24,6 +24,10 @@ public class Server {
 
     public static final int NEW_MESSAGE = 0;
     public static final int NEW_MESSAGE_WITHOUT_TIMESTAMP = 1;
+    public static final int SYNC_REQUEST = 2;
+    public static final int SYNC_RESPONSE = 3;
+
+    public static final String OK = "OK";
 
     private int port;
     private FileHandler fileHandler;
@@ -46,6 +50,7 @@ public class Server {
     private int serverReceiverPort;
     private ServerReceiverThread receiverSyncThread;
     private int[] userIsOnServer = new int[3];
+    private boolean syncThreadActive = false;
     private int[] userChattetWith = new int[3]; //Speichert, wer sich aktuell mit wem im Chat befindet (damit man nicht mit einer Person chatten kann, die gerade mit wem anders chattet)
     private ServerUserThread[] userThreadRegister = new ServerUserThread[3];//Speichert die Referenzvariable des Threads auf dem der User (wenn er online ist) läuft. Der Index für das Feld ist, dabei die ID des Users
 
@@ -61,25 +66,30 @@ public class Server {
     }
 
     public void execute() {
-        fileHandler = new FileHandler(serverNumber);
+        System.out.println(ANSI_YELLOW + "Server wird gebootet" + ANSI_RESET);
+        fileHandler = new FileHandler(this, serverNumber);
+        System.out.println(ANSI_YELLOW + "Sync ServerThread gestartet" + ANSI_RESET);
+        try {
+            this.getUserStatusFromOtherServer(partnerServerAddress, partnerServerPort);
+        } catch (Exception e) {
+            System.out.println(ANSI_RED+"Es ist leider kein anderer Server online"+ANSI_RESET);
+            syncThread = new ServerConnectorThread(partnerServerAddress, partnerServerPort, this);
+            syncThread.start();
+        }
         receiverSyncThread = new ServerReceiverThread(this, serverReceiverPort);
         receiverSyncThread.start();
-        System.out.println(ANSI_YELLOW + "Sync ServerThread gestartet" + ANSI_RESET);
         try (ServerSocket serverSocket = new ServerSocket(port)) {
 
             System.out.println(ANSI_YELLOW + "Chat Server is listening on port " + port + ANSI_YELLOW);
 
             fileHandler.create();
 
-            syncThread = new ServerConnectorThread(partnerServerAddress, partnerServerPort, this);
-            syncThread.start();
-
             // Endlosschleife
-
+            System.out.println(ANSI_YELLOW + "Server ist online" + ANSI_RESET);
             while (true) {
                 Socket socket = serverSocket.accept();
                 System.out.println(ANSI_YELLOW + "New user connected" + ANSI_YELLOW);
-                ServerUserThread newUser = new ServerUserThread(socket, this, serverNumber);
+                ServerUserThread newUser = new ServerUserThread(socket, this, serverNumber, fileHandler);
                 userThreads.add(newUser);
                 newUser.start(); //Thread startet mit User → Name unbekannt deswegen noch kein Eintrag in das userThreadRegister Array
 
@@ -128,6 +138,18 @@ public class Server {
         userThreadRegister[ownID].sendMessage(message); //nachricht wird an den User gesendet
     }
 
+    ClientMessage receiveSynchronization(ClientMessage receivedClientMessage){
+        //System.out.println("Bin jetzt in Server bei receiveSynchronization " + receivedClientMessage);
+        return fileHandler.synchronize(receivedClientMessage);
+    }
+
+    ClientMessage requestSynchronization(ClientMessage sendClientMessage){
+        ClientMessage message = syncThread.requestSynchronization(sendClientMessage);
+        System.out.println("============================= Antwort ist da ======================");
+        System.out.println(message.toString());
+       return message;
+    }
+
     boolean checkUsernameExists(String userName) { //überprüft, ob der User existiert
         boolean usernameValid = false;
         for (int i = 0; i < USER_NAME_REGISTER.length; i++) {
@@ -162,21 +184,6 @@ public class Server {
         }
     }
 
-
-    // When a client is disconnected, removes the UserThread
-    void removeUser(String userName, ServerUserThread aUser) { //noch von Tutorial
-        userThreads.remove(aUser);
-        System.out.println(ANSI_YELLOW + "The user " + userName + " quit." + ANSI_RESET);
-    }
-    void removeUser( ServerUserThread aUser) { //noch von Tutorial
-        userThreads.remove(aUser);
-        }
-    void removeUserThread(int userID, ServerUserThread serverUserThread){
-        removeUser(serverUserThread);
-        userThreadRegister[userID] = null;
-
-    }
-
     int askForID(String username) { //Es wird geschaut, welche Id der User hat (Index von userNameRegister)
         int answer = -1;
         for (int i = 0; i < USER_NAME_REGISTER.length; i++) {
@@ -194,6 +201,19 @@ public class Server {
     }
     void removeChatPartner(int user) { //der ChatPartner bzw. der Chatraum wird für den User gesetzt (ab jetzt kann er Nachrichten empfangen, aber nur von dem Partner)
         userChattetWith[user] = -1;
+
+    }
+    // When a client is disconnected, removes the UserThread
+    void removeUser(String userName, ServerUserThread aUser) { //noch von Tutorial
+        userThreads.remove(aUser);
+        System.out.println(ANSI_YELLOW + "The user " + userName + " quit." + ANSI_RESET);
+    }
+    void removeUser( ServerUserThread aUser) { //noch von Tutorial
+        userThreads.remove(aUser);
+    }
+    void removeUserThread(int userID, ServerUserThread serverUserThread){
+        removeUser(serverUserThread);
+        userThreadRegister[userID] = null;
 
     }
 
@@ -230,6 +250,38 @@ public class Server {
         removeChatPartner(userID);
         removeUserThread(userID, serverUserThread);
         System.out.println(ANSI_YELLOW + "User wurde Erfolgreich abgemeldet!" + ANSI_RESET);
+    }
+    public ServerMessage getUserIsOnServerArrayAsServerMessage(){
+        ServerMessage answer = new ServerMessage(7,1,userIsOnServer);
+        return answer;
+    }
+
+    void getUserStatusFromOtherServer(String hostname, int port) throws IOException {
+        Socket socket = new Socket(hostname, port);
+        OutputStream output = socket.getOutputStream();
+        PrintWriter writer = new PrintWriter(output, true);
+        InputStream input = socket.getInputStream();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+        System.out.println(ANSI_YELLOW + "Sync Server verbunden" + ANSI_RESET);
+        ServerMessage syncUserDataRequest = new ServerMessage(7,1,0);
+        writer.println(syncUserDataRequest.toString());
+        String response = reader.readLine();
+        System.out.println("Die Antwort gab es:"+ response);
+        handleUserStatusSync(response);
+        syncThread = new ServerConnectorThread(socket, writer, reader,this);
+        syncThread.start();
+        //jetzt muss der Connector Thread, mit einem anderen Konstrucktor gebaut werden
+    }
+    void handleUserStatusSync(String response){
+        ServerMessage reponseAsObject = ServerMessage.toObject(response);
+        // hier sollen dann der String dann ausgwertet werden!!!
+        System.out.println("===========================Antwort erhalten==================");
+        System.out.println(reponseAsObject.toString());
+        int[] responseArray = reponseAsObject.getUserIsOnServer();
+        for (int i = 0; i < 3; i++) {
+            userIsOnServer[i] = responseArray[2*i+1];
+        }
+        //System.out.println("Das ist das Ergebnis: "+ userIsOnServer);
     }
 
 
