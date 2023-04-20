@@ -18,24 +18,37 @@ public class ServerConnectorThread extends Thread {
     private String fullresponse;
     private boolean answerIsThere;
     private boolean answerIsPicked;
+    private boolean isThreadAlreadyConnected;
 
     public ServerConnectorThread(String hostname, int port, Server server) {
         this.hostname = hostname;
         this.port = port;
         this.server = server;
+        this.isThreadAlreadyConnected = false;
 
+    }
+    public ServerConnectorThread(Socket socket, PrintWriter writer, BufferedReader reader,Server server) {
+        this.socket = socket;
+        this.writer = writer;
+        this.reader = reader;
+        this.server = server;
+        this.isThreadAlreadyConnected = true;
+//Hier mögliche Fehelrquele durch fehlednes Output
     }
 
     public void run() {
         while (true) {
 
             try {
+                if(!isThreadAlreadyConnected){
                 socket = new Socket(hostname, port);
                 OutputStream output = socket.getOutputStream();
                 writer = new PrintWriter(output, true);
                 InputStream input = socket.getInputStream();
                 reader = new BufferedReader(new InputStreamReader(input));
                 System.out.println(Server.ANSI_YELLOW + "Sync Server verbunden" + Server.ANSI_RESET);
+                isThreadAlreadyConnected = false;
+                }
                 while (socket.isConnected()) {
                     try {
                         answerIsPicked = false;

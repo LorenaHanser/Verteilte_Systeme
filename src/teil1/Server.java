@@ -72,6 +72,7 @@ public class Server {
         try {
             this.getUserStatusFromOtherServer(partnerServerAddress, partnerServerPort);
         } catch (Exception e) {
+            System.out.println(ANSI_RED+"Es ist leider kein anderer Server online"+ANSI_RESET);
             syncThread = new ServerConnectorThread(partnerServerAddress, partnerServerPort, this);
             syncThread.start();
         }
@@ -267,6 +268,8 @@ public class Server {
         String response = reader.readLine();
         System.out.println("Die Antwort gab es:"+ response);
         handleUserStatusSync(response);
+        syncThread = new ServerConnectorThread(socket, writer, reader,this);
+        syncThread.start();
         //jetzt muss der Connector Thread, mit einem anderen Konstrucktor gebaut werden
     }
     void handleUserStatusSync(String response){
