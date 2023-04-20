@@ -46,15 +46,14 @@ public class ServerReceiverThread extends Thread {
                     //System.out.println("=================================================");
                     String response =  reader.readLine();
                     String fullresponse = response;
-                    fullresponse += '\n';
                     System.out.println(response);
                     while(response != null & !response.contains("*")){
                         //System.out.println("Nachricht noch nicht am Ende");
 
                         response = reader.readLine();
                         if(response != null & !response.contains("*")) {
-                            fullresponse += response;
                             fullresponse += '\n';
+                            fullresponse += response;
                             //System.out.println(response);
                         }
                     }

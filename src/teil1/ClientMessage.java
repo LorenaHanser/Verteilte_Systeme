@@ -113,7 +113,7 @@ public class ClientMessage extends Message {
     // Methoden
     @Override
     public String toString() {
-        return this.getUserId() + getSplitSymbol() + this.getReceiverId() + getSplitSymbol() + this.getTimestamp() + getSplitSymbol() + this.getType() + getSplitSymbol() + this.getContent() + "*";
+        return this.getUserId() + getSplitSymbol() + this.getReceiverId() + getSplitSymbol() + this.getTimestamp() + getSplitSymbol() + this.getType() + getSplitSymbol() + this.getContent() + "\n*";
     }
 
     public static ClientMessage toObject(String string) {

@@ -52,15 +52,14 @@ public class ServerConnectorThread extends Thread {
                         //System.out.println("=================================================");
                         String response =  reader.readLine();
                         fullresponse = response;
-                        fullresponse += '\n';
                         System.out.println(response);
                         while(response != null & !response.contains("*")){
                             //System.out.println("Nachricht noch nicht am Ende");
 
                             response = reader.readLine();
                             if(response != null & !response.contains("*")) {
-                                fullresponse += response;
                                 fullresponse += '\n';
+                                fullresponse += response;
                                 System.out.println(response);
                             }
                         }
@@ -91,7 +90,6 @@ public class ServerConnectorThread extends Thread {
 
     protected ClientMessage requestSynchronization(ClientMessage clientMessage){
         ClientMessage answer = null;
-        try {
             System.out.println("=========== Setzte answerIsThere -> false ===========");
             answerIsThere = false;
             writer.println(clientMessage.toString());
@@ -99,29 +97,36 @@ public class ServerConnectorThread extends Thread {
             while(!answerIsThere){
                 //Wartet, bis eine Antwort eintrifft, hier muss man das Timeout reinbauen
                 System.out.println("warte");
-                Thread.sleep(1000);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
             }
             System.out.println("====== Aus der Schliefe draußen ===========");
             answerIsPicked = true;
             answer = ClientMessage.toObject(fullresponse);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
         return answer;
     }
 
     // Senden einer ClientMessage zum anderen Server
     protected void sendMessageToOtherServer(ClientMessage clientMessage) {
         try {
+            if (writer != null) {
             writer.println(clientMessage.toString());
+        }
         }catch (Exception e){
-            e.printStackTrace();
+            System.out.println(Server.ANSI_RED+"Gab beim Senden der Message einen ERROR im ServerConnectorThread"+Server.ANSI_RESET);
         }
     }
 
     protected void sendUserActivity(ServerMessage serverMessage) {
-        if (writer != null) {
-            writer.println(serverMessage.toString());
+        try {
+            if (writer != null) {
+                writer.println(serverMessage.toString());
+            }
+        } catch (Exception e) {
+            System.out.println(Server.ANSI_RED+"Gab beim Senden der UserActivity einen ERROR im ServerConnectorThread"+Server.ANSI_RESET);
         }
     }
 }

@@ -309,7 +309,7 @@ public class FileHandler {
         Timestamp ownTimestamp = new Timestamp(ownLastModified);
 
         // trigger receiver to synchronzie with synchronize
-
+    try{
         ClientMessage triggerSync = new ClientMessage(ownID, chatPartnerID, ownTimestamp, Server.SYNC_REQUEST, contentServer1);
 
         ClientMessage response = server.requestSynchronization(triggerSync);
@@ -323,7 +323,10 @@ public class FileHandler {
         } else {
             String synchronizedFileContent = response.getContent();
             System.out.println(ownServerFile.delete());
-            writeWholeChatfile(synchronizedFileContent, this.getFilename(response.getUserId(), response.getReceiverId()), this.path);
+            this.writeWholeChatfile(synchronizedFileContent, this.getFilename(response.getUserId(), response.getReceiverId()), this.path);
         }
+    } catch (Exception e) {
+        System.out.println(ANSI_RED+ "Anderer Server ist nicht online"+ ANSI_RESET);
+    }
     }
 }
