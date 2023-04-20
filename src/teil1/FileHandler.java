@@ -307,7 +307,7 @@ public class FileHandler {
         System.out.println("=====================================Ende==================================================");
         System.out.println("Wir sind jetzt im Filehandler: "+response.toString());
         // Auswerten der Antwort
-        if (response.getContent().equals(Server.OK+"\n")) {
+        if (response.getContent().equals(Server.OK)) {
             System.out.println("Sync war nicht nötig! Alles ist gut gelaufen.");
         } else {
             String synchronizedFileContent = response.getContent();

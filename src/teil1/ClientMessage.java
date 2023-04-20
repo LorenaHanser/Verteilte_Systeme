@@ -82,7 +82,11 @@ public class ClientMessage extends Message {
     }
 
     public void setContent(String content) {
-        this.content = content;
+        String filterdContent = content;
+        if(content != null){
+            filterdContent = content.replace("*", "");
+        }
+        this.content = filterdContent;
     }
 
     public String getUserName() {

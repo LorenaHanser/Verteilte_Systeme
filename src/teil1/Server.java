@@ -27,7 +27,7 @@ public class Server {
     public static final int SYNC_REQUEST = 2;
     public static final int SYNC_RESPONSE = 3;
 
-    public static final String OK = "OK";
+    public static final String OK = "OK\n";
 
     private int port;
     private FileHandler fileHandler;
