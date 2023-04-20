@@ -8,16 +8,6 @@ import java.util.*;
 
 public class FileHandler {
 
-    public static final String ANSI_RESET = "\u001B[0m";
-    public static final String ANSI_BLACK = "\u001B[30m";
-    public static final String ANSI_RED = "\u001B[31m";
-    public static final String ANSI_GREEN = "\u001B[32m";
-    public static final String ANSI_YELLOW = "\u001B[33m";
-    public static final String ANSI_BLUE = "\u001B[34m";
-    public static final String ANSI_PURPLE = "\u001B[35m";
-    public static final String ANSI_CYAN = "\u001B[36m";
-    public static final String ANSI_WHITE = "\u001B[37m";
-
     private String path;
     private final String[] FILENAMES = {"DanielDavid", "DanielLorena", "DavidLorena"};
     private final String ENDING = ".txt"; //Dateiendung der Textnachrichten
@@ -42,30 +32,30 @@ public class FileHandler {
             if (!new File(path).exists()) {
                 boolean createdDirectory = new File(path).mkdir();
                 if (createdDirectory) {
-                    System.out.println(ANSI_WHITE + "Ordner " + serverDirectoryName + " wurde neu erstellt." + ANSI_RESET);
+                    System.out.println(Server.ANSI_WHITE + "Ordner " + serverDirectoryName + " wurde neu erstellt." + Server.ANSI_RESET);
                 } else {
-                    System.out.println(ANSI_WHITE + "Ordner " + serverDirectoryName + " konnte nicht erstellt werden." + ANSI_RESET);
+                    System.out.println(Server.ANSI_WHITE + "Ordner " + serverDirectoryName + " konnte nicht erstellt werden." + Server.ANSI_RESET);
                 }
             } else {
-                System.out.println(ANSI_WHITE + "Ordner " + serverDirectoryName + " existiert bereits." + ANSI_RESET);
+                System.out.println(Server.ANSI_WHITE + "Ordner " + serverDirectoryName + " existiert bereits." + Server.ANSI_RESET);
             }
 
             //Dateien erstellen
             for (String filename : FILENAMES) {
                 if (!new File(path, filename + ENDING).exists()) {
                     PrintWriter myWriter = new PrintWriter(new FileWriter(path + filename + ENDING));
-                    System.out.println(ANSI_WHITE + "Datei " + filename + ENDING + " wurde neu erstellt." + ANSI_RESET);
+                    System.out.println(Server.ANSI_WHITE + "Datei " + filename + ENDING + " wurde neu erstellt." + Server.ANSI_RESET);
                     BufferedWriter myBufferedWriter = new BufferedWriter(new FileWriter(path + filename + ENDING, true));
                     myBufferedWriter.write("[" + TIMESTAMP_FORMAT.format((System.currentTimeMillis())) + "] [" + " FILEHANDLER " + "]: " + "Chatfile zwischen " + filename);
                     myBufferedWriter.newLine();
                     myBufferedWriter.close();
                     myWriter.close();
                 } else {
-                    System.out.println(ANSI_WHITE + "Datei " + filename + ENDING + " existiert bereits." + ANSI_RESET);
+                    System.out.println(Server.ANSI_WHITE + "Datei " + filename + ENDING + " existiert bereits." + Server.ANSI_RESET);
                 }
             }
         } catch (IOException e) {
-            System.out.println(ANSI_RED + "Fehler bei der Erstellung der Dateien: " + e.getMessage() + ANSI_RESET);
+            System.out.println(Server.ANSI_RED + "Fehler bei der Erstellung der Dateien: " + e.getMessage() + Server.ANSI_RESET);
         }
     }
 
@@ -75,7 +65,7 @@ public class FileHandler {
     public String readWholeChatFile(int ownID, int chatPartnerID) {
         this.askForSynchronization(ownID, chatPartnerID);
         this.sortChatMessages(this.path + this.getFilename(ownID, chatPartnerID) + ENDING);
-        return ANSI_PURPLE + "Bisheriger Chat:\n" + ANSI_BLUE + this.readWholeChatFile(path, this.getFilename(ownID, chatPartnerID)) + ANSI_RESET;
+        return Server.ANSI_PURPLE + "Bisheriger Chat:\n" + Server.ANSI_BLUE + this.readWholeChatFile(path, this.getFilename(ownID, chatPartnerID)) + Server.ANSI_RESET;
     }
 
     // zum Aufrufen innerhalb der Klasse File, damit die Methode synchronize() richtig ausgeführt werden kann
@@ -90,7 +80,7 @@ public class FileHandler {
             }
             bufferedReader.close();
         } catch (IOException e) {
-            System.out.println(ANSI_RED + "Fehler beim Lesen der Datei: " + e.getMessage() + ANSI_RESET);
+            System.out.println(Server.ANSI_RED + "Fehler beim Lesen der Datei: " + e.getMessage() + Server.ANSI_RESET);
         }
         return chat.toString().trim();
     }
@@ -99,7 +89,7 @@ public class FileHandler {
     // [06.04.2023 17:01:12] [Daniel]: Nachricht
     public void writeOneNewMessage(ClientMessage clientMessage) {
         // todo: die Abfrage brauchen wir eigentlich mit dem neuen Protokoll nicht...
-        String[] notAllowedColors = {ANSI_BLACK, ANSI_RED, ANSI_GREEN, ANSI_YELLOW, ANSI_BLUE, ANSI_PURPLE, ANSI_CYAN, ANSI_WHITE, "SHUTDOWN", "DISCONNECT"};
+        String[] notAllowedColors = {Server.ANSI_BLACK, Server.ANSI_RED, Server.ANSI_GREEN, Server.ANSI_YELLOW, Server.ANSI_BLUE, Server.ANSI_PURPLE, Server.ANSI_CYAN, Server.ANSI_WHITE, "SHUTDOWN", "DISCONNECT"};
         boolean writingAllowed = true;
         for (String notAllowedString : notAllowedColors) {
             if (clientMessage.getContent().contains(notAllowedString)) {
@@ -123,7 +113,7 @@ public class FileHandler {
                 this.sortChatMessages(pathToFile);
             }
         } catch (IOException e) {
-            System.out.println(ANSI_RED + "Fehler beim Speichern in der Datei: " + e.getMessage() + ANSI_RESET);
+            System.out.println(Server.ANSI_RED + "Fehler beim Speichern in der Datei: " + e.getMessage() + Server.ANSI_RESET);
         }
     }
 
@@ -136,7 +126,7 @@ public class FileHandler {
             bufferedWriter.close();
 
         } catch (IOException e) {
-            System.out.println(ANSI_RED + "Fehler beim Speichern in der Datei: " + e.getMessage() + ANSI_RESET);
+            System.out.println(Server.ANSI_RED + "Fehler beim Speichern in der Datei: " + e.getMessage() + Server.ANSI_RESET);
         }
     }
 
@@ -155,7 +145,7 @@ public class FileHandler {
             systemSign = "/";
             path = systemUserHome + systemSign + desktop + systemSign + DIRECTORY_NAME + serverNumber + systemSign;
         } else {
-            System.out.println(ANSI_RED + "Das Betriebssystem wird leider nicht unterstützt :(\n" + ANSI_PURPLE + "Der Dateipfad zum Home-Verzeichnis kann manuell eingegeben werden." + ANSI_RESET);
+            System.out.println(Server.ANSI_RED + "Das Betriebssystem wird leider nicht unterstützt :(\n" + Server.ANSI_PURPLE + "Der Dateipfad zum Home-Verzeichnis kann manuell eingegeben werden." + Server.ANSI_RESET);
         }
         return path;
     }
@@ -190,19 +180,19 @@ public class FileHandler {
             File currentFileServer2 = new File(path2 + filename + ENDING);
 
             if (contentServer1.equals(contentServer2)) {
-                System.out.println(ANSI_WHITE + "Die beiden Dateien " + filename + " sind identisch." + ANSI_RESET);
+                System.out.println(Server.ANSI_WHITE + "Die beiden Dateien " + filename + " sind identisch." + Server.ANSI_RESET);
             } else {
-                System.out.println(ANSI_WHITE + "Die beiden Dateien " + filename + " sind unterschiedlich." + ANSI_RESET);
+                System.out.println(Server.ANSI_WHITE + "Die beiden Dateien " + filename + " sind unterschiedlich." + Server.ANSI_RESET);
                 if (currentFileServer1.lastModified() > currentFileServer2.lastModified()) {
-                    System.out.println(ANSI_WHITE + "File: " + path1 + filename + " ist neuer als " + path2 + filename + ANSI_RESET);
-                    System.out.println(ANSI_WHITE + "Die ältere Datei: " + filename + " wurde gelöscht: " + currentFileServer2.delete() + ANSI_RESET);
+                    System.out.println(Server.ANSI_WHITE + "File: " + path1 + filename + " ist neuer als " + path2 + filename + Server.ANSI_RESET);
+                    System.out.println(Server.ANSI_WHITE + "Die ältere Datei: " + filename + " wurde gelöscht: " + currentFileServer2.delete() + Server.ANSI_RESET);
                     this.writeWholeChatfile(contentServer1, filename, path2);
                 } else if (currentFileServer2.lastModified() > currentFileServer1.lastModified()) {
-                    System.out.println(ANSI_WHITE + "File: " + path2 + filename + " ist neuer als " + path1 + filename + ANSI_RESET);
-                    System.out.println(ANSI_WHITE + "Die ältere Datei: " + filename + " wurde gelöscht: " + currentFileServer1.delete() + ANSI_RESET);
+                    System.out.println(Server.ANSI_WHITE + "File: " + path2 + filename + " ist neuer als " + path1 + filename + Server.ANSI_RESET);
+                    System.out.println(Server.ANSI_WHITE + "Die ältere Datei: " + filename + " wurde gelöscht: " + currentFileServer1.delete() + Server.ANSI_RESET);
                     this.writeWholeChatfile(contentServer2, filename, path1);
                 } else {
-                    System.out.println(ANSI_WHITE + "Beide Dateien haben das gleiche Änderungsdatum!" + ANSI_RESET);
+                    System.out.println(Server.ANSI_WHITE + "Beide Dateien haben das gleiche Änderungsdatum!" + Server.ANSI_RESET);
                 }
             }
         }
@@ -226,7 +216,7 @@ public class FileHandler {
         ClientMessage syncResponse = new ClientMessage(otherServerFile.getUserId(), otherServerFile.getReceiverId(), new Timestamp(System.currentTimeMillis()), Server.SYNC_RESPONSE, null);
 
         if (ownContent.equals(otherContent)) {
-            System.out.println(ANSI_WHITE + "Die beiden Dateien " + ownFilename + " sind identisch." + ANSI_RESET);
+            System.out.println(Server.ANSI_WHITE + "Die beiden Dateien " + ownFilename + " sind identisch." + Server.ANSI_RESET);
             syncResponse.setContent(Server.OK);
         } else {
             if (ownLastModified == otherLastModified) {
@@ -276,7 +266,7 @@ public class FileHandler {
                         Timestamp timestampObject2 = new Timestamp((TIMESTAMP_FORMAT.parse(line2.substring(1).split("]")[0])).getTime());
                         return timestampObject1.compareTo(timestampObject2);
                     } catch (ParseException e) {
-                        System.out.println(ANSI_RED + "Fehler beim Sortieren der Nachrichten: " + e.getMessage() + ANSI_RESET);
+                        System.out.println(Server.ANSI_RED + "Fehler beim Sortieren der Nachrichten: " + e.getMessage() + Server.ANSI_RESET);
                     }
                     return returnInt;
                 }
@@ -290,7 +280,7 @@ public class FileHandler {
             }
             writer.close();
 
-            System.out.println(ANSI_WHITE + "Die Textdatei wurde erfolgreich nach dem Timestamp sortiert." + ANSI_RESET);
+            System.out.println(Server.ANSI_WHITE + "Die Textdatei wurde erfolgreich nach dem Timestamp sortiert." + Server.ANSI_RESET);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -326,7 +316,7 @@ public class FileHandler {
             this.writeWholeChatfile(synchronizedFileContent, this.getFilename(response.getUserId(), response.getReceiverId()), this.path);
         }
     } catch (Exception e) {
-        System.out.println(ANSI_RED+ "Anderer Server ist nicht online"+ ANSI_RESET);
+        System.out.println(Server.ANSI_RED+ "Anderer Server ist nicht online"+ Server.ANSI_RESET);
     }
     }
 }
