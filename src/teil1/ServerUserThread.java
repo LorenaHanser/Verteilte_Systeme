@@ -70,7 +70,9 @@ public class ServerUserThread extends Thread {
             while (!foundPartner) { //Endlosschleife, bis existierender Chatpartner gefunden
                 writer.println(Server.ANSI_PURPLE + "Mit wem möchtest du schreiben?" + Server.ANSI_RESET);
                 chatPartnerID = server.askForID(getText(reader.readLine()));
-                if (chatPartnerID != -1) { //geprüft ob ChatPartnerId gültig ist
+                if (ownID == chatPartnerID) {
+                    writer.println(Server.ANSI_RED + "Du kannst nicht mit dir selbst schreiben. Bitte gebe einen anderen Chatpartner an." + Server.ANSI_RESET);
+                } else if (chatPartnerID != -1) { //geprüft ob ChatPartnerId gültig ist
                     writer.println(Server.ANSI_PURPLE + "Alles klar, du wirst verbunden" + Server.ANSI_RESET);
                     server.setChatPartner(ownID, chatPartnerID); //User geht in Chatraum
                     foundPartner = true;
