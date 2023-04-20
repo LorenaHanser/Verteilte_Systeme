@@ -24,6 +24,10 @@ public class Server {
 
     public static final int NEW_MESSAGE = 0;
     public static final int NEW_MESSAGE_WITHOUT_TIMESTAMP = 1;
+    public static final int SYNC_REQUEST = 2;
+    public static final int SYNC_RESPONSE = 3;
+
+    public static final String OK = "OK";
 
     private int port;
     private FileHandler fileHandler;
@@ -50,7 +54,7 @@ public class Server {
     private int serverReceiverPort;
     private ServerReceiverMainThread receiverSyncThread;
 
-
+    private boolean syncThreadActive = false;
     private int[] userIsOnServer = new int[3]; //evtl muss auf protected oder public
     private int[] userChattetWith = new int[3]; //Speichert, wer sich aktuell mit wem im Chat befindet (damit man nicht mit einer Person chatten kann, die gerade mit wem anders chattet)
     private ServerUserThread[] userThreadRegister = new ServerUserThread[3];//Speichert die Referenzvariable des Threads auf dem der User (wenn er online ist) läuft. Der Index für das Feld ist, dabei die ID des Users
@@ -147,6 +151,18 @@ public class Server {
         userThreadRegister[ownID].sendMessage(message); //nachricht wird an den User gesendet
     }
 
+    ClientMessage receiveSynchronization(ClientMessage receivedClientMessage){
+        //System.out.println("Bin jetzt in Server bei receiveSynchronization " + receivedClientMessage);
+        return fileHandler.synchronize(receivedClientMessage);
+    }
+
+    ClientMessage requestSynchronization(ClientMessage sendClientMessage){
+        ClientMessage message = syncThread.requestSynchronization(sendClientMessage);
+        System.out.println("============================= Antwort ist da ======================");
+        System.out.println(message.toString());
+       return message;
+    }
+
     boolean checkUsernameExists(String userName) { //überprüft, ob der User existiert
         boolean usernameValid = false;
         for (int i = 0; i < USER_NAME_REGISTER.length; i++) {
@@ -181,21 +197,6 @@ public class Server {
         }
     }
 
-
-    // When a client is disconnected, removes the UserThread
-    void removeUser(String userName, ServerUserThread aUser) { //noch von Tutorial
-        userThreads.remove(aUser);
-        System.out.println(ANSI_YELLOW + "The user " + userName + " quit." + ANSI_RESET);
-    }
-    void removeUser( ServerUserThread aUser) { //noch von Tutorial
-        userThreads.remove(aUser);
-        }
-    void removeUserThread(int userID, ServerUserThread serverUserThread){
-        removeUser(serverUserThread);
-        userThreadRegister[userID] = null;
-
-    }
-
     int askForID(String username) { //Es wird geschaut, welche Id der User hat (Index von userNameRegister)
         int answer = -1;
         for (int i = 0; i < USER_NAME_REGISTER.length; i++) {
@@ -213,6 +214,19 @@ public class Server {
     }
     void removeChatPartner(int user) { //der ChatPartner bzw. der Chatraum wird für den User gesetzt (ab jetzt kann er Nachrichten empfangen, aber nur von dem Partner)
         userChattetWith[user] = -1;
+
+    }
+    // When a client is disconnected, removes the UserThread
+    void removeUser(String userName, ServerUserThread aUser) { //noch von Tutorial
+        userThreads.remove(aUser);
+        System.out.println(ANSI_YELLOW + "The user " + userName + " quit." + ANSI_RESET);
+    }
+    void removeUser( ServerUserThread aUser) { //noch von Tutorial
+        userThreads.remove(aUser);
+    }
+    void removeUserThread(int userID, ServerUserThread serverUserThread){
+        removeUser(serverUserThread);
+        userThreadRegister[userID] = null;
 
     }
 
