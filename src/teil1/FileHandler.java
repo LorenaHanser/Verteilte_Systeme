@@ -327,6 +327,7 @@ public class FileHandler {
             }
         } catch (Exception e) {
             System.out.println(Server.ANSI_RED + "Anderer Server ist nicht online" + Server.ANSI_RESET);
+            e.printStackTrace();
         }
     }
 }
