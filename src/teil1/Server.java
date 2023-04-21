@@ -2,6 +2,7 @@ package teil1;
 
 import java.io.*;
 import java.net.*;
+import java.rmi.server.ServerCloneException;
 import java.util.*;
 
 
@@ -47,6 +48,7 @@ public class Server {
     private String partnerServerAdress = "localhost"; //hier die Adresse des anderen Server eintragen.
     private ServerConnectorThread syncThread1;
     private ServerConnectorThread syncThread2;
+    private ServerConnectorThread syncThreadArray[] = new ServerConnectorThread[2];
 
     protected MCSHandler mcsHandler;
 
@@ -73,27 +75,44 @@ public class Server {
     }
 
     public void execute() {
-        fileHandler = new FileHandler(serverNumber);
+        System.out.println(ANSI_YELLOW + "Server wird gebootet" + ANSI_RESET);
+        fileHandler = new FileHandler(this, serverNumber);
+        System.out.println(ANSI_YELLOW + "Sync ServerThread gestartet" + ANSI_RESET);
+        try{
+            this.getUserStatusFromOtherServer1(partnerServerAdress, partner1ServerPort);
+            syncThread2 = new ServerConnectorThread(partnerServerAdress, partner2ServerPort, this,mcsHandler,2);
+            syncThread2.start();
+        } catch (Exception e) {
+            try {
+                System.out.println(ANSI_RED+"Leider konnte Version 1 nicht verbunden werden"+ANSI_RESET);
+                this.getUserStatusFromOtherServer2(partnerServerAdress, partner2ServerPort);
+                syncThread1 = new ServerConnectorThread(partnerServerAdress, partner2ServerPort, this,mcsHandler,2);
+                syncThread1.start();
+            } catch (Exception ex) {
+                System.out.println(ANSI_RED+"Leider konnte Version 2 nicht verbunden werden. starte normal"+ANSI_RESET);
+                syncThread1 = new ServerConnectorThread(partnerServerAdress, partner1ServerPort, this,mcsHandler,1); // hier noch 2. Port anmelden
+                syncThread2 = new ServerConnectorThread(partnerServerAdress, partner2ServerPort, this,mcsHandler,2); // hier noch 2. Port anmelden
+                syncThread1.start();
+                syncThread2.start();
+            }
+        }
+
+
         receiverSyncThread = new ServerReceiverMainThread(this, serverReceiverPort);
         receiverSyncThread.start();
-        System.out.println(ANSI_YELLOW + "Sync ServerThread gestartet" + ANSI_RESET);
+        System.out.println(ANSI_YELLOW + "Chat Server ist hochgefahren und bereit für Clienten " + port + ANSI_YELLOW);
         try (ServerSocket serverSocket = new ServerSocket(port)) {
 
             System.out.println(ANSI_YELLOW + "Chat Server is listening on port " + port + ANSI_YELLOW);
 
             fileHandler.create();
 
-            syncThread1 = new ServerConnectorThread(partnerServerAdress, partner1ServerPort, this,mcsHandler,1); // hier noch 2. Port anmelden
-            syncThread2 = new ServerConnectorThread(partnerServerAdress, partner2ServerPort, this,mcsHandler,2); // hier noch 2. Port anmelden
-            syncThread1.start();
-            syncThread2.start();
-
             // Endlosschleife
 
             while (true) {
                 Socket socket = serverSocket.accept();
                 System.out.println(ANSI_YELLOW + "New user connected" + ANSI_YELLOW);
-                ServerUserThread newUser = new ServerUserThread(socket, this, serverNumber);
+                ServerUserThread newUser = new ServerUserThread(socket, this, serverNumber, fileHandler);
                 userThreads.add(newUser);
                 newUser.start(); //Thread startet mit User → Name unbekannt deswegen noch kein Eintrag in das userThreadRegister Array
 
@@ -157,7 +176,7 @@ public class Server {
     }
 
     ClientMessage requestSynchronization(ClientMessage sendClientMessage){
-        ClientMessage message = syncThread.requestSynchronization(sendClientMessage);
+        ClientMessage message = syncThread1.requestSynchronization(sendClientMessage);
         System.out.println("============================= Antwort ist da ======================");
         System.out.println(message.toString());
        return message;
@@ -266,6 +285,55 @@ public class Server {
         removeUserThread(userID, serverUserThread);
         System.out.println(ANSI_YELLOW + "User wurde Erfolgreich abgemeldet!" + ANSI_RESET);
     }
+
+    void getUserStatusFromOtherServer1(String hostname, int port) throws IOException {
+        Socket socket = new Socket(hostname, port);
+        OutputStream output = socket.getOutputStream();
+        PrintWriter writer = new PrintWriter(output, true);
+        InputStream input = socket.getInputStream();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+        System.out.println(ANSI_YELLOW + "Sync Server verbunden" + ANSI_RESET);
+        ServerMessage syncUserDataRequest = new ServerMessage(7,1,0);
+        writer.println(syncUserDataRequest.toString());
+        String response = reader.readLine();
+        System.out.println("Die Antwort gab es:"+ response);
+        handleUserStatusSync(response);
+        syncThread1 = new ServerConnectorThread(socket, writer, reader,this, mcsHandler, 1);
+        syncThread1.start();
+        //jetzt muss der Connector Thread, mit einem anderen Konstrucktor gebaut werden
+    }
+    void getUserStatusFromOtherServer2(String hostname, int port) throws IOException {
+        Socket socket = new Socket(hostname, port);
+        OutputStream output = socket.getOutputStream();
+        PrintWriter writer = new PrintWriter(output, true);
+        InputStream input = socket.getInputStream();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+        System.out.println(ANSI_YELLOW + "Sync Server verbunden" + ANSI_RESET);
+        ServerMessage syncUserDataRequest = new ServerMessage(7,1,0);
+        writer.println(syncUserDataRequest.toString());
+        String response = reader.readLine();
+        System.out.println("Die Antwort gab es:"+ response);
+        handleUserStatusSync(response);
+        syncThread2 = new ServerConnectorThread(socket, writer, reader,this, mcsHandler, 1);
+        syncThread2.start();
+        //jetzt muss der Connector Thread, mit einem anderen Konstrucktor gebaut werden
+    }
+    void handleUserStatusSync(String response){
+        ServerMessage reponseAsObject = ServerMessage.toObject(response);
+        // hier sollen dann der String dann ausgwertet werden!!!
+        System.out.println("===========================Antwort erhalten==================");
+        System.out.println(reponseAsObject.toString());
+        int[] responseArray = reponseAsObject.getUserIsOnServer();
+        for (int i = 0; i < 3; i++) {
+            userIsOnServer[i] = responseArray[2*i+1];
+        }
+        //System.out.println("Das ist das Ergebnis: "+ userIsOnServer);
+    }
+    public ServerMessage getUserIsOnServerArrayAsServerMessage(){
+        ServerMessage answer = new ServerMessage(7,1,userIsOnServer);
+        return answer;
+    }
+
 
 
 }

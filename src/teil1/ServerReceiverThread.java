@@ -31,7 +31,6 @@ public class ServerReceiverThread extends Thread {
             ServerSocket syncServerSocket = new ServerSocket(port);
 
             while (true) {
-                socket = syncServerSocket.accept();
                 System.out.println(Server.ANSI_YELLOW + "Sync Server verbunden" + Server.ANSI_RESET);
                 OutputStream output = socket.getOutputStream();
                 writer = new PrintWriter(output, true);

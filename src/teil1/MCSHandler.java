@@ -25,10 +25,10 @@ public class MCSHandler {
     public void setServerOffline(int ThreadNummer) {
         if(ThreadNummer == 1){
             isServer1Online = false;
-            System.out.println("Server 1 offline");
+            //System.out.println("Server 1 offline");
         } else if (ThreadNummer == 2) {
             isServer2Online = false;
-            System.out.println("Server 2 offline");
+            //System.out.println("Server 2 offline");
         }else {
             System.out.println("Es gibt in der MCSHanlderklasse ein Problem");
         }
