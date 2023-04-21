@@ -68,11 +68,11 @@ public class ServerConnectorThread extends Thread {
     return messageClient;//ist kaputt
     }
 
-    protected MessageClient requestSynchronization(MessageClient messageClient){
-        MessageClient answer = null;
+    protected MessageSync requestSynchronization(MessageSync messageSync){
+        MessageSync answer = null;
             System.out.println("=========== Setzte answerIsThere -> false ===========");
             answerIsThere = false;
-            writer.println(messageClient.toString());
+            writer.println(messageSync.toString());
             System.out.println("====== In der Schliefe drinnen ===========");
          /*   while(!answerIsThere){
                 //Wartet, bis eine Antwort eintrifft, hier muss man das Timeout reinbauen
@@ -86,7 +86,7 @@ public class ServerConnectorThread extends Thread {
             */
             System.out.println("====== Aus der Schliefe draußen ===========");
             answerIsPicked = true;
-            answer = MessageClient.toObject(fullresponse);
+            answer = messageSync.toObject(fullresponse);
         return answer;
     }
 

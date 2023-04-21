@@ -134,13 +134,14 @@ public class Server {
         userThreadRegister[ownID].sendMessage(message); //nachricht wird an den User gesendet
     }
 
-    MessageClient receiveSynchronization(MessageClient receivedMessageClient){
+
+    MessageSync receiveSynchronization(MessageSync receivedSyncMessage){
         //System.out.println("Bin jetzt in Server bei receiveSynchronization " + receivedClientMessage);
-        return fileHandler.synchronize(receivedMessageClient);
+        return fileHandler.synchronize(receivedSyncMessage);
     }
 
-    MessageClient requestSynchronization(MessageClient sendMessageClient){
-        MessageClient message = syncThread.requestSynchronization(sendMessageClient);
+    MessageSync requestSynchronization(MessageSync sendMessageClient){
+        MessageSync message = syncThread.requestSynchronization(sendMessageClient);
         System.out.println("============================= Antwort ist da ======================");
         System.out.println(message.toString());
        return message;

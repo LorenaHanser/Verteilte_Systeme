@@ -199,11 +199,15 @@ public class FileHandler {
     }
 
     // Methode, um zwei Dateien wirklich verteilt zu synchronisieren
-    public MessageSync synchronize(MessageClient otherServerFile) {
+    public MessageSync synchronize(MessageSync otherServerFile) {
         System.out.println("=======================Bin im Sync vom Server der Angefragt wurde==========================");
         System.out.println(otherServerFile.toString());
         System.out.println("=====================================Ende==================================================");
-        String otherContent = otherServerFile.getContent();                                                    // ganzer Inhalt der Datei
+        String[] otherContentArray = otherServerFile.getContent();                                                    // ganzer Inhalt der Datei
+        String otherContent = "";
+        for (int i = 0; i < otherContentArray.length ; i++) {
+            otherContent += otherContentArray[i];
+        }
         Timestamp otherTimestamp = otherServerFile.getTimestamp();                                             // Änderungsdatum der Datei
         long otherLastModified = otherTimestamp.getTime();
 

@@ -38,6 +38,7 @@ public class ServerReceiverThread extends Thread {
                             } else if(Message.getMessageCategoryFromString(response) == Message.CATEGORY_SERVER_MESSAGE){
                                 sendUserActivityToServer(MessageUserActivity.toObject(response));
                             } else if(Message.getMessageCategoryFromString(response) == Message.CATEGORY_SYNC_MESSAGE){
+                                sendSyncMessageToServer(MessageSync.toObject(response));
                                 // todo: neue Methode;
                             }
                         }
@@ -78,6 +79,10 @@ public class ServerReceiverThread extends Thread {
         } else {
             server.changeUserActivity(messageUserActivity);
         }
+    }
+
+    private void sendSyncMessageToServer(MessageSync messageSync){
+        server.receiveSynchronization(messageSync);
     }
 
 }
