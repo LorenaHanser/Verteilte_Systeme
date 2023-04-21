@@ -33,11 +33,14 @@ public class ServerReceiverThread extends Thread {
                 do {
                     try {
                         String response = reader.readLine();
-                        if (Message.isClientMessage(response)) {
-                            sendMessageToServer(ClientMessage.toObject(response));
-                        } else {
-                            sendUserActivityToServer(ServerMessage.toObject(response));
+                        if(!response.equals("*")) {
+                            if (Message.isClientMessage(response)) {
+                                sendMessageToServer(ClientMessage.toObject(response));
+                            } else {
+                                sendUserActivityToServer(ServerMessage.toObject(response));
+                            }
                         }
+
                     } catch (IOException ex) {
                         System.out.println(Server.ANSI_RED + "Error reading from server: " + ex.getMessage() + Server.ANSI_RESET);
                         ex.printStackTrace();
