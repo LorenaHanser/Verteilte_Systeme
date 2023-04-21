@@ -1,6 +1,8 @@
 package teil1;
 
-public class ServerMessage extends Message {
+public class MessageUserActivity extends Message {
+
+    /// int category durch Vererbung
     // int userId durch Vererbung
     private int serverId;
     private int type;
@@ -8,20 +10,23 @@ public class ServerMessage extends Message {
     private int[] userIsOnServer;
 
     // Konstruktor
-    public ServerMessage(int userId, int serverId,  int status) {
+    public MessageUserActivity(int userId, int serverId, int status) {
+        this.setCategory(Message.CATEGORY_SERVER_MESSAGE);
         this.setUserId(userId);
         this.setServerId(serverId);
         this.setStatus(status);
     }
 
-    public ServerMessage(int userId, int serverId, int[] userIsOnServer ) {
+    public MessageUserActivity(int userId, int serverId, int[] userIsOnServer ) {
+        this.setCategory(Message.CATEGORY_SERVER_MESSAGE);
         this.setUserId(userId);
         this.setServerId(serverId);
         this.setType(1);
         this.setuserIsOnServer(userIsOnServer);
     }
 
-    public ServerMessage(int userId, int serverId, int type, int status) {
+    public MessageUserActivity(int userId, int serverId, int type, int status) {
+        this.setCategory(Message.CATEGORY_SERVER_MESSAGE);
         this.setUserId(userId);
         this.setServerId(serverId);
         this.setType(type);
@@ -47,12 +52,12 @@ public class ServerMessage extends Message {
     }
     public String getUserIsOnServerWithSplitsymbols(){
         String answer = String.valueOf(0);
-        answer += getSplitSymbol();
+        answer += SPLIT_SYMBOL;
         answer += String.valueOf(userIsOnServer[0]);
         for (int i = 1; i < 3; i++) {
-            answer += getSplitSymbol();
+            answer += SPLIT_SYMBOL;
             answer += i;
-            answer += getSplitSymbol();
+            answer += SPLIT_SYMBOL;
             answer += String.valueOf(userIsOnServer[i]);
         }
         return answer;
@@ -72,17 +77,17 @@ public class ServerMessage extends Message {
     @Override
     public String toString() {
         if(getType() == 0) {
-            return this.getUserId() + getSplitSymbol() + this.getServerId() + getSplitSymbol() + getType() + getSplitSymbol() + this.getStatus() + "*";
+            return this.getCategory() + SPLIT_SYMBOL + this.getUserId() + SPLIT_SYMBOL + this.getServerId() + SPLIT_SYMBOL + getType() + SPLIT_SYMBOL + this.getStatus() + "*";
         }else {
-            return this.getUserId() + getSplitSymbol() + this.getServerId() + getSplitSymbol() + getType() + getSplitSymbol() + getUserIsOnServerWithSplitsymbols() + "*";
+            return this.getCategory() + SPLIT_SYMBOL + this.getUserId() + SPLIT_SYMBOL + this.getServerId() + SPLIT_SYMBOL + getType() + SPLIT_SYMBOL + getUserIsOnServerWithSplitsymbols() + "*";
         }
     }
 
-    public static ServerMessage toObject(String string) {
+    public static MessageUserActivity toObject(String string) {
         try{
             string = string.replace("*", "");
             string = string.replace("\n", "");
-            String[] attributes = string.split(Message.getSplitSymbol(), 4);
+            String[] attributes = string.split(SPLIT_SYMBOL, 4);
 
 
             int userId = Integer.parseInt(attributes[0]);
@@ -90,18 +95,18 @@ public class ServerMessage extends Message {
             int type = Integer.parseInt(attributes[2]);
             if(type == 0) {
                 int status = Integer.parseInt(attributes[3]);
-                return new ServerMessage(userId, serverId, status);
+                return new MessageUserActivity(userId, serverId, status);
             } else {
-                String[] data = attributes[3].split(getSplitSymbol(), 6);
+                String[] data = attributes[3].split(SPLIT_SYMBOL, 6);
                 int[] userDataArray = new int[6];
                 for (int i = 0; i < userDataArray.length; i++) {
                     userDataArray[i] = Integer.parseInt(data[i]);
                 }
-                return new ServerMessage(userId, serverId, userDataArray);
+                return new MessageUserActivity(userId, serverId, userDataArray);
             }
         } catch(Exception e){
             System.out.println("Fehler bei ServerMessage.toObject(): " + e.getMessage());
-            return new ServerMessage(-100, -100, -100);
+            return new MessageUserActivity(-100, -100, -100);
         }
     }
 

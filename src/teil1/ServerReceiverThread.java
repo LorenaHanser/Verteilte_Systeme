@@ -3,7 +3,6 @@ package teil1;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.stream.Collectors;
 
 public class ServerReceiverThread extends Thread {
 
@@ -34,10 +33,12 @@ public class ServerReceiverThread extends Thread {
                     try {
                         String response = reader.readLine();
                         if(!response.equals("*")) {
-                            if (Message.isClientMessage(response)) {
-                                sendMessageToServer(ClientMessage.toObject(response));
-                            } else {
-                                sendUserActivityToServer(ServerMessage.toObject(response));
+                            if (Message.getMessageCategoryFromString(response) == Message.CATEGORY_CLIENT_MESSAGE) {
+                                sendMessageToServer(MessageClient.toObject(response));
+                            } else if(Message.getMessageCategoryFromString(response) == Message.CATEGORY_SERVER_MESSAGE){
+                                sendUserActivityToServer(MessageUserActivity.toObject(response));
+                            } else if(Message.getMessageCategoryFromString(response) == Message.CATEGORY_SYNC_MESSAGE){
+                                // todo: neue Methode;
                             }
                         }
 
@@ -55,8 +56,7 @@ public class ServerReceiverThread extends Thread {
 
     }
 
-    private void sendMessageToServer(ClientMessage clientMessage) {
-        // todo nur Nachrichten Typ 1 und 2 sollen in sendMessage verarbeitet werden (stand 17.04.) (rest war für Sync gedacht)
+    private void sendMessageToServer(MessageClient messageClient) {
         /*
         // todo: einkommentieren, um einen Delay zwischen den Servern zu simulieren
         try {
@@ -67,24 +67,16 @@ public class ServerReceiverThread extends Thread {
             System.out.println(ANSI_RED + "Fehler beim Schlafen: " + e.getMessage() + ANSI_RESET);
         }
         */
-        if (clientMessage.getType() == Server.SYNC_REQUEST) {
-            if(this.writer != null) {
-                System.out.println("Datei wird übertragen!");
-                writer.println(server.receiveSynchronization(clientMessage).toString());
-                System.out.println("Datei wurde erfolgreich übertragen!");
-            }
-        } else if (clientMessage.getType() == Server.NEW_MESSAGE | clientMessage.getType() == Server.NEW_MESSAGE_WITHOUT_TIMESTAMP) {
-            server.sendMessage(clientMessage);
-        }
+        server.sendMessage(messageClient);
     }
 
-    private void sendUserActivityToServer(ServerMessage serverMessage) {
-        if (serverMessage.getUserId() == 7) {
+    private void sendUserActivityToServer(MessageUserActivity messageUserActivity) {
+        if (messageUserActivity.getUserId() == 7) {
             System.out.println("Wir sollen glaube ich UserDaten übermitteln!!");
             System.out.println("Das sind unsere Antworten: "+ server.getUserIsOnServerArrayAsServerMessage().toString());
             writer.println(server.getUserIsOnServerArrayAsServerMessage());
         } else {
-            server.changeUserActivity(serverMessage);
+            server.changeUserActivity(messageUserActivity);
         }
     }
 

@@ -63,16 +63,16 @@ public class ServerConnectorThread extends Thread {
             }
         }
     }
-    private ClientMessage sendSyncResponseToServer(ClientMessage clientMessage){
+    private MessageClient sendSyncResponseToServer(MessageClient messageClient){
         //if(clientMessage.getType() == Server.)
-    return clientMessage;//ist kaputt
+    return messageClient;//ist kaputt
     }
 
-    protected ClientMessage requestSynchronization(ClientMessage clientMessage){
-        ClientMessage answer = null;
+    protected MessageClient requestSynchronization(MessageClient messageClient){
+        MessageClient answer = null;
             System.out.println("=========== Setzte answerIsThere -> false ===========");
             answerIsThere = false;
-            writer.println(clientMessage.toString());
+            writer.println(messageClient.toString());
             System.out.println("====== In der Schliefe drinnen ===========");
          /*   while(!answerIsThere){
                 //Wartet, bis eine Antwort eintrifft, hier muss man das Timeout reinbauen
@@ -86,25 +86,25 @@ public class ServerConnectorThread extends Thread {
             */
             System.out.println("====== Aus der Schliefe draußen ===========");
             answerIsPicked = true;
-            answer = ClientMessage.toObject(fullresponse);
+            answer = MessageClient.toObject(fullresponse);
         return answer;
     }
 
     // Senden einer ClientMessage zum anderen Server
-    protected void sendMessageToOtherServer(ClientMessage clientMessage) {
+    protected void sendMessageToOtherServer(MessageClient messageClient) {
         try {
             if (writer != null) {
-            writer.println(clientMessage.toString());
+            writer.println(messageClient.toString());
         }
         }catch (Exception e){
             System.out.println(Server.ANSI_RED+"Gab beim Senden der Message einen ERROR im ServerConnectorThread"+Server.ANSI_RESET);
         }
     }
 
-    protected void sendUserActivity(ServerMessage serverMessage) {
+    protected void sendUserActivity(MessageUserActivity messageUserActivity) {
         try {
             if (writer != null) {
-                writer.println(serverMessage.toString());
+                writer.println(messageUserActivity.toString());
             }
         } catch (Exception e) {
             System.out.println(Server.ANSI_RED+"Gab beim Senden der UserActivity einen ERROR im ServerConnectorThread"+Server.ANSI_RESET);

@@ -81,7 +81,8 @@ public class ServerUserThread extends Thread {
                 }
             }// ab hier weiß der User die ID seines Chatpartners
 
-            server.sendMessageToServer(new ClientMessage(ownID, chatPartnerID, new Timestamp(System.currentTimeMillis()), 0, serverMessage));       //Nachricht an den Partner
+            // todo: "kleiner Sonderfall"
+            // server.sendMessageToServer(new MessageClient(ownID, chatPartnerID, new Timestamp(System.currentTimeMillis()), 0, serverMessage));       //Nachricht an den Partner
 
             String clientMessage;
             //todo: hier ist die Ausgabe der File -> muss aktualisiert werden
@@ -92,7 +93,7 @@ public class ServerUserThread extends Thread {
             do {
                 serverMessage = reader.readLine();
                 if (serverMessage != null) {
-                    server.sendMessageToServer(new ClientMessage(serverMessage, ownID, chatPartnerID));
+                    server.sendMessageToServer(new MessageClient(serverMessage, ownID, chatPartnerID));
                 } else {
                     System.out.println(Server.ANSI_RED + "Servermessage ist null" + Server.ANSI_RESET);
                 }
@@ -100,14 +101,16 @@ public class ServerUserThread extends Thread {
             } while (!getText(serverMessage).equals(DISCONNECT) && !getText(serverMessage).equals((SHUTDOWN)));
 
             serverMessage = Server.ANSI_PURPLE + "Client: " + userName + " hat die Verbindung getrennt!" + Server.ANSI_RESET;
-            server.sendMessageToServer(new ClientMessage(ownID, chatPartnerID, new Timestamp(System.currentTimeMillis()), 0, serverMessage));
+            // todo: "kleiner Sonderfall"
+            // server.sendMessageToServer(new MessageClient(ownID, chatPartnerID, new Timestamp(System.currentTimeMillis()), 0, serverMessage));
             socket.close();
             server.userConnectionReset(ownID, this);
 
         } catch (IOException ex) {
             System.out.println(Server.ANSI_RED + "Error in UserThread: " + ex.getMessage() + Server.ANSI_RESET);
             String serverMessage = Server.ANSI_YELLOW + "Client: " + userName + " hat die Verbindung getrennt!" + Server.ANSI_RESET;
-            server.sendMessageToServer(new ClientMessage(ownID, chatPartnerID, new Timestamp(System.currentTimeMillis()), 0, serverMessage));
+            // todo: "kleiner Sonderfall"
+            // server.sendMessageToServer(new MessageClient(ownID, chatPartnerID, new Timestamp(System.currentTimeMillis()), 0, serverMessage));
             server.userConnectionReset(ownID, this);
         }
     }
