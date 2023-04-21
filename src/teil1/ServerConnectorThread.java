@@ -40,16 +40,23 @@ public class ServerConnectorThread extends Thread {
         while (true) {
 
             try {
-                Socket socket = new Socket(hostname, port);
-                OutputStream output = socket.getOutputStream();
-                writer = new PrintWriter(output, true);
-                InputStream input = socket.getInputStream();
-                reader = new BufferedReader(new InputStreamReader(input));
-                System.out.println(Server.ANSI_YELLOW + "Sync Server verbunden" + Server.ANSI_RESET);
+                if(!isThreadAlreadyConnected) {
+                    isThreadAlreadyConnected = false;
+                    socket = new Socket(hostname, port);
+                    OutputStream output = socket.getOutputStream();
+                    writer = new PrintWriter(output, true);
+                    InputStream input = socket.getInputStream();
+                    reader = new BufferedReader(new InputStreamReader(input));
+                    System.out.println(Server.ANSI_YELLOW + "Sync Server verbunden" + Server.ANSI_RESET);
+                }
                 while (socket.isConnected()) {
                     try {
                         response = reader.readLine();
                         System.out.println(response);
+                        if(Message.getMessageCategoryFromString(response) == Message.CATEGORY_SERVER_MESSAGE){
+                            answerIsPicked = true;
+                            server.handleUserStatusSync(response);
+                        }
                         answerIsThere = true;
                         while (!answerIsPicked){
                             System.out.println("Nachricht ist da!!!");
@@ -121,6 +128,10 @@ public class ServerConnectorThread extends Thread {
         } catch (Exception e) {
             System.out.println(Server.ANSI_RED+"Gab beim Senden der UserActivity einen ERROR im ServerConnectorThread"+Server.ANSI_RESET);
         }
+    }
+    protected void askForUserStatus(){
+        MessageUserActivity syncUserDataRequest = new MessageUserActivity(2);
+        writer.println(syncUserDataRequest.toString());
     }
 }
 

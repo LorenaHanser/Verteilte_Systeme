@@ -33,6 +33,7 @@ public class Server {
     private FileHandler fileHandler;
 
     private int serverNumber;
+    protected boolean needUserStateSync;
 
     public static final String[] USER_NAME_REGISTER = {"Daniel", "David", "Lorena"}; //Speichert die Usernamen der Index wird als Id für den User genutzt
 
@@ -63,12 +64,20 @@ public class Server {
         this.port = port;
         this.partnerServerPort = partnerServerPort;
         this.serverReceiverPort = serverReceiverPort;
+        this.needUserStateSync = true;
     }
 
     public void execute() {
         System.out.println(ANSI_YELLOW + "Server wird gebootet" + ANSI_RESET);
         fileHandler = new FileHandler(this, serverNumber);
         System.out.println(ANSI_YELLOW + "Sync ServerThread gestartet" + ANSI_RESET);
+        syncThread = new ServerConnectorThread(partnerServerAddress, partnerServerPort, this);
+        syncThread.start();
+        try{
+            syncThread.askForUserStatus();
+        } catch (Exception e) {
+            needUserStateSync = false;
+        }
         receiverSyncThread = new ServerReceiverThread(this, serverReceiverPort);
         receiverSyncThread.start();
         try (ServerSocket serverSocket = new ServerSocket(port)) {
@@ -77,8 +86,8 @@ public class Server {
 
             fileHandler.create();
 
-            syncThread = new ServerConnectorThread(partnerServerAddress, partnerServerPort, this);
-            syncThread.start();
+            /*syncThread = new ServerConnectorThread(partnerServerAddress, partnerServerPort, this);
+            syncThread.start();*/
 
             // Endlosschleife
             System.out.println(ANSI_YELLOW + "Server ist online" + ANSI_RESET);
@@ -88,7 +97,7 @@ public class Server {
                 ServerUserThread newUser = new ServerUserThread(socket, this, serverNumber, fileHandler);
                 userThreads.add(newUser);
                 newUser.start(); //Thread startet mit User → Name unbekannt deswegen noch kein Eintrag in das userThreadRegister Array
-
+                needUserStateSync = false;
             }
 
         } catch (IOException ex) {
@@ -249,8 +258,16 @@ public class Server {
         System.out.println(ANSI_YELLOW + "User wurde Erfolgreich abgemeldet!" + ANSI_RESET);
     }
     public MessageUserActivity getUserIsOnServerArrayAsServerMessage(){
-        MessageUserActivity answer = new MessageUserActivity(7,1,userIsOnServer);
+        MessageUserActivity answer = new MessageUserActivity(0,0,userIsOnServer);
+        System.out.println("Das übermitteln wir jetzt: "+ answer.toString());
         return answer;
+    }
+    public boolean isServerReadyToShareUserData(){
+        boolean answer = false;
+         if(!needUserStateSync){
+             answer = true;
+         }
+         return answer;
     }
 
     void getUserStatusFromOtherServer(String hostname, int port) throws IOException {
@@ -259,27 +276,31 @@ public class Server {
         PrintWriter writer = new PrintWriter(output, true);
         InputStream input = socket.getInputStream();
         BufferedReader reader = new BufferedReader(new InputStreamReader(input));
-        System.out.println(ANSI_YELLOW + "Sync Server verbunden" + ANSI_RESET);
-        MessageUserActivity syncUserDataRequest = new MessageUserActivity(7,1,0);
+        System.out.println(ANSI_YELLOW + "Sync Server verbunden im Extra Dings" + ANSI_RESET);
+        MessageUserActivity syncUserDataRequest = new MessageUserActivity(2);
         writer.println(syncUserDataRequest.toString());
+        System.out.println("Nachricht gesendet");
         String response = reader.readLine();
         System.out.println("Die Antwort gab es:"+ response);
         handleUserStatusSync(response);
-       // syncThread = new ServerConnectorThread(socket, writer, reader,this);
-      //  syncThread.start();
+        syncThread = new ServerConnectorThread(socket, writer, reader,this);
+        syncThread.start();
         //jetzt muss der Connector Thread, mit einem anderen Konstrucktor gebaut werden
     }
     void handleUserStatusSync(String response){
-        MessageUserActivity reponseAsObject = MessageUserActivity.toObject(response);
-        // hier sollen dann der String dann ausgwertet werden!!!
-        System.out.println("===========================Antwort erhalten==================");
-        System.out.println(reponseAsObject.toString());
-        int[] responseArray = reponseAsObject.getUserIsOnServer();
-        for (int i = 0; i < 3; i++) {
-            userIsOnServer[i] = responseArray[2*i+1];
+        if(needUserStateSync) {
+            MessageUserActivity reponseAsObject = MessageUserActivity.toObject(response);
+            System.out.println("===========================Antwort erhalten==================");
+            System.out.println(reponseAsObject.toString());
+            int[] responseArray = reponseAsObject.getUserIsOnServer();
+            for (int i = 0; i < 3; i++) {
+                userIsOnServer[i] = responseArray[2 * i + 1];
+            }
         }
         //System.out.println("Das ist das Ergebnis: "+ userIsOnServer);
     }
+
+
 
 
 }

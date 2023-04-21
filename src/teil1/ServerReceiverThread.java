@@ -78,7 +78,7 @@ public class ServerReceiverThread extends Thread {
         if(messageUserActivity.getType() == 0){
             System.out.println(Server.ANSI_GREEN+"EMPFANGEN: Wir haben Useraktivitäten erhalten!!"+Server.ANSI_RESET);
             server.changeUserActivity(messageUserActivity);
-        } else if (messageUserActivity.getType() == 1) {
+        } else if (messageUserActivity.getType() == 2 && server.isServerReadyToShareUserData()) {
             System.out.println(Server.ANSI_GREEN+"EMPFANGEN: Wir sollen glaube ich UserDaten übermitteln!!"+Server.ANSI_RESET);
             System.out.println("Das sind unsere Antworten: "+ server.getUserIsOnServerArrayAsServerMessage().toString());
             writer.println(server.getUserIsOnServerArrayAsServerMessage());
