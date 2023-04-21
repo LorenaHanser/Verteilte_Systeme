@@ -41,10 +41,10 @@ public class ServerUserThread extends Thread {
             boolean userSuccessfullyAuthenticated = false;
             String password;
             do {
-                writer.println(Server.ANSI_PURPLE + "Please enter your name:" + Server.ANSI_RESET);
+                writer.println(Server.ANSI_PURPLE + "Bitte Benutzername eingeben:" + Server.ANSI_RESET);
                 userName = getText(reader.readLine());
                 if (server.checkUsernameExists(userName)) {
-                    writer.println(Server.ANSI_PURPLE + "Please insert Password:" + Server.ANSI_RESET);
+                    writer.println(Server.ANSI_PURPLE + "Bitte Passwort eingeben:" + Server.ANSI_RESET);
                     password = getText(reader.readLine());
                     if (server.checkPasswordValid(userName, password)) {
                         if (server.getUserIsOnServer(server.askForID(userName)) != 0) { // User war noch nicht online

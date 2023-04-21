@@ -57,7 +57,7 @@ public class ClientWriteThread extends Thread {
                 timestamp = new Timestamp(System.currentTimeMillis());
                 //System.out.println("-- wir sind in ClientWriteThread run()");
                 if (text.trim().isEmpty()) {
-                    System.out.println("Leere Texteingaben sind nicht erlaubt!");
+                    System.out.println(Server.ANSI_RED + "Leere Texteingaben sind nicht erlaubt!" + Server.ANSI_RESET);
                 } else {
                     String message = timestamp + ";" + text;
                     writer.println(message); // Nachricht senden

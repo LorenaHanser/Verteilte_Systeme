@@ -95,10 +95,10 @@ public class MessageClient extends Message {
         string = string.replace("*", "");
         String[] attributes = string.split(Message.SPLIT_SYMBOL, 5);
 
-        int userId = Integer.parseInt(attributes[0]);
-        int receiverId = Integer.parseInt(attributes[1]);
-        Timestamp timestamp = Timestamp.valueOf(attributes[2]);
-        int type = Integer.parseInt(attributes[3]);
+        int category = Integer.parseInt(attributes[0]);
+        int userId = Integer.parseInt(attributes[1]);
+        int receiverId = Integer.parseInt(attributes[2]);
+        Timestamp timestamp = Timestamp.valueOf(attributes[3]);
         String content = attributes[4];
 
         return new MessageClient(userId, receiverId, timestamp, content);

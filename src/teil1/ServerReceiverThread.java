@@ -42,7 +42,7 @@ public class ServerReceiverThread extends Thread {
                                 sendUserActivityToServer(MessageUserActivity.toObject(response));
                             } else if(Message.getMessageCategoryFromString(response) == Message.CATEGORY_SYNC_MESSAGE){
                                 System.out.println("Hier wird noch gebaut!");
-                                sendUserActivityToServer(MessageSync.toObject(response));
+                                sendSyncMessageToServer(MessageSync.toObject(response));
                             }
 
 
@@ -85,7 +85,7 @@ public class ServerReceiverThread extends Thread {
         }
 
     }
-    private void sendUserActivityToServer(MessageSync messageSync) {
+    private void sendSyncMessageToServer(MessageSync messageSync) {
         System.out.println(Server.ANSI_GREEN+"EMPFANGEN: Syncanfrage erhalten:"+Server.ANSI_RESET);
         System.out.println(messageSync.toString());
         String answer = server.receiveSynchronization(messageSync).toString();
