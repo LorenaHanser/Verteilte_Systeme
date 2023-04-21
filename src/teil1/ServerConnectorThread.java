@@ -55,6 +55,7 @@ public class ServerConnectorThread extends Thread {
                         System.out.println(response);
                         if(Message.getMessageCategoryFromString(response) == Message.CATEGORY_SERVER_MESSAGE){
                             answerIsPicked = true;
+                            System.out.println("Haben eine UserDataSync Nachricht erhalten");
                             server.handleUserStatusSync(response);
                         }
                         answerIsThere = true;
@@ -132,6 +133,7 @@ public class ServerConnectorThread extends Thread {
     protected void askForUserStatus(){
         MessageUserActivity syncUserDataRequest = new MessageUserActivity(2);
         writer.println(syncUserDataRequest.toString());
+        System.out.println(Server.ANSI_GREEN+ "SENDEN: Haben UserDaten Angefragt"+Server.ANSI_RESET);
     }
 }
 

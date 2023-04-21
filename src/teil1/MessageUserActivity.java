@@ -96,7 +96,7 @@ public class MessageUserActivity extends Message {
             string = string.replace("*", "");
             string = string.replace("\n", "");
             String[] header = string.split(SPLIT_SYMBOL, 3);
-
+            System.out.println("Im Message User Activity: "+string);
 
             int Category = Integer.parseInt(header[0]);
             int type = Integer.parseInt(header[1]);
@@ -105,13 +105,13 @@ public class MessageUserActivity extends Message {
             }else
             {
                 String[] attributes = header[2].split(SPLIT_SYMBOL, 3);
-                int serverId = Integer.parseInt(attributes[3]);
-                int userId = Integer.parseInt(attributes[4]);
+                int serverId = Integer.parseInt(attributes[0]);
+                int userId = Integer.parseInt(attributes[1]);
                 if (type == 0) {
-                    int status = Integer.parseInt(attributes[5]);
+                    int status = Integer.parseInt(attributes[2]);
                     return new MessageUserActivity(userId, serverId, status);
                 } else {
-                    String[] data = attributes[5].split(SPLIT_SYMBOL, 6);
+                    String[] data = attributes[2].split(SPLIT_SYMBOL, 6);
                     int[] userDataArray = new int[6];
                     for (int i = 0; i < userDataArray.length; i++) {
                         userDataArray[i] = Integer.parseInt(data[i]);

@@ -94,10 +94,11 @@ public class Server {
             while (true) {
                 Socket socket = serverSocket.accept();
                 System.out.println(ANSI_YELLOW + "New user connected" + ANSI_YELLOW);
+                needUserStateSync = false;
                 ServerUserThread newUser = new ServerUserThread(socket, this, serverNumber, fileHandler);
                 userThreads.add(newUser);
                 newUser.start(); //Thread startet mit User → Name unbekannt deswegen noch kein Eintrag in das userThreadRegister Array
-                needUserStateSync = false;
+
             }
 
         } catch (IOException ex) {
@@ -235,6 +236,7 @@ public class Server {
 
     void setUserLoggedOut(int userID) {
         MessageUserActivity newActivity = new MessageUserActivity(userID, getServerNumber(), LOGGED_OUT);
+        System.out.println();
         syncThread.sendUserActivity(newActivity);
         changeUserActivity(newActivity);
     }
@@ -245,6 +247,12 @@ public class Server {
         } else if (messageUserActivity.getStatus() == LOGGED_OUT) {
             userIsOnServer[messageUserActivity.getUserId()] = 0;
         }
+        System.out.println(Server.ANSI_GREEN+ "==========================User is on Server Array=========================="+Server.ANSI_RESET);
+        for (int i = 0; i < 3; i++) {
+            System.out.println(Server.ANSI_GREEN+ this.getUserIsOnServer(i)+Server.ANSI_RESET);
+        }
+        System.out.println(Server.ANSI_GREEN+ "============================================================================"+Server.ANSI_RESET);
+
     }
 
     public int getUserIsOnServer(int index) {
@@ -264,6 +272,7 @@ public class Server {
     }
     public boolean isServerReadyToShareUserData(){
         boolean answer = false;
+        System.out.println(ANSI_GREEN+"Ich glaube wir wurden für einen USer Sync angefragt"+ANSI_RESET);
          if(!needUserStateSync){
              answer = true;
          }
@@ -290,7 +299,7 @@ public class Server {
     void handleUserStatusSync(String response){
         if(needUserStateSync) {
             MessageUserActivity reponseAsObject = MessageUserActivity.toObject(response);
-            System.out.println("===========================Antwort erhalten==================");
+            System.out.println(Server.ANSI_GREEN+ "Haben UserDaten erhalten"+Server.ANSI_RESET);
             System.out.println(reponseAsObject.toString());
             int[] responseArray = reponseAsObject.getUserIsOnServer();
             for (int i = 0; i < 3; i++) {
