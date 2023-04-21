@@ -216,6 +216,7 @@ public class FileHandler {
         File ownServerFile = new File(ownPath + ownFilename + ENDING);
         long ownLastModified = ownServerFile.lastModified();
         String ownContent = this.readWholeChatFile(ownPath, ownFilename);
+        String[] contentServerArray = ownContent.split("\n");
 
         MessageSync syncResponse = new MessageSync(otherServerFile.getUserId(), MessageSync.SYNC_RESPONSE, otherServerFile.getReceiverId());
 
@@ -230,13 +231,13 @@ public class FileHandler {
                 syncResponse.setType(Server.SYNC_RESPONSE);
                 System.out.println("Das ist die syncRespones " + syncResponse.getType() + Arrays.toString(syncResponse.getContent()));
                 return syncResponse;
-            } else if (ownLastModified < otherLastModified) {
+            } else if (ownLastModified > otherLastModified) {
                 System.out.println("Die eigene Datei ist neuer.");
-                syncResponse.setContent(this.readWholeChatFile(ownPath, ownFilename).split("\n"));
+                syncResponse.setContent(contentServerArray);
                 syncResponse.setType(Server.SYNC_RESPONSE);
                 System.out.println("Die eigene Datei wurde an Partner gesendet!");
 
-            } else if (otherLastModified < ownLastModified) {
+            } else if (otherLastModified > ownLastModified) {
                 System.out.println("Die andere Datei ist neuer.");
                 System.out.println(ownServerFile.delete());
                 this.writeWholeChatfile(otherContent, ownFilename, ownPath);
@@ -247,7 +248,7 @@ public class FileHandler {
                 return syncResponse;
             }
         }
-        System.out.println("Das ist die syncRespones " + syncResponse.getType() + Arrays.toString(syncResponse.getContent()));
+        System.out.println("Das ist die syncRespones " + syncResponse.getType() + " " + Arrays.toString(syncResponse.getContent()));
         return syncResponse;
     }
 
@@ -300,6 +301,7 @@ public class FileHandler {
         String ownFilename = this.getFilename(ownID, chatPartnerID);
 
         String contentServer1 = readWholeChatFile(ownPath, ownFilename);
+        String[] contentServer1Array = contentServer1.split("\n");
 
         File ownServerFile = new File(ownPath + ownFilename + ENDING);
 
@@ -308,16 +310,15 @@ public class FileHandler {
 
         // trigger receiver to synchronize with synchronize
         try {
-            MessageSync triggerSync = new MessageSync(ownID, MessageSync.SYNC_REQUEST, chatPartnerID, new Timestamp(System.currentTimeMillis()), contentServer1.split("\n"));
+            MessageSync triggerSync = new MessageSync(ownID, MessageSync.SYNC_REQUEST, chatPartnerID, ownTimestamp, contentServer1Array);
 
-            // todo @Daniel: server.requestSynchronization zu return MessageSync umbauen
             MessageSync response = server.requestSynchronization(triggerSync); //hier bekommt man die antwort des anderen Servers
             System.out.println("=======================Bin im Sync der den anderen Server anfragt==========================");
-            System.out.println(response.toString());
+            System.out.println(Arrays.toString(response.getContent()));
             System.out.println("=====================================Ende==================================================");
-            System.out.println("Wir sind jetzt im Filehandler: " + response.toString());
+            System.out.println("Wir sind jetzt im Filehandler: ");
             // Auswerten der Antwort
-            if (response.getType() == MessageSync.SYNC_RESPONSE) {
+            if (response.getContentAsString().equals(Server.OK)) {
                 System.out.println("Sync war nicht nötig! Alles ist gut gelaufen.");
             } else {
                 String synchronizedFileContentAsString = response.getContentAsString();
@@ -326,7 +327,7 @@ public class FileHandler {
                 System.out.println("Sync war nötig! Datei wurde neu beschrieben.");
             }
         } catch (Exception e) {
-            System.out.println(Server.ANSI_RED + "Anderer Server ist nicht online" + Server.ANSI_RESET);
+            System.out.println(Server.ANSI_RED + "Anderer Server ist nicht online " + e.getMessage() + Server.ANSI_RESET);
         }
     }
 }

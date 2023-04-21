@@ -89,7 +89,7 @@ public class ServerReceiverThread extends Thread {
         System.out.println(Server.ANSI_GREEN+"EMPFANGEN: Syncanfrage erhalten:"+Server.ANSI_RESET);
         System.out.println(messageSync.toString());
         String answer = server.receiveSynchronization(messageSync).toString();
-        System.out.println(Server.ANSI_GREEN+"ANTWORTEN: Das ist unsere Antwort: "+Server.ANSI_RESET);
+        System.out.println(Server.ANSI_GREEN+"ANTWORTEN(1): Das ist unsere Antwort: "+Server.ANSI_RESET);
         System.out.println(answer);
         writer.println(answer);
     }
