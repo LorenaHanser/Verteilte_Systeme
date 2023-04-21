@@ -86,7 +86,7 @@ public class ServerConnectorThread extends Thread {
             */
             System.out.println("====== Aus der Schliefe draußen ===========");
             answerIsPicked = true;
-            answer = messageSync.toObject(fullresponse);
+            answer = MessageSync.toObject(fullresponse);
         return answer;
     }
 

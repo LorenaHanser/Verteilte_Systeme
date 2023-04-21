@@ -39,7 +39,6 @@ public class ServerReceiverThread extends Thread {
                                 sendUserActivityToServer(MessageUserActivity.toObject(response));
                             } else if(Message.getMessageCategoryFromString(response) == Message.CATEGORY_SYNC_MESSAGE){
                                 sendSyncMessageToServer(MessageSync.toObject(response));
-                                // todo: neue Methode;
                             }
                         }
 

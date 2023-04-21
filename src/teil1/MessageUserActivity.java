@@ -105,7 +105,7 @@ public class MessageUserActivity extends Message {
                 return new MessageUserActivity(userId, serverId, userDataArray);
             }
         } catch(Exception e){
-            System.out.println("Fehler bei ServerMessage.toObject(): " + e.getMessage());
+            System.out.println("Fehler bei MessageUserActivity.toObject(): " + e.getMessage());
             return new MessageUserActivity(-100, -100, -100);
         }
     }
