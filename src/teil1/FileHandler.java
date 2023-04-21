@@ -327,7 +327,8 @@ public class FileHandler {
                 System.out.println("Sync war nötig! Datei wurde neu beschrieben.");
             }
         } catch (Exception e) {
-            System.out.println(Server.ANSI_RED + "Anderer Server ist nicht online " + e.getMessage() + Server.ANSI_RESET);
+            System.out.println(Server.ANSI_RED + "Anderer Server ist nicht online" + Server.ANSI_RESET);
+            e.printStackTrace();
         }
     }
 }

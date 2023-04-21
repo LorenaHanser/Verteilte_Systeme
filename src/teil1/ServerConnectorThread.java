@@ -48,8 +48,17 @@ public class ServerConnectorThread extends Thread {
                 System.out.println(Server.ANSI_YELLOW + "Sync Server verbunden" + Server.ANSI_RESET);
                 while (socket.isConnected()) {
                     try {
-                        String response = reader.readLine();
+                        response = reader.readLine();
                         System.out.println(response);
+                        answerIsThere = true;
+                        while (!answerIsPicked){
+                            System.out.println("Nachricht ist da!!!");
+                            try {
+                                Thread.sleep(1000);
+                            } catch (InterruptedException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
 
                     } catch (IOException ex) {
                         System.out.println(Server.ANSI_PURPLE + "Verbindung getrennt " + ex.getMessage() + Server.ANSI_RESET);
@@ -74,7 +83,7 @@ public class ServerConnectorThread extends Thread {
             answerIsThere = false;
             writer.println(messageSync.toString());
             System.out.println("====== In der Schliefe drinnen ===========");
-         /*   while(!answerIsThere){
+            while(!answerIsThere){
                 //Wartet, bis eine Antwort eintrifft, hier muss man das Timeout reinbauen
                 System.out.println("warte");
                 try {
@@ -83,10 +92,11 @@ public class ServerConnectorThread extends Thread {
                     throw new RuntimeException(e);
                 }
             }
-            */
+
             System.out.println("====== Aus der Schliefe draußen ===========");
             answerIsPicked = true;
-            answer = MessageSync.toObject(fullresponse);
+            answer = MessageSync.toObject(response);
+        System.out.println("toObject was gemacht");
         return answer;
     }
 
