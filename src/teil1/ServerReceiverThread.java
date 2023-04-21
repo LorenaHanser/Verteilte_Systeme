@@ -1,29 +1,18 @@
 package teil1;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.stream.Collectors;
 
 public class ServerReceiverThread extends Thread {
-
-    public static final String ANSI_RESET = "\u001B[0m";
-    public static final String ANSI_BLACK = "\u001B[30m";
-    public static final String ANSI_RED = "\u001B[31m";
-    public static final String ANSI_GREEN = "\u001B[32m";
-    public static final String ANSI_YELLOW = "\u001B[33m";
-    public static final String ANSI_BLUE = "\u001B[34m";
-    public static final String ANSI_PURPLE = "\u001B[35m";
-    public static final String ANSI_CYAN = "\u001B[36m";
-    public static final String ANSI_WHITE = "\u001B[37m";
 
     private Socket socket;
     private Server server;
 
     private int port;
     private BufferedReader reader;
+    private PrintWriter writer;
 
     public ServerReceiverThread(Server server, int port) {
         this.server = server;
@@ -38,8 +27,7 @@ public class ServerReceiverThread extends Thread {
 
             while (true) {
                 socket = syncServerSocket.accept();
-                System.out.println(ANSI_YELLOW + "Sync Server verbunden" + ANSI_RESET);
-
+                System.out.println(Server.ANSI_YELLOW + "Sync Server verbunden" + Server.ANSI_RESET);
                 InputStream input = socket.getInputStream();
                 reader = new BufferedReader(new InputStreamReader(input));
                 do {
@@ -51,12 +39,12 @@ public class ServerReceiverThread extends Thread {
                             sendUserActivityToServer(ServerMessage.toObject(response));
                         }
                     } catch (IOException ex) {
-                        System.out.println(ANSI_RED + "Error reading from server: " + ex.getMessage() + ANSI_RESET);
+                        System.out.println(Server.ANSI_RED + "Error reading from server: " + ex.getMessage() + Server.ANSI_RESET);
                         ex.printStackTrace();
                         break;
                     }
                 } while (socket.isConnected());
-                System.out.println(ANSI_RED + "Sync Server Verbindung verloren" + ANSI_RESET);
+                System.out.println(Server.ANSI_RED + "Sync Server Verbindung verloren" + Server.ANSI_RESET);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -76,11 +64,25 @@ public class ServerReceiverThread extends Thread {
             System.out.println(ANSI_RED + "Fehler beim Schlafen: " + e.getMessage() + ANSI_RESET);
         }
         */
-        server.sendMessage(clientMessage);
+        if (clientMessage.getType() == Server.SYNC_REQUEST) {
+            if(this.writer != null) {
+                System.out.println("Datei wird übertragen!");
+                writer.println(server.receiveSynchronization(clientMessage).toString());
+                System.out.println("Datei wurde erfolgreich übertragen!");
+            }
+        } else if (clientMessage.getType() == Server.NEW_MESSAGE | clientMessage.getType() == Server.NEW_MESSAGE_WITHOUT_TIMESTAMP) {
+            server.sendMessage(clientMessage);
+        }
     }
 
     private void sendUserActivityToServer(ServerMessage serverMessage) {
-        server.changeUserActivity(serverMessage);
+        if (serverMessage.getUserId() == 7) {
+            System.out.println("Wir sollen glaube ich UserDaten übermitteln!!");
+            System.out.println("Das sind unsere Antworten: "+ server.getUserIsOnServerArrayAsServerMessage().toString());
+            writer.println(server.getUserIsOnServerArrayAsServerMessage());
+        } else {
+            server.changeUserActivity(serverMessage);
+        }
     }
 
 }
