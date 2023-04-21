@@ -1,5 +1,6 @@
 package teil1;
 
+import java.sql.Time;
 import java.sql.Timestamp;
 
 public class MessageSync extends Message {
@@ -22,6 +23,15 @@ public class MessageSync extends Message {
         this.setType(type);
         this.setReceiverId(receiverId);
         this.setTimestamp(timestamp);
+        this.setLength(content.length);
+        this.setContent(content);
+    }
+
+    public MessageSync(int userId, int type, int receiverId,  String[] content) {
+        this.setCategory(Message.CATEGORY_SYNC_MESSAGE);
+        this.setUserId(userId);
+        this.setType(type);
+        this.setReceiverId(receiverId);
         this.setLength(content.length);
         this.setContent(content);
     }
@@ -96,12 +106,22 @@ public class MessageSync extends Message {
         int userId = Integer.parseInt(attributes[1]);
         int type = Integer.parseInt(attributes[2]);
         int receiverId = Integer.parseInt(attributes[3]);
-        Timestamp timestamp = Timestamp.valueOf(attributes[4]);
-        int length = Integer.parseInt(attributes[5]);
-        String contentAsString = attributes[6];
-        String[] content = contentAsString.split(SPLIT_SYMBOL);
+        if(type == SYNC_REQUEST) {
+            Timestamp timestamp = Timestamp.valueOf(attributes[4]);
+            int length = Integer.parseInt(attributes[5]);
+            String contentAsString = attributes[6];
+            String[] content = contentAsString.split(SPLIT_SYMBOL);
+            return new MessageSync(userId, type, receiverId, timestamp, content);
+        }else
+        {
+            int length = Integer.parseInt(attributes[5]);
+            String contentAsString = attributes[6];
+            String[] content = contentAsString.split(SPLIT_SYMBOL);
+            return new MessageSync(userId, type, receiverId,  content);
+        }
 
-        return new MessageSync(userId, type, receiverId, timestamp, content);
+
+
     }
 
 }
