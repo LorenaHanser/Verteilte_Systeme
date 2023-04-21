@@ -27,20 +27,24 @@ public class ServerReceiverThread extends Thread {
             while (true) {
                 socket = syncServerSocket.accept();
                 System.out.println(Server.ANSI_YELLOW + "Sync Server verbunden" + Server.ANSI_RESET);
+                OutputStream output = socket.getOutputStream();
+                writer = new PrintWriter(output, true);
                 InputStream input = socket.getInputStream();
                 reader = new BufferedReader(new InputStreamReader(input));
                 do {
                     try {
                         String response = reader.readLine();
-                        if(!response.equals("*")) {
+                        System.out.println(Server.ANSI_GREEN+"EMPFANGEN: Es gab eine Nachricht"+Server.ANSI_RESET);
                             if (Message.getMessageCategoryFromString(response) == Message.CATEGORY_CLIENT_MESSAGE) {
                                 sendMessageToServer(MessageClient.toObject(response));
                             } else if(Message.getMessageCategoryFromString(response) == Message.CATEGORY_SERVER_MESSAGE){
+                                System.out.println(Server.ANSI_GREEN+"EMPFANGEN: Es gab eine Useraktivität"+Server.ANSI_RESET);
                                 sendUserActivityToServer(MessageUserActivity.toObject(response));
                             } else if(Message.getMessageCategoryFromString(response) == Message.CATEGORY_SYNC_MESSAGE){
-                                // todo: neue Methode;
+                                System.out.println("Hier wird noch gebaut!");
+                                sendUserActivityToServer(MessageSync.toObject(response));
                             }
-                        }
+
 
                     } catch (IOException ex) {
                         System.out.println(Server.ANSI_RED + "Error reading from server: " + ex.getMessage() + Server.ANSI_RESET);
@@ -71,13 +75,23 @@ public class ServerReceiverThread extends Thread {
     }
 
     private void sendUserActivityToServer(MessageUserActivity messageUserActivity) {
-        if (messageUserActivity.getUserId() == 7) {
-            System.out.println("Wir sollen glaube ich UserDaten übermitteln!!");
+        if(messageUserActivity.getType() == 0){
+            System.out.println(Server.ANSI_GREEN+"EMPFANGEN: Wir haben Useraktivitäten erhalten!!"+Server.ANSI_RESET);
+            server.changeUserActivity(messageUserActivity);
+        } else if (messageUserActivity.getType() == 1) {
+            System.out.println(Server.ANSI_GREEN+"EMPFANGEN: Wir sollen glaube ich UserDaten übermitteln!!"+Server.ANSI_RESET);
             System.out.println("Das sind unsere Antworten: "+ server.getUserIsOnServerArrayAsServerMessage().toString());
             writer.println(server.getUserIsOnServerArrayAsServerMessage());
-        } else {
-            server.changeUserActivity(messageUserActivity);
         }
+
+    }
+    private void sendUserActivityToServer(MessageSync messageSync) {
+        System.out.println(Server.ANSI_GREEN+"EMPFANGEN: Syncanfrage erhalten:"+Server.ANSI_RESET);
+        System.out.println(messageSync.toString());
+        String answer = server.receiveSynchronization(messageSync).toString();
+        System.out.println(Server.ANSI_GREEN+"ANTWORTEN: Das ist unsere Antwort: "+Server.ANSI_RESET);
+        System.out.println(answer);
+        writer.println(answer);
     }
 
 }

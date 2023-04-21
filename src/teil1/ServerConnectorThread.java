@@ -68,11 +68,11 @@ public class ServerConnectorThread extends Thread {
     return messageClient;//ist kaputt
     }
 
-    protected MessageClient requestSynchronization(MessageClient messageClient){
-        MessageClient answer = null;
+    protected MessageSync requestSynchronization(MessageSync messageSync){
+        MessageSync answer = null;
             System.out.println("=========== Setzte answerIsThere -> false ===========");
             answerIsThere = false;
-            writer.println(messageClient.toString());
+            writer.println(messageSync.toString());
             System.out.println("====== In der Schliefe drinnen ===========");
          /*   while(!answerIsThere){
                 //Wartet, bis eine Antwort eintrifft, hier muss man das Timeout reinbauen
@@ -86,12 +86,13 @@ public class ServerConnectorThread extends Thread {
             */
             System.out.println("====== Aus der Schliefe draußen ===========");
             answerIsPicked = true;
-            answer = MessageClient.toObject(fullresponse);
+            answer = MessageSync.toObject(fullresponse);
         return answer;
     }
 
     // Senden einer ClientMessage zum anderen Server
     protected void sendMessageToOtherServer(MessageClient messageClient) {
+        System.out.println(Server.ANSI_GREEN+"SENDEN: Message wird gesendet"+Server.ANSI_RESET);
         try {
             if (writer != null) {
             writer.println(messageClient.toString());
@@ -102,6 +103,7 @@ public class ServerConnectorThread extends Thread {
     }
 
     protected void sendUserActivity(MessageUserActivity messageUserActivity) {
+        System.out.println(Server.ANSI_GREEN+"SENDEN: Useraktivität wird gesendet"+Server.ANSI_RESET);
         try {
             if (writer != null) {
                 writer.println(messageUserActivity.toString());

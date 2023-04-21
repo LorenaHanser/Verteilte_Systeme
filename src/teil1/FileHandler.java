@@ -199,11 +199,11 @@ public class FileHandler {
     }
 
     // Methode, um zwei Dateien wirklich verteilt zu synchronisieren
-    public MessageSync synchronize(MessageClient otherServerFile) {
+    public MessageSync synchronize(MessageSync otherServerFile) {
         System.out.println("=======================Bin im Sync vom Server der Angefragt wurde==========================");
         System.out.println(otherServerFile.toString());
         System.out.println("=====================================Ende==================================================");
-        String otherContent = otherServerFile.getContent();                                                    // ganzer Inhalt der Datei
+        /*String otherContent = otherServerFile.getContent();                                                    // ganzer Inhalt der Datei
         Timestamp otherTimestamp = otherServerFile.getTimestamp();                                             // Änderungsdatum der Datei
         long otherLastModified = otherTimestamp.getTime();
 
@@ -235,9 +235,9 @@ public class FileHandler {
         }
         //System.out.println("Hier müsste entweder ok oder der fileinhalt stehen: " + syncResponse.getContent());
         System.out.println("=======================Das ist der Rückgabewert ==========================");
-        System.out.println(syncResponse.toString());
+        System.out.println(syncResponse.toString());*/
         System.out.println("=====================================Ende==================================================");
-        return syncResponse;
+        return otherServerFile;//syncResponse;
     }
 
     public void sortChatMessages(String pathToFile) {

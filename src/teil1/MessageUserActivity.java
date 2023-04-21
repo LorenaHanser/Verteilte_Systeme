@@ -4,6 +4,7 @@ public class MessageUserActivity extends Message {
 
     /// int category durch Vererbung
     // int userId durch Vererbung
+    //korrigiert
     private int serverId;
     private int type;
     private int status;
@@ -14,6 +15,7 @@ public class MessageUserActivity extends Message {
         this.setCategory(Message.CATEGORY_SERVER_MESSAGE);
         this.setUserId(userId);
         this.setServerId(serverId);
+        this.setType(0);
         this.setStatus(status);
     }
 
@@ -39,7 +41,7 @@ public class MessageUserActivity extends Message {
     }
 
     public void setServerId(int serverId) {
-        this.serverId = -serverId;
+        this.serverId = serverId;
     }
     public void setType(int type){
         this.type = type;
@@ -77,9 +79,9 @@ public class MessageUserActivity extends Message {
     @Override
     public String toString() {
         if(getType() == 0) {
-            return this.getCategory() + SPLIT_SYMBOL + this.getUserId() + SPLIT_SYMBOL + this.getServerId() + SPLIT_SYMBOL + getType() + SPLIT_SYMBOL + this.getStatus() + "*";
+            return this.getCategory() + SPLIT_SYMBOL + this.getUserId() + SPLIT_SYMBOL + this.getServerId() + SPLIT_SYMBOL + getType() + SPLIT_SYMBOL + this.getStatus();
         }else {
-            return this.getCategory() + SPLIT_SYMBOL + this.getUserId() + SPLIT_SYMBOL + this.getServerId() + SPLIT_SYMBOL + getType() + SPLIT_SYMBOL + getUserIsOnServerWithSplitsymbols() + "*";
+            return this.getCategory() + SPLIT_SYMBOL + this.getUserId() + SPLIT_SYMBOL + this.getServerId() + SPLIT_SYMBOL + getType() + SPLIT_SYMBOL + getUserIsOnServerWithSplitsymbols();
         }
     }
 
@@ -87,17 +89,18 @@ public class MessageUserActivity extends Message {
         try{
             string = string.replace("*", "");
             string = string.replace("\n", "");
-            String[] attributes = string.split(SPLIT_SYMBOL, 4);
+            String[] attributes = string.split(SPLIT_SYMBOL, 5);
 
 
-            int userId = Integer.parseInt(attributes[0]);
-            int serverId = Integer.parseInt(attributes[1]);
-            int type = Integer.parseInt(attributes[2]);
+            int Category = Integer.parseInt(attributes[0]);
+            int userId = Integer.parseInt(attributes[1]);
+            int serverId = Integer.parseInt(attributes[2]);
+            int type = Integer.parseInt(attributes[3]);
             if(type == 0) {
-                int status = Integer.parseInt(attributes[3]);
+                int status = Integer.parseInt(attributes[4]);
                 return new MessageUserActivity(userId, serverId, status);
             } else {
-                String[] data = attributes[3].split(SPLIT_SYMBOL, 6);
+                String[] data = attributes[4].split(SPLIT_SYMBOL, 6);
                 int[] userDataArray = new int[6];
                 for (int i = 0; i < userDataArray.length; i++) {
                     userDataArray[i] = Integer.parseInt(data[i]);
