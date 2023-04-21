@@ -311,7 +311,7 @@ public class FileHandler {
             MessageSync triggerSync = new MessageSync(ownID, MessageSync.SYNC_REQUEST, chatPartnerID, new Timestamp(System.currentTimeMillis()), contentServer1.split("\n"));
 
             // todo @Daniel: server.requestSynchronization zu return MessageSync umbauen
-            MessageSync response = server.requestSynchronization(triggerSync);
+            MessageSync response = server.requestSynchronization(triggerSync); //hier bekommt man die antwort des anderen Servers
             System.out.println("=======================Bin im Sync der den anderen Server anfragt==========================");
             System.out.println(response.toString());
             System.out.println("=====================================Ende==================================================");
