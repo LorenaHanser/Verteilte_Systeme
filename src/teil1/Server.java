@@ -43,7 +43,7 @@ public class Server {
 
     //Variablen für den anderen Server
     private int partnerServerPort; //Port des Partnerservers (Port für Serverkommunikation)
-    private String partnerServerAddress = "localhost"; //hier die Adresse des anderen Server eintragen.
+    private String partnerServerAddress = "192.168.178.48"; //hier die Adresse des anderen Server eintragen.
     private ServerConnectorThread syncThread;
 
     //Variablen für den eigenen Server
