@@ -313,15 +313,17 @@ public class FileHandler {
             MessageSync triggerSync = new MessageSync(ownID, MessageSync.SYNC_REQUEST, chatPartnerID, ownTimestamp, contentServer1Array);
 
             MessageSync response = server.requestSynchronization(triggerSync); //hier bekommt man die antwort des anderen Servers
+
             System.out.println("=======================Bin im Sync der den anderen Server anfragt==========================");
-            System.out.println(Arrays.toString(response.getContent()));
+            System.out.println(response.getContentAsString());
             System.out.println("=====================================Ende==================================================");
             System.out.println("Wir sind jetzt im Filehandler: ");
             // Auswerten der Antwort
-            if (response.getContentAsString().equals(Server.OK)) {
+            if (Arrays.equals(response.getContent(), Server.OK)) {
                 System.out.println("Sync war nicht nötig! Alles ist gut gelaufen.");
             } else {
-                String synchronizedFileContentAsString = response.getContentAsString();
+                String synchronizedFileContentAsString = response.getContentAsString().replaceAll(";", "\n");
+                System.out.println(synchronizedFileContentAsString);
                 System.out.println(ownServerFile.delete());
                 this.writeWholeChatfile(synchronizedFileContentAsString, this.getFilename(response.getUserId(), response.getReceiverId()), this.path);
                 System.out.println("Sync war nötig! Datei wurde neu beschrieben.");
