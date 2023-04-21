@@ -250,6 +250,55 @@ public class FileHandler {
         System.out.println("Das ist die syncRespones " + syncResponse.getType() + Arrays.toString(syncResponse.getContent()));
         return syncResponse;
     }
+    /* Hier ist fusch von Daniel S.
+    public MessageSync synchronize(MessageSync otherServerFile) {
+        System.out.println("=======================Bin im Sync vom Server der Angefragt wurde==========================");
+        System.out.println(otherServerFile.toString());
+        System.out.println("=====================================Ende==================================================");
+        String[] otherContentArray = otherServerFile.getContent();                                                    // ganzer Inhalt der Datei
+        String otherContent = "";
+        for (int i = 0; i < otherContentArray.length ; i++) {
+            otherContent += "\n" + otherContentArray[i];
+        }
+        Timestamp otherTimestamp = otherServerFile.getTimestamp();                                             // Änderungsdatum der Datei
+        long otherLastModified = otherTimestamp.getTime();
+
+        String ownFilename = this.getFilename(otherServerFile.getUserId(), otherServerFile.getReceiverId());
+        String ownPath = this.path;
+        File ownServerFile = new File(ownPath + ownFilename + ENDING);
+        long ownLastModified = ownServerFile.lastModified();
+        String ownContent = this.readWholeChatFile(ownPath, ownFilename);
+
+        MessageSync syncResponse = new MessageSync(otherServerFile.getUserId(), MessageSync.SYNC_RESPONSE, otherServerFile.getReceiverId());
+
+        if (ownContent.equals(otherContent)) {
+            System.out.println(Server.ANSI_WHITE + "Die beiden Dateien " + ownFilename + " sind identisch." + Server.ANSI_RESET);
+            syncResponse.setType(Server.SYNC_RESPONSE);
+            return syncResponse;
+        } else {
+            if (ownLastModified == otherLastModified) {
+                System.out.println("Beide Dateien sind gleich neu.");
+                syncResponse= new MessageSync(otherServerFile.getUserId(), MessageSync.SYNC_RESPONSE, otherServerFile.getReceiverId(), new Timestamp(System.currentTimeMillis()), readWholeChatFile(ownPath, ownFilename).split("\n"));
+                System.out.println("Das ist die syncRespones " + syncResponse.getType() + Arrays.toString(syncResponse.getContent()));
+                return syncResponse;
+            } else if (ownLastModified < otherLastModified) {
+                System.out.println("Die eigene Datei ist neuer.");
+                syncResponse= new MessageSync(otherServerFile.getUserId(), MessageSync.SYNC_RESPONSE, otherServerFile.getReceiverId(), new Timestamp(System.currentTimeMillis()), readWholeChatFile(ownPath, ownFilename).split("\n"));
+                System.out.println("Die eigene Datei wurde an Partner gesendet!");
+
+            } else {//if (otherLastModified < ownLastModified) {
+                System.out.println("Die andere Datei ist neuer.");
+                System.out.println(ownServerFile.delete());
+                this.writeWholeChatfile(otherContent, ownFilename, ownPath);
+                System.out.println("Die eigene Datei wurde ordentlich beschrieben!");
+                syncResponse= new MessageSync(otherServerFile.getUserId(), MessageSync.SYNC_RESPONSE, otherServerFile.getReceiverId(), new Timestamp(System.currentTimeMillis()), readWholeChatFile(ownPath, ownFilename).split("\n"));
+                System.out.println("Das ist die syncRespones " + syncResponse.getType() + Arrays.toString(syncResponse.getContent()));
+                return syncResponse;
+            }
+        }
+        System.out.println("Das ist die syncRespones " + syncResponse.getType() + Arrays.toString(syncResponse.getContent()));
+        return syncResponse;
+    }*/
 
     public void sortChatMessages(String pathToFile) {
         try {

@@ -72,6 +72,10 @@ public class MessageSync extends Message {
     public void setContent(String[] content) {
         this.content = content;
     }
+    public void setContentFromString(String content){
+        String[] contentSplit = content.split("\n");
+        setContent(contentSplit);
+    }
 
     public String getContentAsString() {
         String contentArrayToString = this.getContent()[0];
