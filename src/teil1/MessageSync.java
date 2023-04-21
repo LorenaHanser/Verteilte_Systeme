@@ -79,7 +79,7 @@ public class MessageSync extends Message {
 
     public String getContentAsString() {
         String contentArrayToString = this.getContent()[0];
-        for (int i = 1; i < this.getLength(); i++) {
+        for (int i = 1; i < this.getContent().length; i++) {
             contentArrayToString += SPLIT_SYMBOL + this.getContent()[i];
         }
         return contentArrayToString;
