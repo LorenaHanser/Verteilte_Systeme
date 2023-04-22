@@ -63,7 +63,6 @@ public class FileHandler {
     // zum Aufrufen von außerhalb der Klasse
     public String readWholeChatFile(int ownID, int chatPartnerID) {
         this.askForSynchronization(ownID, chatPartnerID);
-        // this.synchronize();
         this.sortChatMessages(this.path + this.getFilename(ownID, chatPartnerID) + ENDING);
         return Server.ANSI_PURPLE + "Bisheriger Chat:\n" + Server.ANSI_BLUE + this.readWholeChatFile(path, this.getFilename(ownID, chatPartnerID)) + Server.ANSI_RESET;
     }
