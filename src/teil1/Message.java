@@ -6,6 +6,9 @@ public class Message {
     public static final int CATEGORY_CLIENT_MESSAGE = 0;
     public static final int CATEGORY_SERVER_MESSAGE = 1;
     public static final int CATEGORY_SYNC_MESSAGE = 2;
+    public static final int SERVER_MESSAGE = 0;
+    public static final int SERVER_SYNC_RESPONSE = 1;
+    public static final int SERVER_SYNC_REQUST = 2;
 
     public static int getMessageCategoryFromString(String message) {
         try {

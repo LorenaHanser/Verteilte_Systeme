@@ -15,15 +15,13 @@ public class MessageUserActivity extends Message {
         this.setCategory(Message.CATEGORY_SERVER_MESSAGE);
         this.setUserId(userId);
         this.setServerId(serverId);
-        this.setType(0);
+        this.setType(Message.SERVER_MESSAGE);
         this.setStatus(status);
     }
 
-    public MessageUserActivity(int userId, int serverId, int[] userIsOnServer ) {
+    public MessageUserActivity(int[] userIsOnServer ) {
         this.setCategory(Message.CATEGORY_SERVER_MESSAGE);
-        this.setUserId(userId);
-        this.setServerId(serverId);
-        this.setType(1);
+        this.setType(Message.SERVER_SYNC_RESPONSE);
         this.setuserIsOnServer(userIsOnServer);
     }
     public MessageUserActivity(int type) {
@@ -85,7 +83,7 @@ public class MessageUserActivity extends Message {
         if(getType() == 0) {
             return this.getCategory() + SPLIT_SYMBOL + getType() + SPLIT_SYMBOL + this.getUserId() + SPLIT_SYMBOL + this.getServerId() + SPLIT_SYMBOL +  this.getStatus();
         }else if(getType() == 1){
-            return this.getCategory() + SPLIT_SYMBOL + getType() + SPLIT_SYMBOL + this.getUserId() + SPLIT_SYMBOL + this.getServerId() + SPLIT_SYMBOL + getUserIsOnServerWithSplitsymbols();
+            return this.getCategory() + SPLIT_SYMBOL + getType() + SPLIT_SYMBOL + getUserIsOnServerWithSplitsymbols();
         }else {
             return this.getCategory() + SPLIT_SYMBOL + getType();
         }
@@ -102,21 +100,23 @@ public class MessageUserActivity extends Message {
             int type = Integer.parseInt(header[1]);
             if(type == 2) {
                 return new MessageUserActivity(type);
-            }else
-            {
+            }else if(type == Message.SERVER_SYNC_RESPONSE){
+                String[] data = header[2].split(SPLIT_SYMBOL, 6);
+                int[] userDataArray = new int[6];
+                for (int i = 0; i < userDataArray.length; i++) {
+                    userDataArray[i] = Integer.parseInt(data[i]);
+                }
+                return new MessageUserActivity(userDataArray);
+            } else {
                 String[] attributes = header[2].split(SPLIT_SYMBOL, 3);
                 int serverId = Integer.parseInt(attributes[0]);
                 int userId = Integer.parseInt(attributes[1]);
-                if (type == 0) {
+                if (type == Message.SERVER_MESSAGE) {
                     int status = Integer.parseInt(attributes[2]);
                     return new MessageUserActivity(userId, serverId, status);
-                } else {
-                    String[] data = attributes[2].split(SPLIT_SYMBOL, 6);
-                    int[] userDataArray = new int[6];
-                    for (int i = 0; i < userDataArray.length; i++) {
-                        userDataArray[i] = Integer.parseInt(data[i]);
-                    }
-                    return new MessageUserActivity(userId, serverId, userDataArray);
+                } else{
+                    System.out.println(Server.ANSI_RED+"MessageUserAcivity konnte nicht ausgewertet werden"+Server.ANSI_RESET);
+                    throw new RuntimeException();
                 }
             }
         } catch(Exception e){

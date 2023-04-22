@@ -267,11 +267,7 @@ public class Server {
         removeUserThread(userID, serverUserThread);
         System.out.println(ANSI_YELLOW + "User wurde Erfolgreich abgemeldet!" + ANSI_RESET);
     }
-    public MessageUserActivity getUserIsOnServerArrayAsServerMessage(){
-        MessageUserActivity answer = new MessageUserActivity(0,0,userIsOnServer);
-        System.out.println("Das übermitteln wir jetzt: "+ answer.toString());
-        return answer;
-    }
+
     public boolean isServerReadyToShareUserData(){
         boolean answer = false;
         System.out.println(ANSI_GREEN+"Ich glaube wir wurden für einen USer Sync angefragt"+ANSI_RESET);
@@ -281,37 +277,27 @@ public class Server {
          return answer;
     }
 
-    void getUserStatusFromOtherServer(String hostname, int port) throws IOException {
-        Socket socket = new Socket(hostname, port);
-        OutputStream output = socket.getOutputStream();
-        PrintWriter writer = new PrintWriter(output, true);
-        InputStream input = socket.getInputStream();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(input));
-        System.out.println(ANSI_YELLOW + "Sync Server verbunden im Extra Dings" + ANSI_RESET);
-        MessageUserActivity syncUserDataRequest = new MessageUserActivity(2);
-        writer.println(syncUserDataRequest.toString());
-        System.out.println("Nachricht gesendet");
-        String response = reader.readLine();
-        System.out.println("Die Antwort gab es:"+ response);
-        handleUserStatusSync(response);
-        syncThread = new ServerConnectorThread(socket, writer, reader,this);
-        syncThread.start();
-        //jetzt muss der Connector Thread, mit einem anderen Konstrucktor gebaut werden
-    }
-    void handleUserStatusSync(String response){
-        if(needUserStateSync) {
+    void handleUserStatusSync(String response) {
+        if (needUserStateSync) {
             MessageUserActivity reponseAsObject = MessageUserActivity.toObject(response);
-            System.out.println(Server.ANSI_GREEN+ "Haben UserDaten erhalten"+Server.ANSI_RESET);
+            System.out.println(Server.ANSI_GREEN + "Haben UserDaten erhalten" + Server.ANSI_RESET);
             System.out.println(reponseAsObject.toString());
             int[] responseArray = reponseAsObject.getUserIsOnServer();
+            System.out.println(ANSI_GREEN+"================Das sind die Daten die wir empfangen haben====================");
             for (int i = 0; i < 3; i++) {
                 userIsOnServer[i] = responseArray[2 * i + 1];
+                System.out.println(i+":"+userIsOnServer[i]);
             }
+            System.out.println("==============================================================="+ANSI_RESET);
         }
         //System.out.println("Das ist das Ergebnis: "+ userIsOnServer);
     }
 
 
 
+    public MessageUserActivity getUserIsOnServerArrayAsServerMessage() {
+        MessageUserActivity answer = new MessageUserActivity(userIsOnServer);
+        return answer;
+    }
 
 }
