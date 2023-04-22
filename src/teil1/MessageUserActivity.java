@@ -109,8 +109,8 @@ public class MessageUserActivity extends Message {
                 return new MessageUserActivity(userDataArray);
             } else {
                 String[] attributes = header[2].split(SPLIT_SYMBOL, 3);
-                int serverId = Integer.parseInt(attributes[0]);
-                int userId = Integer.parseInt(attributes[1]);
+                int userId = Integer.parseInt(attributes[0]);
+                int serverId = Integer.parseInt(attributes[1]);
                 if (type == Message.SERVER_MESSAGE) {
                     int status = Integer.parseInt(attributes[2]);
                     return new MessageUserActivity(userId, serverId, status);
