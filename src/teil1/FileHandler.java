@@ -164,39 +164,6 @@ public class FileHandler {
         return filename;
     }
 
-    // Methode, um zwei Dateien statisch auf BS-Ebene zu synchronisieren
-    public void synchronize() {
-
-        // todo: Methode dynamisch machen
-        for (String filename : FILENAMES) {
-            String path1 = this.getPath(1);
-            String path2 = this.getPath(2);
-
-            String contentServer1 = this.readWholeChatFile(path1, filename);
-            String contentServer2 = this.readWholeChatFile(path2, filename);
-
-            File currentFileServer1 = new File(path1 + filename + ENDING);
-            File currentFileServer2 = new File(path2 + filename + ENDING);
-
-            if (contentServer1.equals(contentServer2)) {
-                System.out.println(Server.ANSI_WHITE + "Die beiden Dateien " + filename + " sind identisch." + Server.ANSI_RESET);
-            } else {
-                System.out.println(Server.ANSI_WHITE + "Die beiden Dateien " + filename + " sind unterschiedlich." + Server.ANSI_RESET);
-                if (currentFileServer1.lastModified() > currentFileServer2.lastModified()) {
-                    System.out.println(Server.ANSI_WHITE + "File: " + path1 + filename + " ist neuer als " + path2 + filename + Server.ANSI_RESET);
-                    System.out.println(Server.ANSI_WHITE + "Die ältere Datei: " + filename + " wurde gelöscht: " + currentFileServer2.delete() + Server.ANSI_RESET);
-                    this.writeWholeChatfile(contentServer1, filename, path2);
-                } else if (currentFileServer2.lastModified() > currentFileServer1.lastModified()) {
-                    System.out.println(Server.ANSI_WHITE + "File: " + path2 + filename + " ist neuer als " + path1 + filename + Server.ANSI_RESET);
-                    System.out.println(Server.ANSI_WHITE + "Die ältere Datei: " + filename + " wurde gelöscht: " + currentFileServer1.delete() + Server.ANSI_RESET);
-                    this.writeWholeChatfile(contentServer2, filename, path1);
-                } else {
-                    System.out.println(Server.ANSI_WHITE + "Beide Dateien haben das gleiche Änderungsdatum!" + Server.ANSI_RESET);
-                }
-            }
-        }
-    }
-
     // Methode, um zwei Dateien wirklich verteilt zu synchronisieren
     public MessageSync synchronize(MessageSync otherServerFile) {
         System.out.println("=======================Bin im Sync vom Server der Angefragt wurde==========================");

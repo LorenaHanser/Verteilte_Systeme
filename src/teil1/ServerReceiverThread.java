@@ -58,6 +58,7 @@ public class ServerReceiverThread extends Thread {
                     }
                 } while (socket.isConnected());
                 System.out.println(Server.ANSI_RED + "Sync Server Verbindung verloren" + Server.ANSI_RESET);
+                serverReceiverMainThread.resetThread(threadNumber);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
