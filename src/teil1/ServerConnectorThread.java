@@ -51,13 +51,13 @@ private boolean isServerDown;
             try {
                 if (!isThreadAlreadyConnected) {
                     isThreadAlreadyConnected = false;
-                    isServerDown = false;
                     socket = new Socket(hostname, port);
                     OutputStream output = socket.getOutputStream();
                     writer = new PrintWriter(output, true);
                     InputStream input = socket.getInputStream();
                     reader = new BufferedReader(new InputStreamReader(input));
                     System.out.println(Server.ANSI_YELLOW + "Sync Server verbunden" + Server.ANSI_RESET);
+                    isServerDown = false;
                 }
                 mcsHandler.setServerOnline(threadNumber);
                 while (socket.isConnected()) {
