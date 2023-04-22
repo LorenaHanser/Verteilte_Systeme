@@ -23,6 +23,7 @@ public class ServerUserThread extends Thread {
         this.socket = socket;
         this.server = server;
         this.fileHandler = fileHandler;
+        this.ownID = -1;
     }
 
     public void run() {

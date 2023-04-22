@@ -243,6 +243,7 @@ public class Server {
     }
 
     void changeUserActivity(MessageUserActivity messageUserActivity) {
+        needUserStateSync = false;
         if (messageUserActivity.getStatus() == LOGGED_IN) {
             userIsOnServer[messageUserActivity.getUserId()] = messageUserActivity.getServerId();
         } else if (messageUserActivity.getStatus() == LOGGED_OUT) {
@@ -254,6 +255,27 @@ public class Server {
         }
         System.out.println(Server.ANSI_GREEN+ "============================================================================"+Server.ANSI_RESET);
 
+    }
+    void setUserOffline(){
+        System.out.println("Leider müssen wir alle User des Servers: "+getOtherServerNumber(threadID)+" offline nehmen");
+        for (int i = 0; i < userIsOnServer.length; i++) {
+            if(userIsOnServer[i] == getOtherServerNumber()){
+                userIsOnServer[i] = 0;
+            }
+        }
+        System.out.println(Server.ANSI_GREEN + "==========================User is on Server Array==========================" + Server.ANSI_RESET);
+        for (int i = 0; i < 3; i++) {
+            System.out.println(Server.ANSI_GREEN + this.getUserIsOnServer(i) + Server.ANSI_RESET);
+        }
+        System.out.println(Server.ANSI_GREEN + "============================================================================" + Server.ANSI_RESET);
+
+    }
+    int getOtherServerNumber(){
+        int otherServerNumber = 1;
+        if(getServerNumber() == 1){
+            otherServerNumber = 2;
+        }
+        return otherServerNumber;
     }
 
     public int getUserIsOnServer(int index) {
@@ -278,6 +300,7 @@ public class Server {
 
     void handleUserStatusSync(String response) {
         if (needUserStateSync) {
+            needUserStateSync = false;
             MessageUserActivity reponseAsObject = MessageUserActivity.toObject(response);
             System.out.println(Server.ANSI_GREEN + "Haben UserDaten erhalten" + Server.ANSI_RESET);
             System.out.println(reponseAsObject.toString());
