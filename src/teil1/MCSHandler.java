@@ -26,6 +26,7 @@ public class MCSHandler {
         if(ThreadNummer == 1){
             isServer1Online = false;
             //System.out.println("Server 1 offline");
+
         } else if (ThreadNummer == 2) {
             isServer2Online = false;
             //System.out.println("Server 2 offline");

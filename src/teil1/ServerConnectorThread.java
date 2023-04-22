@@ -83,6 +83,7 @@ public class ServerConnectorThread extends Thread {
                 }
                 System.out.println(Server.ANSI_RED + "Verbindung verloren" + Server.ANSI_RESET);
                 mcsHandler.setServerOffline(threadNumber);
+                server.setUserOffline(threadNumber);
 
             } catch (UnknownHostException ex) {
             } catch (IOException ex) {

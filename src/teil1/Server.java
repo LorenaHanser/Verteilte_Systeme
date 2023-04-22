@@ -297,6 +297,7 @@ public class Server {
     }
 
     void changeUserActivity(MessageUserActivity messageUserActivity) {
+        needUserStateSync = false;
         if (messageUserActivity.getStatus() == LOGGED_IN) {
             userIsOnServer[messageUserActivity.getUserId()] = messageUserActivity.getServerId();
         } else if (messageUserActivity.getStatus() == LOGGED_OUT) {
@@ -307,7 +308,30 @@ public class Server {
             System.out.println(Server.ANSI_GREEN + this.getUserIsOnServer(i) + Server.ANSI_RESET);
         }
         System.out.println(Server.ANSI_GREEN + "============================================================================" + Server.ANSI_RESET);
+    }
 
+    void setUserOffline(int threadID){
+        for (int i = 0; i < userIsOnServer.length; i++) {
+            if(userIsOnServer[i] == getServerNumberByPort(getServerPortByThreadID(threadID)));
+        }
+    }
+
+    int getServerNumberByPort(int serverPortParameter){
+        for (int i = 0; i < this.serverPort.length; i++) {
+            if(serverPort[i] == serverPortParameter){
+                return i+1;
+            }
+        }
+        throw new RuntimeException("ERROR bei ServerNummer rausfinden");
+
+    }
+    int getServerPortByThreadID(int threadID){
+        if(getServerPortByThreadID(threadID) == partner1ServerPort){
+            return getServerPortByThreadID(threadID);
+        } else if (getServerPortByThreadID(threadID) == partner2ServerPort) {
+            return getServerPortByThreadID(threadID);
+        }
+        throw new RuntimeException("Konnte ServerPort nicht ausfindig machen");
     }
 
     public boolean isServerReadyToShareUserData() {
@@ -321,6 +345,7 @@ public class Server {
 
     void handleUserStatusSync(String response) {
         if (needUserStateSync) {
+            needUserStateSync = false;
             MessageUserActivity reponseAsObject = MessageUserActivity.toObject(response);
             System.out.println(Server.ANSI_GREEN + "Haben UserDaten erhalten" + Server.ANSI_RESET);
             System.out.println(reponseAsObject.toString());
