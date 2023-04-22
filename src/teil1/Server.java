@@ -257,7 +257,7 @@ public class Server {
 
     }
     void setUserOffline(){
-        System.out.println("Leider müssen wir alle User des Servers: "+getOtherServerNumber(threadID)+" offline nehmen");
+        System.out.println("Leider müssen wir alle User des Servers: "+getOtherServerNumber()+" offline nehmen");
         for (int i = 0; i < userIsOnServer.length; i++) {
             if(userIsOnServer[i] == getOtherServerNumber()){
                 userIsOnServer[i] = 0;
