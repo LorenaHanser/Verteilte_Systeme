@@ -83,25 +83,16 @@ public class Server {
         System.out.println(ANSI_YELLOW + "Server wird gebootet" + ANSI_RESET);
         fileHandler = new FileHandler(this, serverNumber);
         System.out.println(ANSI_YELLOW + "Sync ServerThread gestartet" + ANSI_RESET);
-        try{
-            this.getUserStatusFromOtherServer1(partnerServerAdress, partner1ServerPort);
-            syncThread2 = new ServerConnectorThread(partnerServerAdress, partner2ServerPort, this,mcsHandler,2);
-            syncThread2.start();
-        } catch (Exception e) {
-            try {
-                System.out.println(ANSI_RED+"Leider konnte Version 1 nicht verbunden werden"+ANSI_RESET);
-                this.getUserStatusFromOtherServer2(partnerServerAdress, partner2ServerPort);
-                syncThread1 = new ServerConnectorThread(partnerServerAdress, partner2ServerPort, this,mcsHandler,2);
-                syncThread1.start();
-            } catch (Exception ex) {
-                System.out.println(ANSI_RED+"Leider konnte Version 2 nicht verbunden werden. starte normal"+ANSI_RESET);
-                syncThread1 = new ServerConnectorThread(partnerServerAdress, partner1ServerPort, this,mcsHandler,1); // hier noch 2. Port anmelden
-                syncThread2 = new ServerConnectorThread(partnerServerAdress, partner2ServerPort, this,mcsHandler,2); // hier noch 2. Port anmelden
-                syncThread1.start();
-                syncThread2.start();
-            }
+        syncThread1 = new ServerConnectorThread(partnerServerAdress, partner1ServerPort, this, mcsHandler, 1); // hier noch 2. Port anmelden
+        syncThread2 = new ServerConnectorThread(partnerServerAdress, partner2ServerPort, this, mcsHandler, 2); // hier noch 2. Port anmelden
+        syncThread1.start();
+        syncThread2.start();
+        try {
+            Thread.sleep(2000);
+            syncThread1.askForUserStatus();
+            syncThread2.askForUserStatus();
+        } catch (InterruptedException e) {
         }
-
 
         receiverSyncThread = new ServerReceiverMainThread(this, serverReceiverPort);
         receiverSyncThread.start();
@@ -140,42 +131,49 @@ public class Server {
     }
 
     void sendMessageToServer(MessageClient messageClient) {
-        if(!mcsHandler.isServerBlocked())
-        {
-        try {
-            if (userIsOnServer[receiverUserId] > 0) {
-                int portFromReciverServer = serverPort[userIsOnServer[receiverUserId]-1]; //hier wird ermittelt, auf welchem Server sich der User befindet und welchen Port (zur Threadidentifizierung dieser hat) -1 weil Servernummern ab 1 starten (doofe Sache)
-                if(portFromReciverServer == partner1ServerPort){
-                    syncThread1.sendMessageToOtherServer(message, sendUserId, receiverUserId);
-                } else if (portFromReciverServer == partner2ServerPort) {
-                    syncThread2.sendMessageToOtherServer(message, sendUserId, receiverUserId);
-                }else{
-                    syncThread1.sendMessageToOtherServer(message, sendUserId, receiverUserId);
-                }
-            }
-        } catch (Exception e) {
-            System.out.println(ANSI_RED + "Sync Server nicht gefunden" + ANSI_RESET);
-        }
-        sendMessage(messageClient);
+        if (!mcsHandler.isServerBlocked()) {
+            findeServer(messageClient.getReceiverId()).sendMessageToOtherServer(messageClient);
+            sendMessage(messageClient);
 
-        }else {
-            System.out.println(ANSI_RED+"Server ist Blockiert Nachricht kann nicht zugestellt werden!!!"+ANSI_RESET);
+        } else {
+            System.out.println(ANSI_RED + "Server ist Blockiert Nachricht kann nicht zugestellt werden!!!" + ANSI_RESET);
         }
     }
 
     void sendMessage(MessageClient messageClient) {
-
-        fileHandler.writeOneNewMessage(messageClient);
-        if (userThreadRegister[messageClient.getReceiverId()] != null) { //es wird geschaut, ob der User online ist (zum Vermeiden von Exception)
-            System.out.println(ANSI_YELLOW + "Diese Nachricht wurde erhalten: " + ANSI_CYAN + messageClient.toString() + ANSI_RESET);
-            if (userChattetWith[messageClient.getReceiverId()] == messageClient.getUserId()) { //Es wird geschaut, ob der User sich im gleichen Chatraum (mit dem sendenUser) befindet
-                userThreadRegister[messageClient.getReceiverId()].sendMessage(messageClient.getMessage()); //nachricht wird an den User gesendet
-            } else {
-                System.out.println(ANSI_YELLOW + "Der User ist gerade beschäftigt. Die Nachricht: " + ANSI_CYAN + messageClient.getContent() + ANSI_YELLOW + " wird gespeichert!");
+        if (!mcsHandler.isServerBlocked()) {
+            fileHandler.writeOneNewMessage(messageClient);
+            if (userThreadRegister[messageClient.getReceiverId()] != null) { //es wird geschaut, ob der User online ist (zum Vermeiden von Exception)
+                System.out.println(ANSI_YELLOW + "Diese Nachricht wurde erhalten: " + ANSI_CYAN + messageClient.toString() + ANSI_RESET);
+                if (userChattetWith[messageClient.getReceiverId()] == messageClient.getUserId()) { //Es wird geschaut, ob der User sich im gleichen Chatraum (mit dem sendenUser) befindet
+                    userThreadRegister[messageClient.getReceiverId()].sendMessage(messageClient.getMessage()); //nachricht wird an den User gesendet
+                } else {
+                    System.out.println(ANSI_YELLOW + "Der User ist gerade beschäftigt. Die Nachricht: " + ANSI_CYAN + messageClient.getContent() + ANSI_YELLOW + " wird gespeichert!");
+                }
+            } else if (userIsOnServer[messageClient.getReceiverId()] < 1) {
+                System.out.println(ANSI_YELLOW + "Der User ist nicht online, die Nachricht: " + ANSI_CYAN + messageClient.getContent() + ANSI_YELLOW + " wird aber für ihn gespeichert...");
             }
-        } else if (userIsOnServer[messageClient.getReceiverId()] < 1) {
-            System.out.println(ANSI_YELLOW + "Der User ist nicht online, die Nachricht: " + ANSI_CYAN + messageClient.getContent() + ANSI_YELLOW + " wird aber für ihn gespeichert...");
+        } else {
+            System.out.println(ANSI_RED + "Server ist Blockiert Nachricht kann nicht zugestellt werden!!!" + ANSI_RESET);
         }
+    }
+
+    ServerConnectorThread findeServer(int chatPartnerID) {
+        if (userIsOnServer[chatPartnerID] > 0) {
+            int portFromReciverServer = serverPort[userIsOnServer[chatPartnerID] - 1]; //hier wird ermittelt, auf welchem Server sich der User befindet und welchen Port (zur Threadidentifizierung dieser hat) -1 weil Servernummern ab 1 starten (doofe Sache)
+            if (portFromReciverServer == partner1ServerPort & mcsHandler.isServer1Online()) {
+                return syncThread1;
+            } else if (portFromReciverServer == partner2ServerPort & mcsHandler.isServer1Online()) {
+                return syncThread2;
+            }
+        }
+            if (mcsHandler.isServer1Online()) {
+                return syncThread1;
+            } else if (mcsHandler.isServer2Online()) {
+                return syncThread2;
+            }
+
+        throw new RuntimeException("Kein anderer Server online");
     }
 
     void sendMessage(String message, int ownID) {       // receiverUser war vorher excludeUser
@@ -183,16 +181,16 @@ public class Server {
     }
 
 
-    MessageSync receiveSynchronization(MessageSync receivedSyncMessage){
+    MessageSync receiveSynchronization(MessageSync receivedSyncMessage) {
         //System.out.println("Bin jetzt in Server bei receiveSynchronization " + receivedClientMessage);
         return fileHandler.synchronize(receivedSyncMessage);
     }
 
-    MessageSync requestSynchronization(MessageSync sendMessageSync){
-        MessageSync message = syncThread.requestSynchronization(sendMessageSync);
+    MessageSync requestSynchronization(MessageSync sendMessageSync) {
+        MessageSync message = findeServer(sendMessageSync.getReceiverId()).requestSynchronization(sendMessageSync);
         System.out.println("============================= Antwort ist da ======================");
         System.out.println(message.toString());
-       return message;
+        return message;
     }
 
     boolean checkUsernameExists(String userName) { //überprüft, ob der User existiert
@@ -244,15 +242,18 @@ public class Server {
         userChattetWith[user] = chatPartner;
 
     }
+
     void removeChatPartner(int user) { //der ChatPartner bzw. der Chatraum wird für den User gesetzt (ab jetzt kann er Nachrichten empfangen, aber nur von dem Partner)
         userChattetWith[user] = -1;
 
     }
+
     // When a client is disconnected, removes the UserThread
-    void removeUser( ServerUserThread aUser) { //noch von Tutorial
+    void removeUser(ServerUserThread aUser) { //noch von Tutorial
         userThreads.remove(aUser);
     }
-    void removeUserThread(int userID, ServerUserThread serverUserThread){
+
+    void removeUserThread(int userID, ServerUserThread serverUserThread) {
         removeUser(serverUserThread);
         userThreadRegister[userID] = null;
 
@@ -283,30 +284,35 @@ public class Server {
         } else if (messageUserActivity.getStatus() == LOGGED_OUT) {
             userIsOnServer[messageUserActivity.getUserId()] = 0;
         }
-        System.out.println(Server.ANSI_GREEN+ "==========================User is on Server Array=========================="+Server.ANSI_RESET);
+        System.out.println(Server.ANSI_GREEN + "==========================User is on Server Array==========================" + Server.ANSI_RESET);
         for (int i = 0; i < 3; i++) {
-            System.out.println(Server.ANSI_GREEN+ this.getUserIsOnServer(i)+Server.ANSI_RESET);
+            System.out.println(Server.ANSI_GREEN + this.getUserIsOnServer(i) + Server.ANSI_RESET);
         }
-        System.out.println(Server.ANSI_GREEN+ "============================================================================"+Server.ANSI_RESET);
+        System.out.println(Server.ANSI_GREEN + "============================================================================" + Server.ANSI_RESET);
 
     }
-    public boolean isServerReadyToShareUserData(){
+
+    public boolean isServerReadyToShareUserData() {
         boolean answer = false;
-        System.out.println(ANSI_GREEN+"Ich glaube wir wurden für einen USer Sync angefragt"+ANSI_RESET);
-         if(!needUserStateSync){
-             answer = true;
-         }
-         return answer;
+        System.out.println(ANSI_GREEN + "Ich glaube wir wurden für einen USer Sync angefragt" + ANSI_RESET);
+        if (!needUserStateSync) {
+            answer = true;
+        }
+        return answer;
     }
-    void handleUserStatusSync(String response){
-        if(needUserStateSync) {
+
+    void handleUserStatusSync(String response) {
+        if (needUserStateSync) {
             MessageUserActivity reponseAsObject = MessageUserActivity.toObject(response);
-            System.out.println(Server.ANSI_GREEN+ "Haben UserDaten erhalten"+Server.ANSI_RESET);
+            System.out.println(Server.ANSI_GREEN + "Haben UserDaten erhalten" + Server.ANSI_RESET);
             System.out.println(reponseAsObject.toString());
             int[] responseArray = reponseAsObject.getUserIsOnServer();
+            System.out.println(ANSI_GREEN+"================Das sind die Daten die wir empfangen haben====================");
             for (int i = 0; i < 3; i++) {
                 userIsOnServer[i] = responseArray[2 * i + 1];
+                System.out.println(i+":"+userIsOnServer[i]);
             }
+            System.out.println("==============================================================="+ANSI_RESET);
         }
         //System.out.println("Das ist das Ergebnis: "+ userIsOnServer);
     }
@@ -315,11 +321,16 @@ public class Server {
         return userIsOnServer[index];
     }
 
-    void userConnectionReset(int userID, ServerUserThread serverUserThread){
+    void userConnectionReset(int userID, ServerUserThread serverUserThread) {
         setUserLoggedOut(userID);
         removeChatPartner(userID);
         removeUserThread(userID, serverUserThread);
         System.out.println(ANSI_YELLOW + "User wurde Erfolgreich abgemeldet!" + ANSI_RESET);
+    }
+
+    public MessageUserActivity getUserIsOnServerArrayAsServerMessage() {
+        MessageUserActivity answer = new MessageUserActivity(userIsOnServer);
+        return answer;
     }
 
 }

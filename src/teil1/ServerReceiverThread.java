@@ -28,9 +28,6 @@ public class ServerReceiverThread extends Thread {
     @Override
     public void run() {
         try {
-            ServerSocket syncServerSocket = new ServerSocket(port);
-
-            while (true) {
                 System.out.println(Server.ANSI_YELLOW + "Sync Server verbunden" + Server.ANSI_RESET);
                 OutputStream output = socket.getOutputStream();
                 writer = new PrintWriter(output, true);
@@ -59,7 +56,6 @@ public class ServerReceiverThread extends Thread {
                 } while (socket.isConnected());
                 System.out.println(Server.ANSI_RED + "Sync Server Verbindung verloren" + Server.ANSI_RESET);
                 serverReceiverMainThread.resetThread(threadNumber);
-            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -84,10 +80,11 @@ public class ServerReceiverThread extends Thread {
         if(messageUserActivity.getType() == 0){
             System.out.println(Server.ANSI_GREEN+"EMPFANGEN: Wir haben Useraktivitäten erhalten!!"+Server.ANSI_RESET);
             server.changeUserActivity(messageUserActivity);
-        } else if (messageUserActivity.getType() == 2 && server.isServerReadyToShareUserData()) {
-            System.out.println(Server.ANSI_GREEN+"EMPFANGEN: Wir sollen glaube ich UserDaten übermitteln!!"+Server.ANSI_RESET);
-            System.out.println("Das sind unsere Antworten: "+ server.getUserIsOnServerArrayAsServerMessage().toString());
-            writer.println(server.getUserIsOnServerArrayAsServerMessage());
+        }else if (messageUserActivity.getType() == 2 && server.isServerReadyToShareUserData()) {
+                System.out.println(Server.ANSI_GREEN+"EMPFANGEN: Wir sollen glaube ich UserDaten übermitteln!!"+Server.ANSI_RESET);
+                System.out.println("Das sind unsere Antworten: "+ server.getUserIsOnServerArrayAsServerMessage().toString());
+                writer.println(server.getUserIsOnServerArrayAsServerMessage());
+
         }
 
     }
@@ -99,5 +96,6 @@ public class ServerReceiverThread extends Thread {
         System.out.println(answer);
         writer.println(answer);
     }
+
 
 }

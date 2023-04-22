@@ -1,8 +1,8 @@
 package teil1;
 
 public class MCSHandler {
-    boolean isServer1Online;
-    boolean isServer2Online;
+    private boolean isServer1Online;
+    private boolean isServer2Online;
 
 
     public MCSHandler(){
@@ -41,6 +41,12 @@ public class MCSHandler {
             answer = false;
         }
         return answer;
+    }
+    public boolean isServer1Online(){
+        return isServer1Online;
+    }
+    public boolean isServer2Online(){
+        return isServer2Online;
     }
 
     public boolean isSyncThread1Connected() {

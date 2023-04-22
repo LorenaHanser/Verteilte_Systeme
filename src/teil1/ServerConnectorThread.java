@@ -141,11 +141,14 @@ public class ServerConnectorThread extends Thread {
         }
     }
     protected void askForUserStatus(){
-        System.out.println(Server.ANSI_GREEN+ "SENDEN: Haben UserDaten Angefragt"+Server.ANSI_RESET);
-        MessageUserActivity syncUserDataRequest = new MessageUserActivity(2);
-        writer.println(syncUserDataRequest.toString());
-        System.out.println(Server.ANSI_GREEN+ "SENDEN:Fertig mit der Anfrage"+Server.ANSI_RESET);
-
+        try {
+            System.out.println(Server.ANSI_GREEN + "SENDEN: Haben UserDaten Angefragt" + Server.ANSI_RESET);
+            MessageUserActivity syncUserDataRequest = new MessageUserActivity(2);
+            writer.println(syncUserDataRequest.toString());
+            System.out.println(Server.ANSI_GREEN + "SENDEN:Fertig mit der Anfrage" + Server.ANSI_RESET);
+        } catch (Exception e) {
+            System.out.println(Server.ANSI_RED+"Userdaten konnten nicht abgefragt werden, weil Server "+threadNumber+" offline ist"+Server.ANSI_RESET);
+        }
     }
 }
 
