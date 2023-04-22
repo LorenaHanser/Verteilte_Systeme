@@ -311,25 +311,31 @@ public class Server {
     }
 
     void setUserOffline(int threadID){
+        System.out.println("Leider müssen wir alle User des Servers: "+getServerNumberByThreadID(threadID)+" offline nehmen");
         for (int i = 0; i < userIsOnServer.length; i++) {
-            if(userIsOnServer[i] == getServerNumberByPort(getServerPortByThreadID(threadID)));
-        }
-    }
-
-    int getServerNumberByPort(int serverPortParameter){
-        for (int i = 0; i < this.serverPort.length; i++) {
-            if(serverPort[i] == serverPortParameter){
-                return i+1;
+            if(userIsOnServer[i] == getServerNumberByThreadID(threadID)){
+                userIsOnServer[i] = 0;
             }
         }
-        throw new RuntimeException("ERROR bei ServerNummer rausfinden");
+        System.out.println(Server.ANSI_GREEN + "==========================User is on Server Array==========================" + Server.ANSI_RESET);
+        for (int i = 0; i < 3; i++) {
+            System.out.println(Server.ANSI_GREEN + this.getUserIsOnServer(i) + Server.ANSI_RESET);
+        }
+        System.out.println(Server.ANSI_GREEN + "============================================================================" + Server.ANSI_RESET);
 
     }
-    int getServerPortByThreadID(int threadID){
-        if(getServerPortByThreadID(threadID) == partner1ServerPort){
-            return getServerPortByThreadID(threadID);
-        } else if (getServerPortByThreadID(threadID) == partner2ServerPort) {
-            return getServerPortByThreadID(threadID);
+
+    int getServerNumberByThreadID(int threadID){
+        int threadPort = -1;
+        if(threadID == 1){
+            threadPort = partner1ServerPort;
+        } else if (threadID == 2) {
+         threadPort = partner2ServerPort;
+        }
+        for (int i = 0; i < serverPort.length; i++) {
+            if(threadPort == serverPort[i]){
+                return i+1;
+            }
         }
         throw new RuntimeException("Konnte ServerPort nicht ausfindig machen");
     }
