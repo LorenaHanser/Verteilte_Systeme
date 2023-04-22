@@ -23,6 +23,8 @@ public class ServerConnectorThread extends Thread {
     private boolean isThreadAlreadyConnected;
 
 
+private boolean isServerDown;
+
     public ServerConnectorThread(String hostname, int port, Server server, MCSHandler mcsHandler, int threadNumber) {
         this.hostname = hostname;
         this.port = port;
@@ -47,8 +49,9 @@ public class ServerConnectorThread extends Thread {
         while (true) {
 
             try {
-                if(!isThreadAlreadyConnected) {
+                if (!isThreadAlreadyConnected) {
                     isThreadAlreadyConnected = false;
+                    isServerDown = false;
                     socket = new Socket(hostname, port);
                     OutputStream output = socket.getOutputStream();
                     writer = new PrintWriter(output, true);
@@ -61,13 +64,13 @@ public class ServerConnectorThread extends Thread {
                     try {
                         response = reader.readLine();
                         System.out.println(response);
-                        if(Message.getMessageCategoryFromString(response) == Message.CATEGORY_SERVER_MESSAGE){
+                        if (Message.getMessageCategoryFromString(response) == Message.CATEGORY_SERVER_MESSAGE) {
                             answerIsPicked = true;
                             System.out.println("Haben eine UserDataSync Nachricht erhalten");
                             server.handleUserStatusSync(response);
                         }
                         answerIsThere = true;
-                        while (!answerIsPicked){
+                        while (!answerIsPicked) {
                             System.out.println("Nachricht ist da!!!");
                             try {
                                 Thread.sleep(1000);
@@ -85,60 +88,70 @@ public class ServerConnectorThread extends Thread {
                 mcsHandler.setServerOffline(threadNumber);
                 server.setUserOffline(threadNumber);
 
+                isServerDown = true;
             } catch (UnknownHostException ex) {
             } catch (IOException ex) {
             }
             mcsHandler.setServerOffline(threadNumber);
         }
     }
-    private MessageClient sendSyncResponseToServer(MessageClient messageClient){
+
+    private MessageClient sendSyncResponseToServer(MessageClient messageClient) {
         //if(clientMessage.getType() == Server.)
-    return messageClient;//ist kaputt
+        return messageClient;//ist kaputt
     }
 
-    protected MessageSync requestSynchronization(MessageSync messageSync){
-        MessageSync answer = null;
+    protected MessageSync requestSynchronization(MessageSync messageSync) {
+        if(!isServerDown){
+            throw new RuntimeException("Server Verbindung ist down");
+        } else{
+            MessageSync answer = null;
             System.out.println("=========== Setzte answerIsThere -> false ===========");
             answerIsThere = false;
             writer.println(messageSync.toString());
             System.out.println("====== In der Schliefe drinnen ===========");
-            while(!answerIsThere){
+            int i = 0;
+            while (!answerIsThere) {
                 //Wartet, bis eine Antwort eintrifft, hier muss man das Timeout reinbauen
                 System.out.println("warte");
                 try {
+                    i++;
                     Thread.sleep(1000);
+                    if(i==10){
+                        break;
+                    }
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
             }
-
             System.out.println("====== Aus der Schliefe draußen ===========");
             answerIsPicked = true;
             answer = MessageSync.toObject(response);
-        System.out.println("toObject was gemacht");
-        return answer;
+            System.out.println("toObject was gemacht");
+            return answer;
+        }
     }
 
     // Senden einer ClientMessage zum anderen Server
     protected void sendMessageToOtherServer(MessageClient messageClient) {
-        System.out.println(Server.ANSI_GREEN+"SENDEN: Message wird gesendet"+Server.ANSI_RESET);
+        System.out.println(Server.ANSI_GREEN + "SENDEN: Message wird gesendet" + Server.ANSI_RESET);
         try {
             if (writer != null) {
-            writer.println(messageClient.toString());
-        }
-        }catch (Exception e){
-            System.out.println(Server.ANSI_RED+"Gab beim Senden der Message einen ERROR im ServerConnectorThread"+Server.ANSI_RESET);
+                writer.println(messageClient.toString());
+            }
+        } catch (Exception e) {
+            System.out.println(Server.ANSI_RED + "Gab beim Senden der Message einen ERROR im ServerConnectorThread" + Server.ANSI_RESET);
         }
     }
 
     protected void sendUserActivity(MessageUserActivity messageUserActivity) {
-        System.out.println(Server.ANSI_GREEN+"SENDEN: Useraktivität wird gesendet"+Server.ANSI_RESET);
+        System.out.println(Server.ANSI_GREEN + "SENDEN: Useraktivität wird gesendet" + Server.ANSI_RESET);
         try {
             if (writer != null) {
                 writer.println(messageUserActivity.toString());
             }
         } catch (Exception e) {
-            System.out.println(Server.ANSI_RED+"Gab beim Senden der UserActivity einen ERROR im ServerConnectorThread"+Server.ANSI_RESET);
+            System.out.println(Server.ANSI_RED + "Gab beim Senden der UserActivity einen ERROR im ServerConnectorThread" + Server.ANSI_RESET);
         }
     }
     protected void askForUserStatus(){
