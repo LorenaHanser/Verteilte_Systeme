@@ -131,9 +131,11 @@ public class ServerConnectorThread extends Thread {
         }
     }
     protected void askForUserStatus(){
+        System.out.println(Server.ANSI_GREEN+ "SENDEN: Haben UserDaten Angefragt"+Server.ANSI_RESET);
         MessageUserActivity syncUserDataRequest = new MessageUserActivity(2);
         writer.println(syncUserDataRequest.toString());
-        System.out.println(Server.ANSI_GREEN+ "SENDEN: Haben UserDaten Angefragt"+Server.ANSI_RESET);
+        System.out.println(Server.ANSI_GREEN+ "SENDEN:Fertig mit der Anfrage"+Server.ANSI_RESET);
+
     }
 }
 

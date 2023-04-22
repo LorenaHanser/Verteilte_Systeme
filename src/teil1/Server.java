@@ -74,8 +74,10 @@ public class Server {
         syncThread = new ServerConnectorThread(partnerServerAddress, partnerServerPort, this);
         syncThread.start();
         try{
+            Thread.sleep(1000);
             syncThread.askForUserStatus();
         } catch (Exception e) {
+            System.out.println("Leider konnten wir die Anfrage nicht fertig machen");
             needUserStateSync = false;
         }
         receiverSyncThread = new ServerReceiverThread(this, serverReceiverPort);
