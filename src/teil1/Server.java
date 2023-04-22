@@ -129,7 +129,6 @@ public class Server {
     void sendMessage(MessageClient messageClient) {
 
         fileHandler.writeOneNewMessage(messageClient);
-        // todo nur Nachrichten Typ 1 und 2 Sollen verarbeitet werden (stand 17.04.)
         if (userThreadRegister[messageClient.getReceiverId()] != null) { //es wird geschaut, ob der User online ist (zum Vermeiden von Exception)
             System.out.println(ANSI_YELLOW + "Diese Nachricht wurde erhalten: " + ANSI_CYAN + messageClient.toString() + ANSI_RESET);
             if (userChattetWith[messageClient.getReceiverId()] == messageClient.getUserId()) { //Es wird geschaut, ob der User sich im gleichen Chatraum (mit dem sendenUser) befindet
