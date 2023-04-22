@@ -61,16 +61,16 @@ public class ServerReceiverThread extends Thread {
     }
 
     private void sendMessageToServer(MessageClient messageClient) {
-
+        /*
         // todo: einkommentieren, um einen Delay zwischen den Servern zu simulieren
         try {
             System.out.println("Delay Anfang --- Thread schläft");
             Thread.sleep(10000);
             System.out.println("Delay Ende --- Thread ist aufgewacht");
         } catch (Exception e) {
-            System.out.println(Server.ANSI_RED + "Fehler beim Schlafen: " + e.getMessage() + Server.ANSI_RESET);
+            System.out.println(ANSI_RED + "Fehler beim Schlafen: " + e.getMessage() + ANSI_RESET);
         }
-
+        */
         server.sendMessage(messageClient);
     }
 
@@ -78,7 +78,7 @@ public class ServerReceiverThread extends Thread {
         if(messageUserActivity.getType() == 0){
             System.out.println(Server.ANSI_GREEN+"EMPFANGEN: Wir haben Useraktivitäten erhalten!!"+Server.ANSI_RESET);
             server.changeUserActivity(messageUserActivity);
-        } else if (messageUserActivity.getType() == 1) {
+        } else if (messageUserActivity.getType() == 2 && server.isServerReadyToShareUserData()) {
             System.out.println(Server.ANSI_GREEN+"EMPFANGEN: Wir sollen glaube ich UserDaten übermitteln!!"+Server.ANSI_RESET);
             System.out.println("Das sind unsere Antworten: "+ server.getUserIsOnServerArrayAsServerMessage().toString());
             writer.println(server.getUserIsOnServerArrayAsServerMessage());

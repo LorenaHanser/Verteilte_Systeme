@@ -40,16 +40,24 @@ public class ServerConnectorThread extends Thread {
         while (true) {
 
             try {
-                Socket socket = new Socket(hostname, port);
-                OutputStream output = socket.getOutputStream();
-                writer = new PrintWriter(output, true);
-                InputStream input = socket.getInputStream();
-                reader = new BufferedReader(new InputStreamReader(input));
-                System.out.println(Server.ANSI_YELLOW + "Sync Server verbunden" + Server.ANSI_RESET);
+                if(!isThreadAlreadyConnected) {
+                    isThreadAlreadyConnected = false;
+                    socket = new Socket(hostname, port);
+                    OutputStream output = socket.getOutputStream();
+                    writer = new PrintWriter(output, true);
+                    InputStream input = socket.getInputStream();
+                    reader = new BufferedReader(new InputStreamReader(input));
+                    System.out.println(Server.ANSI_YELLOW + "Sync Server verbunden" + Server.ANSI_RESET);
+                }
                 while (socket.isConnected()) {
                     try {
                         response = reader.readLine();
                         System.out.println(response);
+                        if(Message.getMessageCategoryFromString(response) == Message.CATEGORY_SERVER_MESSAGE){
+                            answerIsPicked = true;
+                            System.out.println("Haben eine UserDataSync Nachricht erhalten");
+                            server.handleUserStatusSync(response);
+                        }
                         answerIsThere = true;
                         while (!answerIsPicked){
                             System.out.println("Nachricht ist da!!!");
@@ -121,6 +129,13 @@ public class ServerConnectorThread extends Thread {
         } catch (Exception e) {
             System.out.println(Server.ANSI_RED+"Gab beim Senden der UserActivity einen ERROR im ServerConnectorThread"+Server.ANSI_RESET);
         }
+    }
+    protected void askForUserStatus(){
+        System.out.println(Server.ANSI_GREEN+ "SENDEN: Haben UserDaten Angefragt"+Server.ANSI_RESET);
+        MessageUserActivity syncUserDataRequest = new MessageUserActivity(2);
+        writer.println(syncUserDataRequest.toString());
+        System.out.println(Server.ANSI_GREEN+ "SENDEN:Fertig mit der Anfrage"+Server.ANSI_RESET);
+
     }
 }
 
