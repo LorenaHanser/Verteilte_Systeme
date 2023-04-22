@@ -2,44 +2,37 @@ package teil1;
 
 import java.sql.Timestamp;
 
-public class ClientMessage extends Message {
+public class MessageClient extends Message {
 
+    // int category durch Vererbung
     // int userId durch Vererbung
     private int receiverId;
     private Timestamp timestamp;
-    private int type;
     private String content;
 
     // Konstruktor
-    public ClientMessage(int userId, int receiverId, Timestamp timestamp, int type, String content) {
+    public MessageClient(int userId, int receiverId, Timestamp timestamp, String content) {
+        this.setCategory(Message.CATEGORY_CLIENT_MESSAGE);
         this.setUserId(userId);
         this.setReceiverId(receiverId);
         this.setTimestamp(timestamp);
-        this.setType(type);
         this.setContent(content);
     }
 
-    public ClientMessage(int userId, int receiverId, int type, String content) {
+    public MessageClient(int userId, int receiverId, String content) {
+        this.setCategory(Message.CATEGORY_CLIENT_MESSAGE);
         this.setUserId(userId);
         this.setReceiverId(receiverId);
-        this.setType(type);
         this.setContent(content);
     }
 
-    public ClientMessage(String clientResponse, int userId, int receiverId) {
-        String[] clientResponseSplit = clientResponse.split(";", 2);
+    public MessageClient(String clientResponse, int userId, int receiverId) {
+        this.setCategory(Message.CATEGORY_CLIENT_MESSAGE);
+        String[] clientResponseSplit = clientResponse.split(SPLIT_SYMBOL, 2);
         this.setUserId(userId);
         this.setReceiverId(receiverId);
         this.setTimestamp(Timestamp.valueOf(clientResponseSplit[0]));
-        this.setType(Server.NEW_MESSAGE);
         this.setContent(clientResponseSplit[1]);
-    }
-
-    public ClientMessage(int userId, int receiverId, String content) {
-        this.setUserId(userId);
-        this.setReceiverId(receiverId);
-        this.setType(Server.NEW_MESSAGE_WITHOUT_TIMESTAMP);
-        this.setContent(content);
     }
 
     // get()- und set()-Methoden
@@ -57,14 +50,6 @@ public class ClientMessage extends Message {
 
     public void setReceiverId(int receiverId) {
         this.receiverId = receiverId;
-    }
-
-    public int getType() {
-        return type;
-    }
-
-    public void setType(int type) {
-        this.type = type;
     }
 
     public String getContent() {
@@ -103,20 +88,20 @@ public class ClientMessage extends Message {
     // Methoden
     @Override
     public String toString() {
-        return this.getUserId() + getSplitSymbol() + this.getReceiverId() + getSplitSymbol() + this.getTimestamp() + getSplitSymbol() + this.getType() + getSplitSymbol() + this.getContent() + "\n*";
+        return this.getCategory() + SPLIT_SYMBOL + this.getUserId() + SPLIT_SYMBOL + this.getReceiverId() + SPLIT_SYMBOL + this.getTimestamp() + SPLIT_SYMBOL + this.getContent() + "\n*";
     }
 
-    public static ClientMessage toObject(String string) {
+    public static MessageClient toObject(String string) {
         string = string.replace("*", "");
-        String[] attributes = string.split(Message.getSplitSymbol(), 5);
+        String[] attributes = string.split(Message.SPLIT_SYMBOL, 5);
 
-        int userId = Integer.parseInt(attributes[0]);
-        int receiverId = Integer.parseInt(attributes[1]);
-        Timestamp timestamp = Timestamp.valueOf(attributes[2]);
-        int type = Integer.parseInt(attributes[3]);
+        int category = Integer.parseInt(attributes[0]);
+        int userId = Integer.parseInt(attributes[1]);
+        int receiverId = Integer.parseInt(attributes[2]);
+        Timestamp timestamp = Timestamp.valueOf(attributes[3]);
         String content = attributes[4];
 
-        return new ClientMessage(userId, receiverId, timestamp, type, content);
+        return new MessageClient(userId, receiverId, timestamp, content);
     }
 
 }

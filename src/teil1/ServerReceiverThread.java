@@ -37,31 +37,24 @@ public class ServerReceiverThread extends Thread {
                 InputStream input = socket.getInputStream();
                 reader = new BufferedReader(new InputStreamReader(input));
                 do {
-                    //System.out.println("=================================================");
-                    String response = reader.readLine();
-                    String fullresponse = response;
-                    System.out.println(response);
-                    while (response != null & !response.contains("*")) {
-                        //System.out.println("Nachricht noch nicht am Ende");
+                    try {
+                        String response = reader.readLine();
+                        System.out.println(Server.ANSI_GREEN+"EMPFANGEN: Es gab eine Nachricht"+Server.ANSI_RESET);
+                            if (Message.getMessageCategoryFromString(response) == Message.CATEGORY_CLIENT_MESSAGE) {
+                                sendMessageToServer(MessageClient.toObject(response));
+                            } else if(Message.getMessageCategoryFromString(response) == Message.CATEGORY_SERVER_MESSAGE){
+                                System.out.println(Server.ANSI_GREEN+"EMPFANGEN: Es gab eine Useraktivität"+Server.ANSI_RESET);
+                                sendUserActivityToServer(MessageUserActivity.toObject(response));
+                            } else if(Message.getMessageCategoryFromString(response) == Message.CATEGORY_SYNC_MESSAGE){
+                                System.out.println("Hier wird noch gebaut!");
+                                sendSyncMessageToServer(MessageSync.toObject(response));
+                            }
 
-                        response = reader.readLine();
-                        if (response != null & !response.contains("*")) {
-                            fullresponse += '\n';
-                            fullresponse += response;
-                            //System.out.println(response);
-                        }
-                    }
-                    //System.out.println("=================================================");
-                    //System.out.println("Bin im Receiver " + fullresponse);
-                    if (fullresponse.contains(";")) {
-                        if (Message.isClientMessage(fullresponse)) {
 
-                            sendMessageToServer(ClientMessage.toObject(fullresponse));
-                        } else {
-                            sendUserActivityToServer(ServerMessage.toObject(fullresponse));
-                        }
-                    } else {
-                        System.out.println("Und wieder gibt es einen ERROR in der Nachricht: " + fullresponse);
+                    } catch (IOException ex) {
+                        System.out.println(Server.ANSI_RED + "Error reading from server: " + ex.getMessage() + Server.ANSI_RESET);
+                        ex.printStackTrace();
+                        break;
                     }
                 } while (socket.isConnected());
                 System.out.println(Server.ANSI_RED + "Sync Server Verbindung verloren" + Server.ANSI_RESET);
@@ -72,8 +65,7 @@ public class ServerReceiverThread extends Thread {
 
     }
 
-    private void sendMessageToServer(ClientMessage clientMessage) {
-        // todo nur Nachrichten Typ 1 und 2 sollen in sendMessage verarbeitet werden (stand 17.04.) (rest war für Sync gedacht)
+    private void sendMessageToServer(MessageClient messageClient) {
         /*
         // todo: einkommentieren, um einen Delay zwischen den Servern zu simulieren
         try {
@@ -84,23 +76,27 @@ public class ServerReceiverThread extends Thread {
             System.out.println(ANSI_RED + "Fehler beim Schlafen: " + e.getMessage() + ANSI_RESET);
         }
         */
-        if (clientMessage.getType() == Server.SYNC_REQUEST) {
-            System.out.println("Datei wird übertragen!");
-            writer.println(server.receiveSynchronization(clientMessage).toString());
-            System.out.println("Datei wurde erfolgreich übertragen!");
-        } else if (clientMessage.getType() == Server.NEW_MESSAGE | clientMessage.getType() == Server.NEW_MESSAGE_WITHOUT_TIMESTAMP) {
-            server.sendMessage(clientMessage);
-        }
+        server.sendMessage(messageClient);
     }
 
-    private void sendUserActivityToServer(ServerMessage serverMessage) {
-        if (serverMessage.getUserId() == 7) {
-            System.out.println("Wir sollen glaube ich UserDaten übermitteln!!");
+    private void sendUserActivityToServer(MessageUserActivity messageUserActivity) {
+        if(messageUserActivity.getType() == 0){
+            System.out.println(Server.ANSI_GREEN+"EMPFANGEN: Wir haben Useraktivitäten erhalten!!"+Server.ANSI_RESET);
+            server.changeUserActivity(messageUserActivity);
+        } else if (messageUserActivity.getType() == 2 && server.isServerReadyToShareUserData()) {
+            System.out.println(Server.ANSI_GREEN+"EMPFANGEN: Wir sollen glaube ich UserDaten übermitteln!!"+Server.ANSI_RESET);
             System.out.println("Das sind unsere Antworten: "+ server.getUserIsOnServerArrayAsServerMessage().toString());
             writer.println(server.getUserIsOnServerArrayAsServerMessage());
-        } else {
-            server.changeUserActivity(serverMessage);
         }
+
+    }
+    private void sendSyncMessageToServer(MessageSync messageSync) {
+        System.out.println(Server.ANSI_GREEN+"EMPFANGEN: Syncanfrage erhalten:"+Server.ANSI_RESET);
+        System.out.println(messageSync.toString());
+        String answer = server.receiveSynchronization(messageSync).toString();
+        System.out.println(Server.ANSI_GREEN+"ANTWORTEN(1): Das ist unsere Antwort: "+Server.ANSI_RESET);
+        System.out.println(answer);
+        writer.println(answer);
     }
 
 }

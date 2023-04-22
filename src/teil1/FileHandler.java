@@ -86,12 +86,12 @@ public class FileHandler {
 
     // Methode, um eine neue Chatnachricht in der .txt Datei zu speichern
     // [06.04.2023 17:01:12] [Daniel]: Nachricht
-    public void writeOneNewMessage(ClientMessage clientMessage) {
+    public void writeOneNewMessage(MessageClient messageClient) {
         // todo: die Abfrage brauchen wir eigentlich mit dem neuen Protokoll nicht...
         String[] notAllowedColors = {Server.ANSI_BLACK, Server.ANSI_RED, Server.ANSI_GREEN, Server.ANSI_YELLOW, Server.ANSI_BLUE, Server.ANSI_PURPLE, Server.ANSI_CYAN, Server.ANSI_WHITE, "SHUTDOWN", "DISCONNECT"};
         boolean writingAllowed = true;
         for (String notAllowedString : notAllowedColors) {
-            if (clientMessage.getContent().contains(notAllowedString)) {
+            if (messageClient.getContent().contains(notAllowedString)) {
                 writingAllowed = false;
                 break;
             }
@@ -102,10 +102,10 @@ public class FileHandler {
                 this.create();
             }
 
-            if (writingAllowed & !clientMessage.getContent().isEmpty()) {
-                String pathToFile = path + getFilename(clientMessage.getUserId(), clientMessage.getReceiverId()) + ENDING;
+            if (writingAllowed & !messageClient.getContent().isEmpty()) {
+                String pathToFile = path + getFilename(messageClient.getUserId(), messageClient.getReceiverId()) + ENDING;
                 BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(pathToFile, true));
-                bufferedWriter.write("[" + TIMESTAMP_FORMAT.format(clientMessage.getTimestamp()) + "] [" + clientMessage.getUserName() + "]: " + clientMessage.getContent());
+                bufferedWriter.write("[" + TIMESTAMP_FORMAT.format(messageClient.getTimestamp()) + "] [" + messageClient.getUserName() + "]: " + messageClient.getContent());
                 bufferedWriter.newLine();
                 bufferedWriter.close();
 
@@ -165,9 +165,9 @@ public class FileHandler {
     }
 
     // Methode, um zwei Dateien statisch auf BS-Ebene zu synchronisieren
-    /* todo: delete
     public void synchronize() {
 
+        // todo: Methode dynamisch machen
         for (String filename : FILENAMES) {
             String path1 = this.getPath(1);
             String path2 = this.getPath(2);
@@ -196,14 +196,17 @@ public class FileHandler {
             }
         }
     }
-    */
 
     // Methode, um zwei Dateien wirklich verteilt zu synchronisieren
-    public ClientMessage synchronize(ClientMessage otherServerFile) {
+    public MessageSync synchronize(MessageSync otherServerFile) {
         System.out.println("=======================Bin im Sync vom Server der Angefragt wurde==========================");
         System.out.println(otherServerFile.toString());
         System.out.println("=====================================Ende==================================================");
-        String otherContent = otherServerFile.getContent();                                                    // ganzer Inhalt der Datei
+        String[] otherContentArray = otherServerFile.getContent();                                                    // ganzer Inhalt der Datei
+        String otherContent = "";
+        for (int i = 0; i < otherContentArray.length ; i++) {
+            otherContent += "\n" + otherContentArray[i];
+        }
         Timestamp otherTimestamp = otherServerFile.getTimestamp();                                             // Änderungsdatum der Datei
         long otherLastModified = otherTimestamp.getTime();
 
@@ -212,20 +215,25 @@ public class FileHandler {
         File ownServerFile = new File(ownPath + ownFilename + ENDING);
         long ownLastModified = ownServerFile.lastModified();
         String ownContent = this.readWholeChatFile(ownPath, ownFilename);
+        String[] contentServerArray = ownContent.split("\n");
 
-        ClientMessage syncResponse = new ClientMessage(otherServerFile.getUserId(), otherServerFile.getReceiverId(), new Timestamp(System.currentTimeMillis()), Server.SYNC_RESPONSE, null);
+        MessageSync syncResponse = new MessageSync(otherServerFile.getUserId(), MessageSync.SYNC_RESPONSE, otherServerFile.getReceiverId());
 
         if (ownContent.equals(otherContent)) {
             System.out.println(Server.ANSI_WHITE + "Die beiden Dateien " + ownFilename + " sind identisch." + Server.ANSI_RESET);
-            syncResponse.setContent(Server.OK);
+            syncResponse.setType(Server.SYNC_RESPONSE);
+            return syncResponse;
         } else {
             if (ownLastModified == otherLastModified) {
                 System.out.println("Beide Dateien sind gleich neu.");
                 syncResponse.setContent(Server.OK);
-
+                syncResponse.setType(Server.SYNC_RESPONSE);
+                System.out.println("Das ist die syncRespones " + syncResponse.getType() + Arrays.toString(syncResponse.getContent()));
+                return syncResponse;
             } else if (ownLastModified > otherLastModified) {
                 System.out.println("Die eigene Datei ist neuer.");
-                syncResponse.setContent(this.readWholeChatFile(ownPath, ownFilename));
+                syncResponse.setContent(contentServerArray);
+                syncResponse.setType(Server.SYNC_RESPONSE);
                 System.out.println("Die eigene Datei wurde an Partner gesendet!");
 
             } else if (otherLastModified > ownLastModified) {
@@ -234,12 +242,12 @@ public class FileHandler {
                 this.writeWholeChatfile(otherContent, ownFilename, ownPath);
                 System.out.println("Die eigene Datei wurde ordentlich beschrieben!");
                 syncResponse.setContent(Server.OK);
+                syncResponse.setType(Server.SYNC_RESPONSE);
+                System.out.println("Das ist die syncRespones " + syncResponse.getType() + Arrays.toString(syncResponse.getContent()));
+                return syncResponse;
             }
         }
-        //System.out.println("Hier müsste entweder ok oder der fileinhalt stehen: " + syncResponse.getContent());
-        System.out.println("=======================Das ist der Rückgabewert ==========================");
-        System.out.println(syncResponse.toString());
-        System.out.println("=====================================Ende==================================================");
+        System.out.println("Das ist die syncRespones " + syncResponse.getType() + " " + Arrays.toString(syncResponse.getContent()));
         return syncResponse;
     }
 
@@ -292,31 +300,36 @@ public class FileHandler {
         String ownFilename = this.getFilename(ownID, chatPartnerID);
 
         String contentServer1 = readWholeChatFile(ownPath, ownFilename);
+        String[] contentServer1Array = contentServer1.split("\n");
 
         File ownServerFile = new File(ownPath + ownFilename + ENDING);
 
         long ownLastModified = ownServerFile.lastModified();
         Timestamp ownTimestamp = new Timestamp(ownLastModified);
 
-        // trigger receiver to synchronzie with synchronize
-    try{
-        ClientMessage triggerSync = new ClientMessage(ownID, chatPartnerID, ownTimestamp, Server.SYNC_REQUEST, contentServer1);
+        // trigger receiver to synchronize with synchronize
+        try {
+            MessageSync triggerSync = new MessageSync(ownID, MessageSync.SYNC_REQUEST, chatPartnerID, ownTimestamp, contentServer1Array);
 
-        ClientMessage response = server.requestSynchronization(triggerSync);
-        System.out.println("=======================Bin im Sync der den anderen Server anfragt==========================");
-        System.out.println(response.toString());
-        System.out.println("=====================================Ende==================================================");
-        System.out.println("Wir sind jetzt im Filehandler: " + response.toString());
-        // Auswerten der Antwort
-        if (response.getContent().equals(Server.OK)) {
-            System.out.println("Sync war nicht nötig! Alles ist gut gelaufen.");
-        } else {
-            String synchronizedFileContent = response.getContent();
-            System.out.println(ownServerFile.delete());
-            this.writeWholeChatfile(synchronizedFileContent, this.getFilename(response.getUserId(), response.getReceiverId()), this.path);
+            MessageSync response = server.requestSynchronization(triggerSync); //hier bekommt man die antwort des anderen Servers
+
+            System.out.println("=======================Bin im Sync der den anderen Server anfragt==========================");
+            System.out.println(response.getContentAsString());
+            System.out.println("=====================================Ende==================================================");
+            System.out.println("Wir sind jetzt im Filehandler: ");
+            // Auswerten der Antwort
+            if (Arrays.equals(response.getContent(), Server.OK)) {
+                System.out.println("Sync war nicht nötig! Alles ist gut gelaufen.");
+            } else {
+                String synchronizedFileContentAsString = response.getContentAsString().replaceAll(";", "\n");
+                System.out.println(synchronizedFileContentAsString);
+                System.out.println(ownServerFile.delete());
+                this.writeWholeChatfile(synchronizedFileContentAsString, this.getFilename(response.getUserId(), response.getReceiverId()), this.path);
+                System.out.println("Sync war nötig! Datei wurde neu beschrieben.");
+            }
+        } catch (Exception e) {
+            System.out.println(Server.ANSI_RED + "Anderer Server ist nicht online" + Server.ANSI_RESET);
+            e.printStackTrace();
         }
-    } catch (Exception e) {
-        System.out.println(Server.ANSI_RED+ "Anderer Server ist nicht online"+ Server.ANSI_RESET);
-    }
     }
 }
