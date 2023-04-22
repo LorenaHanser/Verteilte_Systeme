@@ -2,7 +2,6 @@ package teil1;
 
 import java.io.*;
 import java.net.*;
-import java.rmi.server.ServerCloneException;
 import java.util.*;
 
 
@@ -132,7 +131,7 @@ public class Server {
 
     void sendMessageToServer(MessageClient messageClient) {
         if (!mcsHandler.isServerBlocked()) {
-            findeServer(messageClient.getReceiverId()).sendMessageToOtherServer(messageClient);
+            findServer(messageClient.getReceiverId()).sendMessageToOtherServer(messageClient);
             sendMessage(messageClient);
 
         } else {
@@ -158,12 +157,12 @@ public class Server {
         }
     }
 
-    ServerConnectorThread findeServer(int chatPartnerID) {
+    ServerConnectorThread findServer(int chatPartnerID) {
         if (userIsOnServer[chatPartnerID] > 0) {
             int portFromReciverServer = serverPort[userIsOnServer[chatPartnerID] - 1]; //hier wird ermittelt, auf welchem Server sich der User befindet und welchen Port (zur Threadidentifizierung dieser hat) -1 weil Servernummern ab 1 starten (doofe Sache)
             if (portFromReciverServer == partner1ServerPort & mcsHandler.isServer1Online()) {
                 return syncThread1;
-            } else if (portFromReciverServer == partner2ServerPort & mcsHandler.isServer1Online()) {
+            } else if (portFromReciverServer == partner2ServerPort & mcsHandler.isServer2Online()) {
                 return syncThread2;
             }
         }
@@ -187,7 +186,7 @@ public class Server {
     }
 
     MessageSync requestSynchronization(MessageSync sendMessageSync) {
-        MessageSync message = findeServer(sendMessageSync.getReceiverId()).requestSynchronization(sendMessageSync);
+        MessageSync message = findServer(sendMessageSync.getReceiverId()).requestSynchronization(sendMessageSync);
         System.out.println("============================= Antwort ist da ======================");
         System.out.println(message.toString());
         return message;
