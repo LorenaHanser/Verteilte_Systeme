@@ -12,7 +12,7 @@ public class ClientForTesting {
             boolean portFound = false;
             int port = 8988; //Default Port from Server 1
             while (!portFound) {
-                System.out.println("Bitte Port eingeben: \n Server 1: 8988 \n Server 2: 8989 \n Server 3: 8990");
+                System.out.println("Bitte Port eingeben: \n Server 1: 8989 \n Server 2: 8990.\n Geben Sie bitte einen Port ein!");
                 String answer = userIn.readLine();
                 port = Integer.parseInt(answer);
                 if (port <= 8990 && port >= 8988) {
