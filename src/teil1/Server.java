@@ -22,6 +22,8 @@ public class Server {
     //public static final int MESSAGE = 1;
     public static final int LOGGED_OUT = 0;
     public static final int LOGGED_IN = 1;
+    public static final int ANSWER_TO_MESSAGE = 0;
+    public static final int ACCEPT_MESSAGE = 0;
 
     public static final int NEW_MESSAGE = 0;
     public static final int NEW_MESSAGE_WITHOUT_TIMESTAMP = 1;
@@ -58,6 +60,7 @@ public class Server {
     private ServerReceiverMainThread receiverSyncThread;
 
     private boolean syncThreadActive = false;
+    private int[] serverPort = {8991, 8992, 8993};
     private int[] userIsOnServer = new int[3]; //evtl muss auf protected oder public
     private int[] userChattetWith = new int[3]; //Speichert, wer sich aktuell mit wem im Chat befindet (damit man nicht mit einer Person chatten kann, die gerade mit wem anders chattet)
     private ServerUserThread[] userThreadRegister = new ServerUserThread[3];//Speichert die Referenzvariable des Threads auf dem der User (wenn er online ist) läuft. Der Index für das Feld ist, dabei die ID des Users
@@ -140,8 +143,16 @@ public class Server {
         if(!mcsHandler.isServerBlocked())
         {
         try {
-            syncThread1.sendMessageToOtherServer(messageClient);
-            syncThread2.sendMessageToOtherServer(messageClient);
+            if (userIsOnServer[receiverUserId] > 0) {
+                int portFromReciverServer = serverPort[userIsOnServer[receiverUserId]-1]; //hier wird ermittelt, auf welchem Server sich der User befindet und welchen Port (zur Threadidentifizierung dieser hat) -1 weil Servernummern ab 1 starten (doofe Sache)
+                if(portFromReciverServer == partner1ServerPort){
+                    syncThread1.sendMessageToOtherServer(message, sendUserId, receiverUserId);
+                } else if (portFromReciverServer == partner2ServerPort) {
+                    syncThread2.sendMessageToOtherServer(message, sendUserId, receiverUserId);
+                }else{
+                    syncThread1.sendMessageToOtherServer(message, sendUserId, receiverUserId);
+                }
+            }
         } catch (Exception e) {
             System.out.println(ANSI_RED + "Sync Server nicht gefunden" + ANSI_RESET);
         }

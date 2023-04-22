@@ -5,7 +5,7 @@ public class Server3 {
 
         public static void main(String[] args) {
             System.out.println("Server 3 wird gestartet");
-            int port = 8990;//Server 2 läuft immer auf Port 8990 Server 1 auf 8989 Server 3 auf 8991
+            int port = 8990;//Server 3 läuft immer auf Port 8990 Server 1 auf 8989 Server 3 auf 8991
             int partner1ServerPort = 8991;
             int partner2ServerPort = 8992;
             int serverReciverPort = 8993;
