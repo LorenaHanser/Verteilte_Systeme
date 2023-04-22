@@ -131,7 +131,7 @@ public class Server {
 
     void sendMessageToServer(MessageClient messageClient) {
         if (!mcsHandler.isServerBlocked()) {
-            findServer(messageClient.getReceiverId()).sendMessageToOtherServer(messageClient);
+            findServer(messageClient.getUserId(), messageClient.getReceiverId()).sendMessageToOtherServer(messageClient);
             sendMessage(messageClient);
 
         } else {
@@ -157,7 +157,7 @@ public class Server {
         }
     }
 
-    ServerConnectorThread findServer(int chatPartnerID) {
+    ServerConnectorThread findServer(int userID, int chatPartnerID) {
         if (userIsOnServer[chatPartnerID] > 0) {
             int portFromReciverServer = serverPort[userIsOnServer[chatPartnerID] - 1]; //hier wird ermittelt, auf welchem Server sich der User befindet und welchen Port (zur Threadidentifizierung dieser hat) -1 weil Servernummern ab 1 starten (doofe Sache)
             if (portFromReciverServer == partner1ServerPort & mcsHandler.isServer1Online()) {
@@ -167,10 +167,29 @@ public class Server {
             }
         }
             if (mcsHandler.isServer1Online()) {
+                fileHandler.askForSynchronization(userID, chatPartnerID, syncThread1);
                 return syncThread1;
             } else if (mcsHandler.isServer2Online()) {
+                fileHandler.askForSynchronization(userID, chatPartnerID, syncThread2);
                 return syncThread2;
             }
+
+        throw new RuntimeException("Kein anderer Server online");
+    }
+    ServerConnectorThread findServerForSync(int chatPartnerID) {
+        if (userIsOnServer[chatPartnerID] > 0) {
+            int portFromReciverServer = serverPort[userIsOnServer[chatPartnerID] - 1]; //hier wird ermittelt, auf welchem Server sich der User befindet und welchen Port (zur Threadidentifizierung dieser hat) -1 weil Servernummern ab 1 starten (doofe Sache)
+            if (portFromReciverServer == partner1ServerPort & mcsHandler.isServer1Online()) {
+                return syncThread1;
+            } else if (portFromReciverServer == partner2ServerPort & mcsHandler.isServer2Online()) {
+                return syncThread2;
+            }
+        }
+        if (mcsHandler.isServer1Online()) {
+            return syncThread1;
+        } else if (mcsHandler.isServer2Online()) {
+            return syncThread2;
+        }
 
         throw new RuntimeException("Kein anderer Server online");
     }
@@ -186,7 +205,7 @@ public class Server {
     }
 
     MessageSync requestSynchronization(MessageSync sendMessageSync) {
-        MessageSync message = findServer(sendMessageSync.getReceiverId()).requestSynchronization(sendMessageSync);
+        MessageSync message = findServerForSync(sendMessageSync.getReceiverId()).requestSynchronization(sendMessageSync);
         System.out.println("============================= Antwort ist da ======================");
         System.out.println(message.toString());
         return message;

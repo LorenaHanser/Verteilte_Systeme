@@ -299,4 +299,42 @@ public class FileHandler {
             e.printStackTrace();
         }
     }
+    protected void askForSynchronization(int ownID, int chatPartnerID, ServerConnectorThread syncThread) {
+
+        String ownPath = this.path;
+        String ownFilename = this.getFilename(ownID, chatPartnerID);
+
+        String contentServer1 = readWholeChatFile(ownPath, ownFilename);
+        String[] contentServer1Array = contentServer1.split("\n");
+
+        File ownServerFile = new File(ownPath + ownFilename + ENDING);
+
+        long ownLastModified = ownServerFile.lastModified();
+        Timestamp ownTimestamp = new Timestamp(ownLastModified);
+
+        // trigger receiver to synchronize with synchronize
+        try {
+            MessageSync triggerSync = new MessageSync(ownID, MessageSync.SYNC_REQUEST, chatPartnerID, ownTimestamp, contentServer1Array);
+
+            MessageSync response = syncThread.requestSynchronization(triggerSync); //hier bekommt man die antwort des anderen Servers
+
+            System.out.println("=======================Bin im Sync der den anderen Server anfragt==========================");
+            System.out.println(response.getContentAsString());
+            System.out.println("=====================================Ende==================================================");
+            System.out.println("Wir sind jetzt im Filehandler: ");
+            // Auswerten der Antwort
+            if (Arrays.equals(response.getContent(), Server.OK)) {
+                System.out.println("Sync war nicht nötig! Alles ist gut gelaufen.");
+            } else {
+                String synchronizedFileContentAsString = response.getContentAsString().replaceAll(";", "\n");
+                System.out.println(synchronizedFileContentAsString);
+                System.out.println(ownServerFile.delete());
+                this.writeWholeChatfile(synchronizedFileContentAsString, this.getFilename(response.getUserId(), response.getReceiverId()), this.path);
+                System.out.println("Sync war nötig! Datei wurde neu beschrieben.");
+            }
+        } catch (Exception e) {
+            System.out.println(Server.ANSI_RED + "Anderer Server ist nicht online" + Server.ANSI_RESET);
+            e.printStackTrace();
+        }
+    }
 }
