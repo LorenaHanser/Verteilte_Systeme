@@ -2,8 +2,10 @@ package teil1;
 
 import java.io.*;
 import java.net.Socket;
-import java.net.UnknownHostException;
 
+/**
+ * Klasse ServerConnectorThread
+ */
 public class ServerConnectorThread extends Thread {
 
     private String hostname;
@@ -36,9 +38,10 @@ public class ServerConnectorThread extends Thread {
         this.reader = reader;
         this.server = server;
         this.isThreadAlreadyConnected = true;
-//Hier mögliche Fehelrquele durch fehlednes Output
+        //Hier mögliche Fehelrquele durch fehlednes Output
     }
 
+    @Override
     public void run() {
         while (true) {
 
@@ -80,8 +83,8 @@ public class ServerConnectorThread extends Thread {
                 System.out.println(Server.ANSI_RED + "Verbindung verloren" + Server.ANSI_RESET);
                 isServerDown = true;
                 server.setUserOffline();
-            } catch (UnknownHostException ex) {
-            } catch (IOException ex) {
+            } catch (Exception e) {
+
             }
         }
     }
@@ -92,9 +95,9 @@ public class ServerConnectorThread extends Thread {
     }
 
     protected MessageSync requestSynchronization(MessageSync messageSync) {
-        if(isServerDown){
+        if (isServerDown) {
             throw new RuntimeException("Server Verbindung ist down");
-        } else{
+        } else {
             MessageSync answer = null;
             System.out.println("=========== Setzte answerIsThere -> false ===========");
             answerIsThere = false;
@@ -107,7 +110,7 @@ public class ServerConnectorThread extends Thread {
                 try {
                     i++;
                     Thread.sleep(1000);
-                    if(i==10){
+                    if (i == 10) {
                         break;
                     }
                 } catch (InterruptedException e) {

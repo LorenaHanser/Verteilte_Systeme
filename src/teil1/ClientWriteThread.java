@@ -4,58 +4,61 @@ import java.io.*;
 import java.net.*;
 import java.sql.Timestamp;
 
+/**
+ * Liest Konsoleneingaben des Clients aus und leitet diese zur Weiterverarbeitung an den Server weiter.
+ */
 public class ClientWriteThread extends Thread {
 
     private PrintWriter writer;
     private Socket socket;
     private Client client;
 
-    private final String DISCONNECT = "DISCONNECT";
-    private final String SHUTDOWN = "SHUTDOWN";
-
-    // Konstruktor
-
+    /**
+     * Konstruktor
+     * @param socket
+     * @param client
+     */
     public ClientWriteThread(Socket socket, Client client) {
         this.socket = socket;
         this.client = client;
 
         try {
-            // Schreiben der Chatnachricht
             OutputStream output = socket.getOutputStream();
             writer = new PrintWriter(output, true);
         } catch (IOException ex) {
             System.out.println(Server.ANSI_RED + "Error getting output stream: " + ex.getMessage() + Server.ANSI_RESET);
-            ex.printStackTrace();
         }
     }
 
+    /**
+     * Die Methode liest zu Beginn den Nutzernamen des Clients aus.
+     * Danach werden in einer Schleife so lange die neuen Konsoleneingaben des Clients gelesen, bis eines der Schlüsselwörter "DISCONNECT" oder "SHUTDOWN" gelesen wird.
+     * <p>
+     * Es folgt ein Dialog mit "Möchten Sie weiter chatten? (y/n)", ob der Chatraum gewechselt werden oder der Client vollständig getrennt werden soll
+     */
+    @Override
     public void run() {
 
         boolean reconnect = false;
 
         BufferedReader userIn = new BufferedReader(new InputStreamReader(System.in));
 
-        String userName = null;
+        String userName = "";
         try {
             userName = userIn.readLine();
         } catch (IOException e) {
-            System.out.println(Server.ANSI_RED + "!!!!!!!!!!!!!!!!!! Fehler 1 in WriteThread!!!!!!!!!!!!!!!!!!!!!!!" + Server.ANSI_RESET);
-            throw new RuntimeException(e);
-
+            System.out.println(Server.ANSI_RED + "Fehler 1 in WriteThread!" + Server.ANSI_RESET);
         }
         client.setUserName(userName);
         writer.println(userName);
 
-        String text;
+        String text = "";
         Timestamp timestamp;
 
-        // Endlosschleife
         do {
-            // switch/case
             try {
                 text = userIn.readLine();
                 timestamp = new Timestamp(System.currentTimeMillis());
-                //System.out.println("-- wir sind in ClientWriteThread run()");
                 if (text.trim().isEmpty()) {
                     System.out.println(Server.ANSI_RED + "Leere Texteingaben sind nicht erlaubt!" + Server.ANSI_RESET);
                 } else {
@@ -63,19 +66,18 @@ public class ClientWriteThread extends Thread {
                     writer.println(message); // Nachricht senden
                 }
             } catch (IOException e) {
-                System.out.println(Server.ANSI_RED + "!!!!!!!!!!!!!!!!!! Fehler 2 in WriteThread!!!!!!!!!!!!!!!!!!!!!!!" + Server.ANSI_RESET);
-                throw new RuntimeException(e);
+                System.out.println(Server.ANSI_RED + "Fehler 2 in WriteThread!" + Server.ANSI_RESET);
             }
-            if (text.equals(DISCONNECT)) {
-                reconnect = true; // Flag setzen
-                break; // Schleife beenden, und Socket noch nicht schließen
-            } else if (text.equals(SHUTDOWN)) {
-                break; // Schleife beenden, und Socket schließen
+
+            if (text.equals(Client.DISCONNECT)) {
+                reconnect = true;   // Flag setzen
+                break;              // Schleife beenden, und Socket noch nicht schließen
+            } else if (text.equals(Client.SHUTDOWN)) {
+                break;              // Schleife beenden, und Socket schließen
             }
         } while (true);
 
         if (reconnect) {
-            // Client fragen, ob er sich neu verbinden möchte
             reconnect = false;
             System.out.println(Server.ANSI_PURPLE + "Möchten Sie weiter chatten? (y/n)" + Server.ANSI_RESET);
             try {
@@ -101,8 +103,9 @@ public class ClientWriteThread extends Thread {
                 socket.close();
                 System.exit(0);
             } catch (IOException ex) {
-                System.out.println(Server.ANSI_RED + "Error writing to server: " + ex.getMessage() + Server.ANSI_RESET);
+                System.out.println(Server.ANSI_RED + "Error: " + ex.getMessage() + Server.ANSI_RESET);
             }
         }
     }
+
 }
