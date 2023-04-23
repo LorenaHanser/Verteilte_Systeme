@@ -296,7 +296,7 @@ public class FileHandler {
             }
         } catch (Exception e) {
             System.out.println(Server.ANSI_RED + "Anderer Server ist nicht online" + Server.ANSI_RESET);
-            e.printStackTrace();
+            throw new RuntimeException("Anderer Server leider nicht online");
         }
     }
     protected void askForSynchronization(int ownID, int chatPartnerID, ServerConnectorThread syncThread) {

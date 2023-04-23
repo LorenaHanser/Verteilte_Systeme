@@ -104,8 +104,12 @@ public class ServerUserThread extends Thread {
 
             String clientMessage;
             //todo: hier ist die Ausgabe der File -> muss aktualisiert werden
-            server.sendMessage(fileHandler.readWholeChatFile(ownID, chatPartnerID), ownID); // bisheriger Chat wird an den Client übergeben
-
+            try {
+                server.sendMessage(fileHandler.readWholeChatFile(ownID, chatPartnerID), ownID); // bisheriger Chat wird an den Client übergeben
+            }catch (Exception e){
+                writer.println(Server.ANSI_RED + "Es tut uns sehr leid, aber leider haben wir ein Technisches Problem.\n Sie werden jetzt abgemeldet! \n Bitte versuchen Sie es später erneut! Sollte dieses Problem weiterhin bestehen, wenden Sie sich bitte an den Support!" + Server.ANSI_RESET);
+                socket.close();
+            }
             // Endlosschleife
 
             do {
