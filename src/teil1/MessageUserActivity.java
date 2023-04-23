@@ -158,12 +158,10 @@ public class MessageUserActivity extends Message {
                     int status = Integer.parseInt(attributes[2]);
                     return new MessageUserActivity(userId, serverId, status);
                 } else {
-                    System.out.println(Server.ANSI_RED + "MessageUserActivity konnte nicht ausgewertet werden" + Server.ANSI_RESET);
                     throw new RuntimeException();
                 }
             }
         } catch (Exception e) {
-            System.out.println(Server.ANSI_RED + "Fehler bei MessageUserActivity.toObject(): " + e.getMessage() + Server.ANSI_RESET);
             return new MessageUserActivity(-100, -100, -100);
         }
     }
