@@ -102,7 +102,7 @@ private boolean isServerDown;
     }
 
     protected MessageSync requestSynchronization(MessageSync messageSync) {
-        if(!isServerDown){
+        if(isServerDown){
             throw new RuntimeException("Server Verbindung ist down");
         } else{
             MessageSync answer = null;
