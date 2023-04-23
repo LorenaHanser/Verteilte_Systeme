@@ -1,4 +1,4 @@
-package teil1;
+package teil2;
 
 import java.net.*;
 import java.io.*;
@@ -55,7 +55,7 @@ public class Client {
      * Setzt den Nutzernamen des Clients
      * @param userName vom Nutzer eingegebener Nutzername
      */
-    public void setUserName(String userName) {
+    void setUserName(String userName) {
         this.userName = userName;
     }
 
@@ -69,8 +69,8 @@ public class Client {
     public static void main(String[] args) {
 
         String hostname = "localhost";
-        int port = 8989;
-        int randomNumber = (int) (Math.random() * 2);
+        int port = 8988;
+        int randomNumber = (int) (Math.random() * 3);
         port = port + randomNumber;
 
         Client client = new Client(hostname, port);
