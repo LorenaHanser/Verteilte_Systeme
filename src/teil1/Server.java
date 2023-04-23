@@ -62,7 +62,7 @@ public class Server {
     //Variablen für den anderen Server
     private int partner1ServerPort; //Port des Partnerservers (Port für Serverkommunikation)
     private int partner2ServerPort; //Port des 2.Partnerservers (Port für Serverkommunikation)
-    private String partnerServerAdress = "localhost"; //hier die Adresse des anderen Server eintragen.
+    private String partnerServerAddress = "localhost"; //hier die Adresse des anderen Server eintragen.
     private ServerConnectorThread syncThread1;
     private ServerConnectorThread syncThread2;
     private ServerConnectorThread syncThreadArray[] = new ServerConnectorThread[2];
@@ -112,8 +112,8 @@ public class Server {
         System.out.println(ANSI_YELLOW + "Server wird gebootet" + ANSI_RESET);
         fileHandler = new FileHandler(this, serverNumber);
         System.out.println(ANSI_YELLOW + "Sync ServerThread gestartet" + ANSI_RESET);
-        syncThread1 = new ServerConnectorThread(partnerServerAdress, partner1ServerPort, this, mcsHandler, 1); // hier noch 2. Port anmelden
-        syncThread2 = new ServerConnectorThread(partnerServerAdress, partner2ServerPort, this, mcsHandler, 2); // hier noch 2. Port anmelden
+        syncThread1 = new ServerConnectorThread(partnerServerAddress, partner1ServerPort, this, mcsHandler, 1); // hier noch 2. Port anmelden
+        syncThread2 = new ServerConnectorThread(partnerServerAddress, partner2ServerPort, this, mcsHandler, 2); // hier noch 2. Port anmelden
         syncThread1.start();
         syncThread2.start();
         try {
@@ -209,10 +209,10 @@ public class Server {
 
     ServerConnectorThread findServer(int userID, int chatPartnerID) {
         if (userIsOnServer[chatPartnerID] > 0) {
-            int portFromReciverServer = serverPort[userIsOnServer[chatPartnerID] - 1];
-            if (portFromReciverServer == partner1ServerPort & mcsHandler.isServer1Online()) {
+            int portFromReceiverServer = serverPort[userIsOnServer[chatPartnerID] - 1];
+            if (portFromReceiverServer == partner1ServerPort & mcsHandler.isServer1Online()) {
                 return syncThread1;
-            } else if (portFromReciverServer == partner2ServerPort & mcsHandler.isServer2Online()) {
+            } else if (portFromReceiverServer == partner2ServerPort & mcsHandler.isServer2Online()) {
                 return syncThread2;
             }
         }
@@ -229,10 +229,10 @@ public class Server {
 
     ServerConnectorThread findServerForSync(int chatPartnerID) {
         if (userIsOnServer[chatPartnerID] > 0) {
-            int portFromReciverServer = serverPort[userIsOnServer[chatPartnerID] - 1];
-            if (portFromReciverServer == partner1ServerPort & mcsHandler.isServer1Online()) {
+            int portFromReceiverServer = serverPort[userIsOnServer[chatPartnerID] - 1];
+            if (portFromReceiverServer == partner1ServerPort & mcsHandler.isServer1Online()) {
                 return syncThread1;
-            } else if (portFromReciverServer == partner2ServerPort & mcsHandler.isServer2Online()) {
+            } else if (portFromReceiverServer == partner2ServerPort & mcsHandler.isServer2Online()) {
                 return syncThread2;
             }
         }
