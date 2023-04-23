@@ -23,8 +23,8 @@ public class ServerReceiverThread extends Thread {
      *
      * @param socket                   Port des Servers
      * @param server                   Entsprechendes Objekt der Klasse {@link Server}
-     * @param serverReceiverMainThread
-     * @param threadNumber
+     * @param serverReceiverMainThread gibt den serverReceiverMainThread mit, der die ServerReceiverThreads verwaltet
+     * @param threadNumber gibt den serverReceiverThread eine ID mit, diese wird benötigt um den Thread im serverReceiverMainThread, zu identifizieren
      */
     public ServerReceiverThread(Socket socket, Server server, ServerReceiverMainThread serverReceiverMainThread, int threadNumber) {
         this.socket = socket;
@@ -37,6 +37,7 @@ public class ServerReceiverThread extends Thread {
     /**
      * In der Methode verbindet sich der Thread mit seinem SyncServer.
      * Je nachdem, welche Nachricht vom anderen Server empfangen wird, wird diese unterschiedlich verarbeitet, indem eine der nachfolgenden Methoden aufgerufen wird.
+     * Der serverReceiverThread löscht sich automatisch aus dem serverReceiverMainThread raus, wenn die Verbindung unterbrochen wird.
      */
     @Override
     public void run() {
