@@ -122,7 +122,7 @@ public class Server {
                 Socket socket = serverSocket.accept();
                 System.out.println(ANSI_YELLOW + "Neuer Nutzer verbunden" + ANSI_RESET);
                 needUserStateSync = false;
-                ServerUserThread newUser = new ServerUserThread(socket, this, serverNumber, fileHandler);
+                ServerUserThread newUser = new ServerUserThread(socket, this, fileHandler);
                 userThreads.add(newUser);
                 newUser.start();
             }
