@@ -25,7 +25,7 @@ public class ServerUserThread extends Thread {
      *
      * @param socket       Verbindungsanschluss zwischen Client und Server
      * @param server       Server Klasse damit man auf die Server Methoden zugreifen kann
-     * @param fileHandler  Filehandler Klasse damit man auf die FileHandler Methoden zugreifen kann
+     * @param fileHandler  FileHandler Klasse damit man auf die FileHandler Methoden zugreifen kann
      */
     public ServerUserThread(Socket socket, Server server, FileHandler fileHandler) {
         this.socket = socket;
@@ -35,11 +35,11 @@ public class ServerUserThread extends Thread {
     }
 
     /**
-     * run-Methode des Threads um die Verbindung zu einem beliebigen Client herzustellen
-     * Authentifizierungsprozzess wird durchlaufen {link {@link ServerUserThread}} {@link #userSuccessfullyAuthenticated}
-     * Es werden sowohl die Referenzvariablen auf den passenden Thread dem User-Array gleichgesetzt mit {link {@link Server#setThreadId(String, ServerUserThread)}}
-     * als auch die passende User-Id des neu angemeldeten Clients übermittelt
-     * Die Datei wird mit {@link FileHandler#readWholeChatFile(int, int)} gelesen und dem User zur Verfügung gestellt
+     * run-Methode des Threads um die Verbindung zu einem beliebigen Client herzustellen.
+     * Authentifizierungsprozess wird durchlaufen {link {@link ServerUserThread}} {@link #userSuccessfullyAuthenticated}.
+     * Es werden sowohl die Referenzvariablen auf den passenden Thread dem User-Array gleichgesetzt mit {link {@link Server#setThreadId(String, ServerUserThread)}},
+     * als auch die passende UserId des neu angemeldeten Clients übermittelt.
+     * Die Datei wird mit {@link FileHandler#readWholeChatFile(int, int)} gelesen und dem User zur Verfügung gestellt.
      * Am Ende geht die Methode in eine Endlosschleife, um Eingaben des Clients zu erfassen und weiterzuleiten.
      */
     @Override
@@ -109,7 +109,7 @@ public class ServerUserThread extends Thread {
                 if (serverMessage != null) {
                     server.sendMessageToServer(new MessageClient(serverMessage, ownID, chatPartnerID));
                 } else {
-                    System.out.println(Server.ANSI_RED + "Servermessage ist null" + Server.ANSI_RESET);
+                    System.out.println(Server.ANSI_RED + "ServerMessage ist null" + Server.ANSI_RESET);
                 }
 
             } while (!getText(serverMessage).equals(DISCONNECT) && !getText(serverMessage).equals((SHUTDOWN)));

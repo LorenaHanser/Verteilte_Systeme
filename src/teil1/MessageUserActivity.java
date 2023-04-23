@@ -139,7 +139,7 @@ public class MessageUserActivity extends Message {
             string = string.replace("\n", "");
             String[] header = string.split(SPLIT_SYMBOL, 3);
 
-            int Category = Integer.parseInt(header[0]);
+            int category = Integer.parseInt(header[0]);
             int type = Integer.parseInt(header[1]);
             if (type == 2) {
                 return new MessageUserActivity(type);
@@ -158,7 +158,7 @@ public class MessageUserActivity extends Message {
                     int status = Integer.parseInt(attributes[2]);
                     return new MessageUserActivity(userId, serverId, status);
                 } else {
-                    System.out.println(Server.ANSI_RED + "MessageUserAcivity konnte nicht ausgewertet werden" + Server.ANSI_RESET);
+                    System.out.println(Server.ANSI_RED + "MessageUserActivity konnte nicht ausgewertet werden" + Server.ANSI_RESET);
                     throw new RuntimeException();
                 }
             }

@@ -10,7 +10,7 @@ public class Server2 {
      * Dabei läuft dieser {@link Server2} auf einem anderen Port als ein in der Klasse {@link Server} erstelltes Objekt.
      * <p>
      * {@link Server2} kann auch vor {@link Server} gestartet werden.
-     * @param args
+     * @param args String[]
      */
     public static void main(String[] args) {
         System.out.println(Server.ANSI_YELLOW + "Server 2 wird gestartet" + Server.ANSI_RESET);

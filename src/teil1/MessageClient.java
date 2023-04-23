@@ -64,11 +64,11 @@ public class MessageClient extends Message {
     }
 
     public void setContent(String content) {
-        String filterdContent = content;
+        String filteredContent = content;
         if(content != null){
-            filterdContent = content.replace("*", "");
+            filteredContent = content.replace("*", "");
         }
-        this.content = filterdContent;
+        this.content = filteredContent;
     }
 
     public String getUserName() {

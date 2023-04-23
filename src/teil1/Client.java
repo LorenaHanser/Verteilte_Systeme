@@ -64,7 +64,7 @@ public class Client {
      * <p>
      * Hier wird die Lastverteilung ausgeführt, indem mit {@link Math#random()} eine Zufallszahl generiert wird, die entweder 0 oder 1 ist.
      * Diese wird zum Port des ersten Servers dazu addiert.
-     * @param args
+     * @param args String[]
      */
     public static void main(String[] args) {
 

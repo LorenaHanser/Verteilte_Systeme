@@ -135,7 +135,7 @@ public class Server {
     /**
      * Ein neues Objekt der Klasse {@link Server} wird erstellt und ausgeführt.
      *
-     * @param args
+     * @param args String[]
      */
     public static void main(String[] args) {
         int port = 8989;

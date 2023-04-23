@@ -4,7 +4,7 @@ import java.io.*;
 import java.net.Socket;
 
 /**
- * Klasse ServerConnectorThread damit die Verbindung zwischen den Servern besteht um
+ * Klasse ServerConnectorThread damit die Verbindung zwischen den Servern besteht, um
  * Messages an den anderen Server zu übermitteln. [EINBAHNSTRASSE: SENDEN]
  */
 public class ServerConnectorThread extends Thread {
@@ -35,8 +35,8 @@ public class ServerConnectorThread extends Thread {
     }
 
     /**
-     * run-Methode des Threads das bei {{@link ServerConnectorThread #run}} ausgeführt wird
-     * Thread sendet alle Nachrichten nach Kategorie von {{@link Message}} über passende Methoden an den Partnerserver
+     * run-Methode des Threads das bei {{@link ServerConnectorThread #run}} ausgeführt wird.
+     * Thread sendet alle Nachrichten nach Kategorie von {{@link Message}} über passende Methoden an den Partnerserver.
      */
     @Override
     public void run() {
@@ -82,10 +82,10 @@ public class ServerConnectorThread extends Thread {
 
     /**
      * Methode zum Anfragen einer Synchronisation der Dateien.
+     * Es wurde ein künstliches Delay eingeführt, um die Threads auszubremsen und zu warten bis er seine Antwort erhält.
+     * Außerdem wird aus dem erhaltenen MessageSync-Objekt ein String gemacht, damit dieses zu dem ReceiverThread übertragen werden kann mit {link {@link MessageSync#toString()}}.
      * @param messageSync Die Sync-Message mit Aufbau wird an die Methode weitergegeben. {link {@link MessageSync}}
      * @return Die Antwort auf die Anfrage zum Synchronisieren wird hier wieder zurückgegeben. ("OK"; "INHALT DER NEUEREN DATEI")
-     * Es wurde ein künstliches Delay eingeführt um die Threads auszubremsen und zu warten bis er seine Antwort erhält.
-     * Außerdem wird aus dem erhalten MessageSync-Objekt ein String gemacht damit dieses zu dem ReceiverThread übertragen werden kann mit {link {@link MessageSync#toString()}}
      */
     protected MessageSync requestSynchronization(MessageSync messageSync) {
         if (isServerDown | writer == null) {
@@ -113,9 +113,9 @@ public class ServerConnectorThread extends Thread {
     }
 
     /**
-     * Methode zum Senden der Chatnachricht an den anderen Server
+     * Methode zum Senden der Chatnachricht an den anderen Server.
+     * Außerdem wird aus dem erhaltenen messageClient-Objekt ein String gemacht damit dieses zu dem ReceiverThread übertragen werden kann mit {link {@link MessageClient#toString()}}.
      * @param messageClient Die Client-Message mit Aufbau wird an die Methode weitergegeben. {link {@link MessageClient}}
-     * Außerdem wird aus dem erhalten messageClient-Objekt ein String gemacht damit dieses zu dem ReceiverThread übertragen werden kann mit {link {@link MessageClient#toString()}}
      */
     protected void sendMessageToOtherServer(MessageClient messageClient) {
         try {
@@ -128,9 +128,9 @@ public class ServerConnectorThread extends Thread {
     }
 
     /**
-     * Methode zum Senden einer User-Aktivität an den anderen Server
+     * Methode zum Senden einer User-Aktivität an den anderen Server.
+     * Außerdem wird aus dem erhaltenen messageUserActivity-Objekt ein String gemacht damit dieses zu dem ReceiverThread übertragen werden kann mit {link {@link MessageUserActivity#toString()}}.
      * @param messageUserActivity Die UserActivity-Message mit Aufbau wird an die Methode weitergegeben. {link {@link MessageUserActivity}}
-     * Außerdem wird aus dem erhalten messageUserActivity-Objekt ein String gemacht damit dieses zu dem ReceiverThread übertragen werden kann mit {link {@link MessageUserActivity#toString()}}
      */
     protected void sendUserActivity(MessageUserActivity messageUserActivity) {
         try {
@@ -143,8 +143,8 @@ public class ServerConnectorThread extends Thread {
     }
 
     /**
-     * Methode fragt am anderen Server welche Userdaten er besitzt. Damit bringt er in Erfahrung welche User wo angemeldet sind.
-     * Außerdem wird aus dem erhalten messageUserActivity-Objekt ein String gemacht damit dieses zu dem ReceiverThread übertragen werden kann mit {link {@link MessageUserActivity#toString()}}
+     * Methode fragt den anderen Server, welche Userdaten er besitzt. Damit bringt er in Erfahrung welche User wo angemeldet sind.
+     * Außerdem wird aus dem erhaltenen messageUserActivity-Objekt ein String gemacht, damit dieses zu dem ReceiverThread übertragen werden kann mit {link {@link MessageUserActivity#toString()}}
      */
     protected void askForUserStatus() {
         MessageUserActivity syncUserDataRequest = new MessageUserActivity(Message.SERVER_SYNC_REQUEST);

@@ -5,7 +5,7 @@ import java.net.*;
 import java.sql.Timestamp;
 
 /**
- * Liest Konsoleneingaben des Clients aus und leitet diese zur Weiterverarbeitung an den Server weiter.
+ * Die Klasse liest Konsoleneingaben des Clients aus und leitet diese zur Weiterverarbeitung an den Server weiter.
  */
 public class ClientWriteThread extends Thread {
 
@@ -15,8 +15,8 @@ public class ClientWriteThread extends Thread {
 
     /**
      * Konstruktor
-     * @param socket
-     * @param client
+     * @param socket Socket
+     * @param client Client des Threads
      */
     public ClientWriteThread(Socket socket, Client client) {
         this.socket = socket;

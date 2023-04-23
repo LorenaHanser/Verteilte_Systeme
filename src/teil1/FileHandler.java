@@ -62,7 +62,7 @@ public class FileHandler {
                     PrintWriter myWriter = new PrintWriter(new FileWriter(path + filename + ENDING));
                     System.out.println(Server.ANSI_WHITE + "Datei " + filename + ENDING + " wurde neu erstellt." + Server.ANSI_RESET);
                     BufferedWriter myBufferedWriter = new BufferedWriter(new FileWriter(path + filename + ENDING, true));
-                    myBufferedWriter.write("[" + TIMESTAMP_FORMAT.format((System.currentTimeMillis())) + "] [" + " FILEHANDLER " + "]: " + "Chatfile zwischen " + filename);
+                    myBufferedWriter.write("[" + TIMESTAMP_FORMAT.format((System.currentTimeMillis())) + "] [" + " FILE_HANDLER " + "]: " + "Chatfile zwischen " + filename);
                     myBufferedWriter.newLine();
                     myBufferedWriter.close();
                     myWriter.close();
