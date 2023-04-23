@@ -30,6 +30,9 @@ public class ClientReadThread extends Thread {
         while (socket.isBound()) {
             try {
                 String response = reader.readLine();
+                if(response == null){
+                    throw new RuntimeException("Verbindung getrennt");
+                }
                 if (!response.contains("SHUTDOWN") && !response.contains("DISCONNECT")) {
                     System.out.println(response);
                 }
