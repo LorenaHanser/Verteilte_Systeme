@@ -4,12 +4,15 @@ import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+/**
+ * Klasse ServerConnectorThread damit die Verbindung zwischen den Servern besteht, um
+ * Messages an den anderen Server zu übermitteln. [EINBAHNSTRASSE: SENDEN]
+ */
 public class ServerConnectorThread extends Thread {
 
     private String hostname;
     private int port;
     private Server server;
-
     private PrintWriter writer;
     private BufferedReader reader;
     private Socket socket;
@@ -17,61 +20,54 @@ public class ServerConnectorThread extends Thread {
     private int threadNumber;
 
     private String response;
-    private String fullresponse;
     private boolean answerIsThere;
     private boolean answerIsPicked;
-    private boolean isThreadAlreadyConnected;
 
+    private boolean isServerDown;
 
-private boolean isServerDown;
-
+    /**
+     * Konstruktor
+     *
+     * @param hostname     hostname ist immer die Adresse des Partnerservers. Nötig um die Verbindung zu Server 2 zu ermöglichen.
+     * @param port         port ist immer der Port des Partnerservers. Nötig um die Verbindung zu Server 2 zu ermöglichen.
+     * @param server       Attribut um auf Methoden der Server-Klasse ausführen zu können
+     * @param mcsHandler
+     * @param threadNumber
+     */
     public ServerConnectorThread(String hostname, int port, Server server, MCSHandler mcsHandler, int threadNumber) {
         this.hostname = hostname;
         this.port = port;
         this.server = server;
         this.mcsHandler = mcsHandler;
         this.threadNumber = threadNumber;
-        this.isThreadAlreadyConnected = false;
     }
 
-    public ServerConnectorThread(Socket socket, PrintWriter writer, BufferedReader reader, Server server, MCSHandler mcsHandler, int threadNumber) {
-        this.socket = socket;
-        this.writer = writer;
-        this.reader = reader;
-        this.server = server;
-        this.mcsHandler = mcsHandler;
-        this.threadNumber = threadNumber;
-        this.isThreadAlreadyConnected = true;
-//Hier mögliche Fehelrquele durch fehlednes Output
-    }
-
+    /**
+     * run-Methode des Threads das bei {{@link ServerConnectorThread #run}} ausgeführt wird.
+     * Thread sendet alle Nachrichten nach Kategorie von {{@link Message}} über passende Methoden an den Partnerserver.
+     */
+    @Override
     public void run() {
         while (true) {
 
             try {
-                if (!isThreadAlreadyConnected) {
-                    isThreadAlreadyConnected = false;
-                    socket = new Socket(hostname, port);
-                    OutputStream output = socket.getOutputStream();
-                    writer = new PrintWriter(output, true);
-                    InputStream input = socket.getInputStream();
-                    reader = new BufferedReader(new InputStreamReader(input));
-                    System.out.println(Server.ANSI_YELLOW + "Sync Server verbunden" + Server.ANSI_RESET);
-                    isServerDown = false;
-                }
+                socket = new Socket(hostname, port);
+                OutputStream output = socket.getOutputStream();
+                writer = new PrintWriter(output, true);
+                InputStream input = socket.getInputStream();
+                reader = new BufferedReader(new InputStreamReader(input));
+                System.out.println(Server.ANSI_YELLOW + "Sync Server verbunden" + Server.ANSI_RESET);
+                isServerDown = false;
                 mcsHandler.setServerOnline(threadNumber);
                 while (socket.isConnected()) {
                     try {
                         response = reader.readLine();
-                        System.out.println(response);
                         if (Message.getMessageCategoryFromString(response) == Message.CATEGORY_SERVER_MESSAGE) {
                             answerIsPicked = true;
-                            System.out.println("Haben eine UserDataSync Nachricht erhalten");
                             server.handleUserStatusSync(response);
                         }
                         answerIsThere = true;
                         while (!answerIsPicked) {
-                            System.out.println("Nachricht ist da!!!");
                             try {
                                 Thread.sleep(1000);
                             } catch (InterruptedException e) {
@@ -89,80 +85,81 @@ private boolean isServerDown;
                 server.setUserOffline(threadNumber);
 
                 isServerDown = true;
-            } catch (UnknownHostException ex) {
-            } catch (IOException ex) {
+            } catch (Exception e) {
             }
             mcsHandler.setServerOffline(threadNumber);
         }
     }
 
-    private MessageClient sendSyncResponseToServer(MessageClient messageClient) {
-        //if(clientMessage.getType() == Server.)
-        return messageClient;//ist kaputt
-    }
-
+    /**
+     * Methode zum Anfragen einer Synchronisation der Dateien.
+     * Es wurde ein künstliches Delay eingeführt, um die Threads auszubremsen und zu warten bis er seine Antwort erhält.
+     * Außerdem wird aus dem erhaltenen MessageSync-Objekt ein String gemacht, damit dieses zu dem ReceiverThread übertragen werden kann mit {link {@link MessageSync#toString()}}.
+     * @param messageSync Die Sync-Message mit Aufbau wird an die Methode weitergegeben. {link {@link MessageSync}}
+     * @return Die Antwort auf die Anfrage zum Synchronisieren wird hier wieder zurückgegeben. ("OK"; "INHALT DER NEUEREN DATEI")
+     */
     protected MessageSync requestSynchronization(MessageSync messageSync) {
-        if(isServerDown){
-            throw new RuntimeException("Server Verbindung ist down");
-        } else{
-            MessageSync answer = null;
-            System.out.println("=========== Setzte answerIsThere -> false ===========");
+        if (isServerDown | writer == null) {
+            throw new RuntimeException(Server.ANSI_RED + "Server Verbindung ist verloren gegangen!" + Server.ANSI_RESET);
+        } else {
+            MessageSync answer;
             answerIsThere = false;
             writer.println(messageSync.toString());
-            System.out.println("====== In der Schliefe drinnen ===========");
             int i = 0;
             while (!answerIsThere) {
-                //Wartet, bis eine Antwort eintrifft, hier muss man das Timeout reinbauen
-                System.out.println("warte");
                 try {
                     i++;
                     Thread.sleep(1000);
-                    if(i==10){
+                    if (i == 10) {
                         break;
                     }
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
             }
-            System.out.println("====== Aus der Schliefe draußen ===========");
             answerIsPicked = true;
             answer = MessageSync.toObject(response);
-            System.out.println("toObject was gemacht");
             return answer;
         }
     }
 
-    // Senden einer ClientMessage zum anderen Server
+    /**
+     * Methode zum Senden der Chatnachricht an den anderen Server.
+     * Außerdem wird aus dem erhaltenen messageClient-Objekt ein String gemacht damit dieses zu dem ReceiverThread übertragen werden kann mit {link {@link MessageClient#toString()}}.
+     * @param messageClient Die Client-Message mit Aufbau wird an die Methode weitergegeben. {link {@link MessageClient}}
+     */
     protected void sendMessageToOtherServer(MessageClient messageClient) {
-        System.out.println(Server.ANSI_GREEN + "SENDEN: Message wird gesendet" + Server.ANSI_RESET);
         try {
             if (writer != null) {
                 writer.println(messageClient.toString());
             }
         } catch (Exception e) {
-            System.out.println(Server.ANSI_RED + "Gab beim Senden der Message einen ERROR im ServerConnectorThread" + Server.ANSI_RESET);
+            System.out.println(Server.ANSI_RED + "Es gab beim Senden der Message einen ERROR im ServerConnectorThread" + Server.ANSI_RESET);
         }
     }
 
+    /**
+     * Methode zum Senden einer User-Aktivität an den anderen Server.
+     * Außerdem wird aus dem erhaltenen messageUserActivity-Objekt ein String gemacht damit dieses zu dem ReceiverThread übertragen werden kann mit {link {@link MessageUserActivity#toString()}}.
+     * @param messageUserActivity Die UserActivity-Message mit Aufbau wird an die Methode weitergegeben. {link {@link MessageUserActivity}}
+     */
     protected void sendUserActivity(MessageUserActivity messageUserActivity) {
-        System.out.println(Server.ANSI_GREEN + "SENDEN: Useraktivität wird gesendet" + Server.ANSI_RESET);
         try {
             if (writer != null) {
                 writer.println(messageUserActivity.toString());
             }
         } catch (Exception e) {
-            System.out.println(Server.ANSI_RED + "Gab beim Senden der UserActivity einen ERROR im ServerConnectorThread" + Server.ANSI_RESET);
+            System.out.println(Server.ANSI_RED + "Es gab beim Senden der UserActivity einen ERROR im ServerConnectorThread" + Server.ANSI_RESET);
         }
     }
-    protected void askForUserStatus(){
-        try {
-            System.out.println(Server.ANSI_GREEN + "SENDEN: Haben UserDaten Angefragt" + Server.ANSI_RESET);
-            MessageUserActivity syncUserDataRequest = new MessageUserActivity(2);
-            writer.println(syncUserDataRequest.toString());
-            System.out.println(Server.ANSI_GREEN + "SENDEN:Fertig mit der Anfrage" + Server.ANSI_RESET);
-        } catch (Exception e) {
-            System.out.println(Server.ANSI_RED+"Userdaten konnten nicht abgefragt werden, weil Server "+threadNumber+" offline ist"+Server.ANSI_RESET);
-        }
+
+    /**
+     * Methode fragt den anderen Server, welche Userdaten er besitzt. Damit bringt er in Erfahrung welche User wo angemeldet sind.
+     * Außerdem wird aus dem erhaltenen messageUserActivity-Objekt ein String gemacht, damit dieses zu dem ReceiverThread übertragen werden kann mit {link {@link MessageUserActivity#toString()}}
+     */
+    protected void askForUserStatus() {
+        MessageUserActivity syncUserDataRequest = new MessageUserActivity(Message.SERVER_SYNC_REQUEST);
+        writer.println(syncUserDataRequest.toString());
     }
 }
 

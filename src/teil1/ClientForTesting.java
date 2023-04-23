@@ -4,8 +4,16 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+/**
+ * Diese Klasse haben wir für Entwicklungszwecke verwendet.
+ * Sie kann alternativ zu {@link Client} ausgeführt werden, um den Port des Servers nicht zufällig zugewiesen zu bekommen, sondern ihn selbst eingeben zu können.
+ * <p>
+ * Danach erstellt sie ein neues Objekt der Klasse {@link Client} und führt die {@link Client#execute()}-Methode aus.
+ */
 public class ClientForTesting {
+
     public static void main(String[] args) {
+
         try {
             BufferedReader userIn = new BufferedReader(new InputStreamReader(System.in));
             String hostname = "localhost";
@@ -26,6 +34,7 @@ public class ClientForTesting {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-}
 
+    }
+
+}

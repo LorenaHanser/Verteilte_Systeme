@@ -6,18 +6,30 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+/**
+ * Die Klasse kümmert sich um alles, was mit dem Lesen, Schreiben und Synchronisieren des Chatverlaufs in die .txt-Datei zu tun hat.
+ */
 public class FileHandler {
 
-    private String path;
     private final String[] FILENAMES = {"DanielDavid", "DanielLorena", "DavidLorena"};
     private final String ENDING = ".txt"; //Dateiendung der Textnachrichten
     private final String DIRECTORY_NAME = "Messages";
     private static final SimpleDateFormat TIMESTAMP_FORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss.SSS");
 
+    private String path;
     private String serverDirectoryName;
     private int serverNumber;
     private Server server;
 
+    /**
+     * Konstruktor
+     * <p>
+     * path wird abhängig vom Betriebssystem automatisch festgelegt
+     *
+     * @param server       Server, zu dem das neu erstellte Objekt gehört
+     * @param serverNumber Nummer des Servers
+     *
+     */
     public FileHandler(Server server, int serverNumber) {
         this.serverNumber = serverNumber;
         this.serverDirectoryName = DIRECTORY_NAME + serverNumber;
@@ -25,7 +37,11 @@ public class FileHandler {
         this.server = server;
     }
 
-    // Methode zur Erstellung von Messages-Ordner und Chatfiles
+    /**
+     * Die Methode wird zu Beginn vom {@link Server} ausgeführt, um die Ordner und .txt-Dateien auf dem Rechner zu erstellen.
+     * Zuerst wird der Ordner des Servers, z.B. "Messages1" erstellt.
+     * In diesem Ordner werden nachfolgend die drei Dateien "DanielDavid.txt", "DanielLorena.txt", "DavidLorena.txt" zum Speichern der entsprechenden Chatverläufe erstellt.
+     */
     public void create() {
         try {
             //Ordner erstellen
@@ -46,7 +62,7 @@ public class FileHandler {
                     PrintWriter myWriter = new PrintWriter(new FileWriter(path + filename + ENDING));
                     System.out.println(Server.ANSI_WHITE + "Datei " + filename + ENDING + " wurde neu erstellt." + Server.ANSI_RESET);
                     BufferedWriter myBufferedWriter = new BufferedWriter(new FileWriter(path + filename + ENDING, true));
-                    myBufferedWriter.write("[" + TIMESTAMP_FORMAT.format((System.currentTimeMillis())) + "] [" + " FILEHANDLER " + "]: " + "Chatfile zwischen " + filename);
+                    myBufferedWriter.write("[" + TIMESTAMP_FORMAT.format((System.currentTimeMillis())) + "] [" + " FILE_HANDLER " + "]: " + "Chatfile zwischen " + filename);
                     myBufferedWriter.newLine();
                     myBufferedWriter.close();
                     myWriter.close();
@@ -59,15 +75,29 @@ public class FileHandler {
         }
     }
 
-    // Methode, um eine Chatdatei zu lesen und in der Konsole anzeigen zu lassen
-    // zum Aufrufen von außerhalb der Klasse
+    /**
+     * Die Methode dient dazu, eine Chatdatei zu lesen und diese als String zurückzugeben.
+     * <p>
+     * Sie wird von außerhalb der Klasse aufgerufen.
+     * Erst wird der gespeicherte Chatverlauf synchronisiert und sortiert, dann ruft sie die "interne" Methode {@link FileHandler#readWholeChatFile(String, String)} auf.
+     *
+     * @param ownID         ID des eigenen Clients
+     * @param chatPartnerID ID des Chatpartners, mit dem der Client sich in einem Chatraum befindet
+     * @return Chatverlauf wird als String zurückgegeben mit dem Zusatz "Bisheriger Chat:\n"
+     */
     public String readWholeChatFile(int ownID, int chatPartnerID) {
         this.askForSynchronization(ownID, chatPartnerID);
         this.sortChatMessages(this.path + this.getFilename(ownID, chatPartnerID) + ENDING);
         return Server.ANSI_PURPLE + "Bisheriger Chat:\n" + Server.ANSI_BLUE + this.readWholeChatFile(path, this.getFilename(ownID, chatPartnerID)) + Server.ANSI_RESET;
     }
 
-    // zum Aufrufen innerhalb der Klasse File, damit die Methode synchronize() richtig ausgeführt werden kann
+    /**
+     * Die Methode ist zum Lesen einer Datei und wird nur von innerhalb der Klasse aufgerufen.
+     *
+     * @param path     Pfad zur zu lesenden Datei
+     * @param filename Dateiname der zu lesenden Datei
+     * @return Chatverlauf wird als String zurückgegeben
+     */
     public String readWholeChatFile(String path, String filename) {
         StringBuilder chat = new StringBuilder();
         String currentLine;
@@ -84,11 +114,17 @@ public class FileHandler {
         return chat.toString().trim();
     }
 
-    // Methode, um eine neue Chatnachricht in der .txt Datei zu speichern
-    // [06.04.2023 17:01:12] [Daniel]: Nachricht
+    /**
+     * Die Methode speichert eine neue Nachricht, welche als Objekt der Klasse {@link MessageClient} mitgegeben wird, in der entsprechenden .txt-Datei.
+     * <p>
+     * Die Idee ist, dass nur solche Nachrichten gespeichert werden, die keine Farbe haben und nicht die Schlüsselwörter "SHUTDOWN" oder "DISCONNECT" beinhalten.
+     * <p>
+     * Neue Nachrichten werden im folgenden Format gespeichert: [06.04.2023 17:01:12] [Daniel]: Das ist meine Nachricht
+     *
+     * @param messageClient Objekt, das alle Informationen zur neuen Datei als Attribute beinhaltet
+     */
     public void writeOneNewMessage(MessageClient messageClient) {
-        // todo: die Abfrage brauchen wir eigentlich mit dem neuen Protokoll nicht...
-        String[] notAllowedColors = {Server.ANSI_BLACK, Server.ANSI_RED, Server.ANSI_GREEN, Server.ANSI_YELLOW, Server.ANSI_BLUE, Server.ANSI_PURPLE, Server.ANSI_CYAN, Server.ANSI_WHITE, "SHUTDOWN", "DISCONNECT"};
+        String[] notAllowedColors = {Server.ANSI_BLACK, Server.ANSI_RED, Server.ANSI_GREEN, Server.ANSI_YELLOW, Server.ANSI_BLUE, Server.ANSI_PURPLE, Server.ANSI_CYAN, Server.ANSI_WHITE, Client.SHUTDOWN, Client.DISCONNECT};
         boolean writingAllowed = true;
         for (String notAllowedString : notAllowedColors) {
             if (messageClient.getContent().contains(notAllowedString)) {
@@ -116,7 +152,13 @@ public class FileHandler {
         }
     }
 
-    // Methode, um alle Textnachrichten der Datei in die andere Datei zu übertragen
+    /**
+     * Methode, um alle Textnachrichten der Datei in die andere Datei zu übertragen
+     *
+     * @param message  Inhalt, der in die Datei geschrieben werden soll
+     * @param path     Pfad zur Datei, in die geschrieben werden soll
+     * @param filename Dateiname zur Datei, in die geschrieben werden soll
+     */
     public void writeWholeChatfile(String message, String filename, String path) {
         try {
             BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(path + filename + ENDING, true));
@@ -129,7 +171,12 @@ public class FileHandler {
         }
     }
 
-    // Methode ermittelt den Pfad zum Speichern der Chatdateien abhängig von Betriebssystem und Nutzername
+    /**
+     * Methode ermittelt den Pfad zum Speichern der Chatdateien abhängig von Betriebssystem und Nutzername
+     *
+     * @param serverNumber Nummer des Servers
+     * @return Gibt den Pfad als String zurück
+     */
     public String getPath(int serverNumber) {
         String systemUserHome = System.getProperty("user.home");
         String systemOS = System.getProperty("os.name").toLowerCase();
@@ -149,7 +196,16 @@ public class FileHandler {
         return path;
     }
 
-    // Methode gibt aus zwei UserIDs den richtigen Dateinamen zurück
+    /**
+     * Methode gibt aus zwei UserIDs den richtigen Dateinamen zurück.
+     * <p>
+     * Achtung: Die Methode funktioniert in dieser Form nur für maximal 3 Clients, da über eine einfache Addition der userIDs der Dateiname errechnet wird.
+     * Sollte das System in Zukunft mehr als 3 Clients bedienen können, müsste eine andere Rechnung genutzt werden.
+     *
+     * @param ownID         eigene ID
+     * @param chatPartnerID ID des Chatpartners
+     * @return gibt den Dateinamen zurück
+     */
     public String getFilename(int ownID, int chatPartnerID) {
         String filename;
         int sum = ownID + chatPartnerID;
@@ -164,7 +220,13 @@ public class FileHandler {
         return filename;
     }
 
-    // Methode, um zwei Dateien wirklich verteilt zu synchronisieren
+    /**
+     * Methode, um zwei Dateien über das Netzwerk des verteilten Systems zu synchronisieren.
+     * Dabei werden die Dateien und deren Inhalte verglichen und dementsprechend nötige Schritte ausgeführt.
+     *
+     * @param otherServerFile Anfrage des anderen Servers als Objekt der Klasse {@link MessageSync}
+     * @return Antwort der Synchronisationsanfrage wird zurückgegeben, um über das Netzwerk verschickt zu werden.
+     */
     public MessageSync synchronize(MessageSync otherServerFile) {
         System.out.println("=======================Bin im Sync vom Server der Angefragt wurde==========================");
         System.out.println(otherServerFile.toString());
@@ -218,12 +280,17 @@ public class FileHandler {
         return syncResponse;
     }
 
+    /**
+     * Die Methode sortiert alle Nachrichten einer .txt-Datei nach ihren Zeitstempeln.
+     * Dazu werden alle Nachrichten der Datei ausgelesen und ihr Zeitstempel extrahiert.
+     * Dementsprechend werden die Nachrichten sortiert und wieder in die Datei zurückgeschrieben.
+     *
+     * @param pathToFile Pfad zur Datei, die sortiert werden soll
+     */
     public void sortChatMessages(String pathToFile) {
         try {
-            // Liste, um Daten aus Textdatei zu speichern
             List<String> lines = new ArrayList<>();
 
-            // Lesen der Daten aus der Textdatei und Speichern in der Liste
             BufferedReader reader = new BufferedReader(new FileReader(pathToFile));
             String line;
             while ((line = reader.readLine()) != null) {
@@ -231,7 +298,6 @@ public class FileHandler {
             }
             reader.close();
 
-            // Sortieren der Liste nach dem Timestamp
             Collections.sort(lines, new Comparator<String>() {
                 public int compare(String line1, String line2) {
                     int returnInt = 22;
@@ -247,7 +313,6 @@ public class FileHandler {
                 }
             });
 
-            // Zurückschreiben der sortierten Daten in die Textdatei
             BufferedWriter writer = new BufferedWriter(new FileWriter(pathToFile));
             for (String sortedLine : lines) {
                 writer.write(sortedLine.trim());
@@ -261,6 +326,10 @@ public class FileHandler {
         }
     }
 
+    /**
+     * @param ownID         eigene ID
+     * @param chatPartnerID ID des Chatpartners
+     */
     private void askForSynchronization(int ownID, int chatPartnerID) {
 
         String ownPath = this.path;
@@ -274,29 +343,22 @@ public class FileHandler {
         long ownLastModified = ownServerFile.lastModified();
         Timestamp ownTimestamp = new Timestamp(ownLastModified);
 
-        // trigger receiver to synchronize with synchronize
         try {
             MessageSync triggerSync = new MessageSync(ownID, MessageSync.SYNC_REQUEST, chatPartnerID, ownTimestamp, contentServer1Array);
 
-            MessageSync response = server.requestSynchronization(triggerSync); //hier bekommt man die antwort des anderen Servers
+            MessageSync response = server.requestSynchronization(triggerSync);
 
-            System.out.println("=======================Bin im Sync der den anderen Server anfragt==========================");
-            System.out.println(response.getContentAsString());
-            System.out.println("=====================================Ende==================================================");
-            System.out.println("Wir sind jetzt im Filehandler: ");
             // Auswerten der Antwort
             if (Arrays.equals(response.getContent(), Server.OK)) {
-                System.out.println("Sync war nicht nötig! Alles ist gut gelaufen.");
+                System.out.println(Server.ANSI_WHITE + "Synchronization war nicht nötig! Alles ist gut gelaufen." + Server.ANSI_RESET);
             } else {
                 String synchronizedFileContentAsString = response.getContentAsString().replaceAll(";", "\n");
-                System.out.println(synchronizedFileContentAsString);
-                System.out.println(ownServerFile.delete());
+                System.out.println(Server.ANSI_WHITE + "Die andere Datei wurde gelöscht: " + ownServerFile.delete() + Server.ANSI_RESET);
                 this.writeWholeChatfile(synchronizedFileContentAsString, this.getFilename(response.getUserId(), response.getReceiverId()), this.path);
-                System.out.println("Sync war nötig! Datei wurde neu beschrieben.");
+                System.out.println(Server.ANSI_WHITE + "Synchronization der Dateien war nötig! Datei wurde neu beschrieben." + Server.ANSI_RESET);
             }
         } catch (Exception e) {
             System.out.println(Server.ANSI_RED + "Anderer Server ist nicht online" + Server.ANSI_RESET);
-            throw new RuntimeException("Anderer Server leider nicht online");
         }
     }
     protected void askForSynchronization(int ownID, int chatPartnerID, ServerConnectorThread syncThread) {
@@ -337,4 +399,5 @@ public class FileHandler {
             e.printStackTrace();
         }
     }
+
 }

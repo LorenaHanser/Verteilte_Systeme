@@ -4,8 +4,16 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
-
+/**
+ * Um einen Server zu starten, muss diese Klasse ausgeführt werden.
+ * Sie stellt allgemeine Variablen bereit, startet die ServerThreads und beinhaltet zentrale Methoden.
+ */
 public class Server {
+
+    /**
+     * Die Farben für die Konsolenausgabe werden hier einmalig definiert, sodass von allen Klassen aus auf diese Farben zugegriffen werden kann.
+     */
+
     public static final String ANSI_RESET = "\u001B[0m";
     public static final String ANSI_BLACK = "\u001B[30m";
     public static final String ANSI_RED = "\u001B[31m";
@@ -16,13 +24,10 @@ public class Server {
     public static final String ANSI_CYAN = "\u001B[36m";
     public static final String ANSI_WHITE = "\u001B[37m";
 
-    //Für das Protokoll
-    //public static final int USER_ACTIVITY = 0;
-    //public static final int MESSAGE = 1;
+    // public static final int USER_ACTIVITY = 0;
+    // public static final int MESSAGE = 1;
     public static final int LOGGED_OUT = 0;
     public static final int LOGGED_IN = 1;
-    public static final int ANSWER_TO_MESSAGE = 0;
-    public static final int ACCEPT_MESSAGE = 0;
 
     public static final int NEW_MESSAGE = 0;
     public static final int NEW_MESSAGE_WITHOUT_TIMESTAMP = 1;
@@ -31,22 +36,32 @@ public class Server {
 
     public static final String[] OK = {"OK"};
 
+    /**
+     * Der Index der Nutzernamen wird als ID des Nutzers verwendet
+     */
+    public static final String[] USER_NAME_REGISTER = {"Daniel", "David", "Lorena"};
+
+
+    /**
+     * Attribute für Objekte der Klasse Server (auch für Synchronisation)
+     */
+
     private int port;
     private FileHandler fileHandler;
 
     private int serverNumber;
     protected boolean needUserStateSync;
 
-    public static final String[] USER_NAME_REGISTER = {"Daniel", "David", "Lorena"}; //Speichert die Usernamen der Index wird als Id für den User genutzt
-
     private final String[] USER_PASSWORD = {"hallo", "geheim", "test"};
 
 
-    //hier sind die Attribute für die Synchronisation
+    /**
+     * Variablen für den anderen Server
+     */
 
     //Variablen für den anderen Server
     private int partner1ServerPort; //Port des Partnerservers (Port für Serverkommunikation)
-    private int partner2ServerPort;
+    private int partner2ServerPort; //Port des 2.Partnerservers (Port für Serverkommunikation)
     private String partnerServerAdress = "localhost"; //hier die Adresse des anderen Server eintragen.
     private ServerConnectorThread syncThread1;
     private ServerConnectorThread syncThread2;
@@ -54,7 +69,10 @@ public class Server {
 
     protected MCSHandler mcsHandler;
 
-    //Variablen für den eigenen Server
+    /**
+     * Variablen für den eigenen Server
+     */
+
     private int serverReceiverPort;
     private ServerReceiverMainThread receiverSyncThread;
 
@@ -66,7 +84,15 @@ public class Server {
 
     private Set<ServerUserThread> userThreads = new HashSet<>(); //hier werden die Referenzvariablen gespeichert (kann man das überarbeiten?) Vorsicht vor Garbage Collector
 
-    // Konstruktor
+    /**
+     * Konstruktor
+     *
+     * @param port               Port des Servers
+     * @param partner1ServerPort Port für Synchronisierung, gehört Server 1
+     * @param partner2ServerPort Port für Synchronisierung, gehört Server 2
+     * @param serverReceiverPort Port für Synchronisation, gehört zu eigenem Server
+     * @param serverNumber       Nummer des Servers
+     */
     public Server(int port, int partner1ServerPort, int partner2ServerPort, int serverReceiverPort, int serverNumber) {
         System.out.println(ANSI_YELLOW + "Server 1 wird gestartet" + ANSI_RESET);
         this.serverNumber = serverNumber;
@@ -78,6 +104,10 @@ public class Server {
         this.needUserStateSync = true;
     }
 
+    /**
+     * Methode zum Hochfahren des Servers: Starten der Threads {@link ServerConnectorThread} und {@link ServerReceiverThread}.
+     * Wenn sich ein neuer Nutzer verbindet, wird einer neuer {@link ServerUserThread} gestartet.
+     */
     public void execute() {
         System.out.println(ANSI_YELLOW + "Server wird gebootet" + ANSI_RESET);
         fileHandler = new FileHandler(this, serverNumber);
@@ -88,30 +118,33 @@ public class Server {
         syncThread2.start();
         try {
             Thread.sleep(2000);
+        } catch (Exception e) {
+        }
+        try {
             syncThread1.askForUserStatus();
+        } catch (Exception e) {
+        }
+        try {
             syncThread2.askForUserStatus();
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
         }
 
         receiverSyncThread = new ServerReceiverMainThread(this, serverReceiverPort);
         receiverSyncThread.start();
-        System.out.println(ANSI_YELLOW + "Chat Server ist hochgefahren und bereit für Clienten " + port + ANSI_YELLOW);
         try (ServerSocket serverSocket = new ServerSocket(port)) {
 
-            System.out.println(ANSI_YELLOW + "Chat Server is listening on port " + port + ANSI_YELLOW);
+            System.out.println(ANSI_YELLOW + "Server läuft auf Port " + port + ANSI_RESET);
 
             fileHandler.create();
 
-            // Endlosschleife
             System.out.println(ANSI_YELLOW + "Server ist online" + ANSI_RESET);
             while (true) {
                 Socket socket = serverSocket.accept();
-                System.out.println(ANSI_YELLOW + "New user connected" + ANSI_YELLOW);
+                System.out.println(ANSI_YELLOW + "Neuer Nutzer verbunden" + ANSI_RESET);
                 needUserStateSync = false;
-                ServerUserThread newUser = new ServerUserThread(socket, this, serverNumber, fileHandler);
+                ServerUserThread newUser = new ServerUserThread(socket, this, fileHandler);
                 userThreads.add(newUser);
-                newUser.start(); //Thread startet mit User → Name unbekannt deswegen noch kein Eintrag in das userThreadRegister Array
-
+                newUser.start();
             }
 
         } catch (IOException ex) {
@@ -119,6 +152,11 @@ public class Server {
         }
     }
 
+    /**
+     * Ein neues Objekt der Klasse {@link Server} wird erstellt und ausgeführt.
+     *
+     * @param args String[]
+     */
     public static void main(String[] args) {
         int port = 8988;//Server 2 läuft immer auf Port 8990 Server 1 auf 8989 Server 3 auf 8991
         int partner1ServerPort = 8992;
@@ -129,6 +167,11 @@ public class Server {
         server.execute();
     }
 
+    /**
+     * Die Methode empfängt die mitgegebene {@link MessageClient} und ruft damit die Methode {@link Server#sendMessage(MessageClient)} auf.
+     *
+     * @param messageClient Nachricht, die an den Server geschickt werden soll
+     */
     void sendMessageToServer(MessageClient messageClient) {
         if (!mcsHandler.isServerBlocked()) {
             findServer(messageClient.getUserId(), messageClient.getReceiverId()).sendMessageToOtherServer(messageClient);
@@ -139,6 +182,13 @@ public class Server {
         }
     }
 
+
+    /**
+     * Die Methode nimmt eine {@link MessageClient} entgegen und schickt diese an den entsprechenden User, wenn dieser online ist.
+     * In jedem Fall wird die Nachricht in der .txt-Datei gespeichert.
+     *
+     * @param messageClient Nachricht eines Clients
+     */
     void sendMessage(MessageClient messageClient) {
         if (!mcsHandler.isServerBlocked()) {
             fileHandler.writeOneNewMessage(messageClient);
@@ -166,16 +216,17 @@ public class Server {
                 return syncThread2;
             }
         }
-            if (mcsHandler.isServer1Online()) {
-                fileHandler.askForSynchronization(userID, chatPartnerID, syncThread1);
-                return syncThread1;
-            } else if (mcsHandler.isServer2Online()) {
-                fileHandler.askForSynchronization(userID, chatPartnerID, syncThread2);
-                return syncThread2;
-            }
+        if (mcsHandler.isServer1Online()) {
+            fileHandler.askForSynchronization(userID, chatPartnerID, syncThread1);
+            return syncThread1;
+        } else if (mcsHandler.isServer2Online()) {
+            fileHandler.askForSynchronization(userID, chatPartnerID, syncThread2);
+            return syncThread2;
+        }
 
         throw new RuntimeException("Kein anderer Server online");
     }
+
     ServerConnectorThread findServerForSync(int chatPartnerID) {
         if (userIsOnServer[chatPartnerID] > 0) {
             int portFromReciverServer = serverPort[userIsOnServer[chatPartnerID] - 1]; //hier wird ermittelt, auf welchem Server sich der User befindet und welchen Port (zur Threadidentifizierung dieser hat) -1 weil Servernummern ab 1 starten (doofe Sache)
@@ -199,11 +250,23 @@ public class Server {
     }
 
 
+    /**
+     * Die Methode empfängt eine Synchronisationsanfrage eines anderen Servers und gibt die Antwort der Methode {@link FileHandler#synchronize(MessageSync)} zurück.
+     *
+     * @param receivedSyncMessage Empfangene Synchronisationsanfrage
+     * @return Gibt das Ergebnis von {@link FileHandler} zurück
+     */
     MessageSync receiveSynchronization(MessageSync receivedSyncMessage) {
         //System.out.println("Bin jetzt in Server bei receiveSynchronization " + receivedClientMessage);
         return fileHandler.synchronize(receivedSyncMessage);
     }
 
+    /**
+     * Die Methode wird vom {@link FileHandler} aufgerufen und gibt die Anfrage eines Servers zur Weiterverarbeitung weiter.
+     *
+     * @param sendMessageSync Synchronisierungsanfrage vom {@link FileHandler}
+     * @return Rückgabe der {@link MessageSync} an den {@link FileHandler}
+     */
     MessageSync requestSynchronization(MessageSync sendMessageSync) {
         MessageSync message = findServerForSync(sendMessageSync.getReceiverId()).requestSynchronization(sendMessageSync);
         System.out.println("============================= Antwort ist da ======================");
@@ -211,7 +274,13 @@ public class Server {
         return message;
     }
 
-    boolean checkUsernameExists(String userName) { //überprüft, ob der User existiert
+    /**
+     * Methode überprüft, ob ein Nutzername im Array USER_NAME_REGISTER existiert.
+     *
+     * @param userName Nutzername
+     * @return Gibt mit boolean zurück, ob der Nutzername existiert
+     */
+    public boolean checkUsernameExists(String userName) {
         boolean usernameValid = false;
         for (int i = 0; i < USER_NAME_REGISTER.length; i++) {
             if (USER_NAME_REGISTER[i].equals(userName)) {
@@ -222,7 +291,14 @@ public class Server {
         return usernameValid;
     }
 
-    boolean checkPasswordValid(String userName, String password) { //Überprüft, ob das Password das richtige ist
+    /**
+     * Methode überprüft, ob das Passwort zum angegebenen Nutzernamen passt.
+     *
+     * @param userName Nutzername
+     * @param password Passwort
+     * @return Gibt mit boolean zurück, ob das Passwort stimmt
+     */
+    public boolean checkPasswordValid(String userName, String password) {
         boolean passwordValid = false;
         for (int i = 0; i < USER_NAME_REGISTER.length; i++) {
             if (USER_NAME_REGISTER[i].equals(userName)) {
@@ -235,17 +311,29 @@ public class Server {
         return passwordValid;
     }
 
-    void setThreadId(String userName, ServerUserThread Thread) { //nachdem der User sich registriert hat, wird Referenz von Thread an den Platz vom User gespeichert → ab jetzt ist Thread erreichbar
+    /**
+     * Nachdem sich ein Nutzer angemeldet hat, wird Referenz des {@link ServerUserThread} an den Platz vom User gespeichert, sodass ab jetzt der Thread erreichbar ist.
+     *
+     * @param userName         Nutzername
+     * @param serverUserThread passender ServerUserThread
+     */
+    public void setThreadId(String userName, ServerUserThread serverUserThread) {
         for (int i = 0; i < USER_NAME_REGISTER.length; i++) {
             if (USER_NAME_REGISTER[i].equals(userName)) {
-                userThreadRegister[i] = Thread;
+                userThreadRegister[i] = serverUserThread;
                 userIsOnServer[i] = serverNumber;
                 break;
             }
         }
     }
 
-    int askForID(String username) { //Es wird geschaut, welche Id der User hat (Index von userNameRegister)
+    /**
+     * Die Methode schaut über den Index des userNameRegister, welche Id der User hat.
+     *
+     * @param username Nutzername
+     * @return UserId
+     */
+    public int askForID(String username) {
         int answer = -1;
         for (int i = 0; i < USER_NAME_REGISTER.length; i++) {
             if (username.equals(USER_NAME_REGISTER[i])) {
@@ -256,85 +344,96 @@ public class Server {
         return answer;
     }
 
-    void setChatPartner(int user, int chatPartner) { //der ChatPartner bzw. der Chatraum wird für den User gesetzt (ab jetzt kann er Nachrichten empfangen, aber nur von dem Partner)
-        userChattetWith[user] = chatPartner;
-
+    /**
+     * Die Methode setzt den ChatPartner bzw. der Chatraum für den User (ab jetzt kann er Nachrichten empfangen, aber nur von dem Partner).
+     *
+     * @param userId
+     * @param chatPartnerId
+     */
+    public void setChatPartner(int userId, int chatPartnerId) {
+        userChattetWith[userId] = chatPartnerId;
     }
 
-    void removeChatPartner(int user) { //der ChatPartner bzw. der Chatraum wird für den User gesetzt (ab jetzt kann er Nachrichten empfangen, aber nur von dem Partner)
-        userChattetWith[user] = -1;
-
+    /**
+     * Die Methode setzt den ChatPartner bzw. den Chatraum des Users zurück
+     *
+     * @param userId eigene Id
+     */
+    public void removeChatPartner(int userId) {
+        userChattetWith[userId] = -1;
     }
 
-    // When a client is disconnected, removes the UserThread
-    void removeUser(ServerUserThread aUser) { //noch von Tutorial
-        userThreads.remove(aUser);
+    /**
+     * Die Methode setzt den ChatPartner bzw. den Chatraum des Users zurück
+     *
+     * @param serverUserThread ServerUserThread des Nutzers
+     */
+    public void removeUser(ServerUserThread serverUserThread) {
+        userThreads.remove(serverUserThread);
     }
 
-    void removeUserThread(int userID, ServerUserThread serverUserThread) {
+    /**
+     * Die Methode setzt den {@link ServerUserThread} des Nutzers im {@link Server#userThreadRegister} auf null.
+     *
+     * @param userID           eigene ID
+     * @param serverUserThread ServerUserThread des Nutzers
+     */
+    public void removeUserThread(int userID, ServerUserThread serverUserThread) {
         removeUser(serverUserThread);
         userThreadRegister[userID] = null;
-
     }
 
-    int getServerNumber() {
+    public int getServerNumber() {
         return serverNumber;
     }
 
-    void setUserLoggedIn(int userID) {
+    public void setUserLoggedIn(int userID) {
         MessageUserActivity newActivity = new MessageUserActivity(userID, getServerNumber(), LOGGED_IN);
         syncThread1.sendUserActivity(newActivity);
         syncThread2.sendUserActivity(newActivity);
         changeUserActivity(newActivity);
     }
 
-    void setUserLoggedOut(int userID) {
+    public void setUserLoggedOut(int userID) {
         MessageUserActivity newActivity = new MessageUserActivity(userID, getServerNumber(), LOGGED_OUT);
-        System.out.println();
         syncThread1.sendUserActivity(newActivity);
         syncThread2.sendUserActivity(newActivity);
         changeUserActivity(newActivity);
     }
 
-    void changeUserActivity(MessageUserActivity messageUserActivity) {
+    /**
+     * Die Methode ruft je nach Nutzeraktivität andere Methoden auf.
+     *
+     * @param messageUserActivity Nutzeraktivität
+     */
+    public void changeUserActivity(MessageUserActivity messageUserActivity) {
         needUserStateSync = false;
         if (messageUserActivity.getStatus() == LOGGED_IN) {
             userIsOnServer[messageUserActivity.getUserId()] = messageUserActivity.getServerId();
         } else if (messageUserActivity.getStatus() == LOGGED_OUT) {
             userIsOnServer[messageUserActivity.getUserId()] = 0;
         }
-        System.out.println(Server.ANSI_GREEN + "==========================User is on Server Array==========================" + Server.ANSI_RESET);
-        for (int i = 0; i < 3; i++) {
-            System.out.println(Server.ANSI_GREEN + this.getUserIsOnServer(i) + Server.ANSI_RESET);
-        }
-        System.out.println(Server.ANSI_GREEN + "============================================================================" + Server.ANSI_RESET);
     }
 
-    void setUserOffline(int threadID){
-        System.out.println("Leider müssen wir alle User des Servers: "+getServerNumberByThreadID(threadID)+" offline nehmen");
+    public void setUserOffline(int threadID) {
+        System.out.println(ANSI_YELLOW + "Leider müssen wir alle User des Servers: " + getServerNumberByThreadID(threadID) + " offline nehmen" + ANSI_RESET);
         for (int i = 0; i < userIsOnServer.length; i++) {
-            if(userIsOnServer[i] == getServerNumberByThreadID(threadID)){
+            if (userIsOnServer[i] == getServerNumberByThreadID(threadID)) {
                 userIsOnServer[i] = 0;
             }
         }
-        System.out.println(Server.ANSI_GREEN + "==========================User is on Server Array==========================" + Server.ANSI_RESET);
-        for (int i = 0; i < 3; i++) {
-            System.out.println(Server.ANSI_GREEN + this.getUserIsOnServer(i) + Server.ANSI_RESET);
-        }
-        System.out.println(Server.ANSI_GREEN + "============================================================================" + Server.ANSI_RESET);
-
     }
 
-    int getServerNumberByThreadID(int threadID){
+    public int getServerNumberByThreadID(int threadID) {
         int threadPort = -1;
-        if(threadID == 1){
+        if (threadID == 1) {
             threadPort = partner1ServerPort;
         } else if (threadID == 2) {
-         threadPort = partner2ServerPort;
+            threadPort = partner2ServerPort;
         }
         for (int i = 0; i < serverPort.length; i++) {
-            if(threadPort == serverPort[i]){
-                return i+1;
+            if (threadPort == serverPort[i]) {
+                return i + 1;
             }
         }
         throw new RuntimeException("Konnte ServerPort nicht ausfindig machen");
@@ -349,36 +448,49 @@ public class Server {
         return answer;
     }
 
-    void handleUserStatusSync(String response) {
+    /**
+     * Die Methode verwaltet die Antwort des Status vom Nutzer zum Sync und gibt diese Antwort aus.
+     *
+     * @param response Antwort
+     */
+    public void handleUserStatusSync(String response) {
         if (needUserStateSync) {
             needUserStateSync = false;
-            MessageUserActivity reponseAsObject = MessageUserActivity.toObject(response);
+            MessageUserActivity responseAsObject = MessageUserActivity.toObject(response);
             System.out.println(Server.ANSI_GREEN + "Haben UserDaten erhalten" + Server.ANSI_RESET);
-            System.out.println(reponseAsObject.toString());
-            int[] responseArray = reponseAsObject.getUserIsOnServer();
-            System.out.println(ANSI_GREEN+"================Das sind die Daten die wir empfangen haben====================");
+            System.out.println(responseAsObject.toString());
+            int[] responseArray = responseAsObject.getUserIsOnServer();
             for (int i = 0; i < 3; i++) {
                 userIsOnServer[i] = responseArray[2 * i + 1];
-                System.out.println(i+":"+userIsOnServer[i]);
+                System.out.println(i + ":" + userIsOnServer[i]);
             }
-            System.out.println("==============================================================="+ANSI_RESET);
         }
-        //System.out.println("Das ist das Ergebnis: "+ userIsOnServer);
     }
 
     public int getUserIsOnServer(int index) {
         return userIsOnServer[index];
     }
 
-    void userConnectionReset(int userID, ServerUserThread serverUserThread) {
-        if(userID >= 0) {
+    /**
+     * Die Methode meldet einen Nutzer ab.
+     *
+     * @param userID           eigene ID
+     * @param serverUserThread ServerUserThread des Nutzers
+     */
+    public void userConnectionReset(int userID, ServerUserThread serverUserThread) {
+        if (userID >= 0) {
             setUserLoggedOut(userID);
             removeChatPartner(userID);
             removeUserThread(userID, serverUserThread);
-            System.out.println(ANSI_YELLOW + "User wurde Erfolgreich abgemeldet!" + ANSI_RESET);
+            System.out.println(ANSI_YELLOW + "Nutzer wurde erfolgreich abgemeldet!" + ANSI_RESET);
         }
     }
 
+    /**
+     * Die Methode verpackt das int[]-Array {@link Server#userIsOnServer} als Objekt der Klasse {@link MessageUserActivity} und gibt es zurück.
+     *
+     * @return Array {@link Server#userIsOnServer} als Objekt der Klasse {@link MessageUserActivity}
+     */
     public MessageUserActivity getUserIsOnServerArrayAsServerMessage() {
         MessageUserActivity answer = new MessageUserActivity(userIsOnServer);
         return answer;
