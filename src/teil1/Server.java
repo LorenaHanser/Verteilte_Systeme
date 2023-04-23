@@ -62,7 +62,7 @@ public class Server {
     //Variablen für den anderen Server
     private int partner1ServerPort; //Port des Partnerservers (Port für Serverkommunikation)
     private int partner2ServerPort; //Port des 2.Partnerservers (Port für Serverkommunikation)
-    private String partnerServerAdress = "localhost"; //hier die Adresse des anderen Server eintragen.
+    private String partnerServerAddress = "localhost"; //hier die Adresse des anderen Server eintragen.
     private ServerConnectorThread syncThread1;
     private ServerConnectorThread syncThread2;
     private ServerConnectorThread syncThreadArray[] = new ServerConnectorThread[2];
@@ -78,11 +78,11 @@ public class Server {
 
     private boolean syncThreadActive = false;
     private int[] serverPort = {8991, 8992, 8993};
-    private int[] userIsOnServer = new int[3]; //evtl muss auf protected oder public
-    private int[] userChattetWith = new int[3]; //Speichert, wer sich aktuell mit wem im Chat befindet (damit man nicht mit einer Person chatten kann, die gerade mit wem anders chattet)
-    private ServerUserThread[] userThreadRegister = new ServerUserThread[3];//Speichert die Referenzvariable des Threads auf dem der User (wenn er online ist) läuft. Der Index für das Feld ist, dabei die ID des Users
+    private int[] userIsOnServer = new int[3];
+    private int[] userChattetWith = new int[3];
+    private ServerUserThread[] userThreadRegister = new ServerUserThread[3];
 
-    private Set<ServerUserThread> userThreads = new HashSet<>(); //hier werden die Referenzvariablen gespeichert (kann man das überarbeiten?) Vorsicht vor Garbage Collector
+    private Set<ServerUserThread> userThreads = new HashSet<>();
 
     /**
      * Konstruktor
@@ -112,8 +112,8 @@ public class Server {
         System.out.println(ANSI_YELLOW + "Server wird gebootet" + ANSI_RESET);
         fileHandler = new FileHandler(this, serverNumber);
         System.out.println(ANSI_YELLOW + "Sync ServerThread gestartet" + ANSI_RESET);
-        syncThread1 = new ServerConnectorThread(partnerServerAdress, partner1ServerPort, this, mcsHandler, 1); // hier noch 2. Port anmelden
-        syncThread2 = new ServerConnectorThread(partnerServerAdress, partner2ServerPort, this, mcsHandler, 2); // hier noch 2. Port anmelden
+        syncThread1 = new ServerConnectorThread(partnerServerAddress, partner1ServerPort, this, mcsHandler, 1); // hier noch 2. Port anmelden
+        syncThread2 = new ServerConnectorThread(partnerServerAddress, partner2ServerPort, this, mcsHandler, 2); // hier noch 2. Port anmelden
         syncThread1.start();
         syncThread2.start();
         try {
@@ -209,10 +209,10 @@ public class Server {
 
     ServerConnectorThread findServer(int userID, int chatPartnerID) {
         if (userIsOnServer[chatPartnerID] > 0) {
-            int portFromReciverServer = serverPort[userIsOnServer[chatPartnerID] - 1]; //hier wird ermittelt, auf welchem Server sich der User befindet und welchen Port (zur Threadidentifizierung dieser hat) -1 weil Servernummern ab 1 starten (doofe Sache)
-            if (portFromReciverServer == partner1ServerPort & mcsHandler.isServer1Online()) {
+            int portFromReceiverServer = serverPort[userIsOnServer[chatPartnerID] - 1];
+            if (portFromReceiverServer == partner1ServerPort & mcsHandler.isServer1Online()) {
                 return syncThread1;
-            } else if (portFromReciverServer == partner2ServerPort & mcsHandler.isServer2Online()) {
+            } else if (portFromReceiverServer == partner2ServerPort & mcsHandler.isServer2Online()) {
                 return syncThread2;
             }
         }
@@ -229,10 +229,10 @@ public class Server {
 
     ServerConnectorThread findServerForSync(int chatPartnerID) {
         if (userIsOnServer[chatPartnerID] > 0) {
-            int portFromReciverServer = serverPort[userIsOnServer[chatPartnerID] - 1]; //hier wird ermittelt, auf welchem Server sich der User befindet und welchen Port (zur Threadidentifizierung dieser hat) -1 weil Servernummern ab 1 starten (doofe Sache)
-            if (portFromReciverServer == partner1ServerPort & mcsHandler.isServer1Online()) {
+            int portFromReceiverServer = serverPort[userIsOnServer[chatPartnerID] - 1];
+            if (portFromReceiverServer == partner1ServerPort & mcsHandler.isServer1Online()) {
                 return syncThread1;
-            } else if (portFromReciverServer == partner2ServerPort & mcsHandler.isServer2Online()) {
+            } else if (portFromReceiverServer == partner2ServerPort & mcsHandler.isServer2Online()) {
                 return syncThread2;
             }
         }
@@ -257,7 +257,6 @@ public class Server {
      * @return Gibt das Ergebnis von {@link FileHandler} zurück
      */
     MessageSync receiveSynchronization(MessageSync receivedSyncMessage) {
-        //System.out.println("Bin jetzt in Server bei receiveSynchronization " + receivedClientMessage);
         return fileHandler.synchronize(receivedSyncMessage);
     }
 
@@ -347,8 +346,8 @@ public class Server {
     /**
      * Die Methode setzt den ChatPartner bzw. der Chatraum für den User (ab jetzt kann er Nachrichten empfangen, aber nur von dem Partner).
      *
-     * @param userId
-     * @param chatPartnerId
+     * @param userId        eigene ID
+     * @param chatPartnerId ID des Chatpartners
      */
     public void setChatPartner(int userId, int chatPartnerId) {
         userChattetWith[userId] = chatPartnerId;
@@ -441,7 +440,6 @@ public class Server {
 
     public boolean isServerReadyToShareUserData() {
         boolean answer = false;
-        System.out.println(ANSI_GREEN + "Ich glaube wir wurden für einen USer Sync angefragt" + ANSI_RESET);
         if (!needUserStateSync) {
             answer = true;
         }
@@ -457,7 +455,6 @@ public class Server {
         if (needUserStateSync) {
             needUserStateSync = false;
             MessageUserActivity responseAsObject = MessageUserActivity.toObject(response);
-            System.out.println(Server.ANSI_GREEN + "Haben UserDaten erhalten" + Server.ANSI_RESET);
             System.out.println(responseAsObject.toString());
             int[] responseArray = responseAsObject.getUserIsOnServer();
             for (int i = 0; i < 3; i++) {
@@ -492,8 +489,7 @@ public class Server {
      * @return Array {@link Server#userIsOnServer} als Objekt der Klasse {@link MessageUserActivity}
      */
     public MessageUserActivity getUserIsOnServerArrayAsServerMessage() {
-        MessageUserActivity answer = new MessageUserActivity(userIsOnServer);
-        return answer;
+        return new MessageUserActivity(userIsOnServer);
     }
 
 }

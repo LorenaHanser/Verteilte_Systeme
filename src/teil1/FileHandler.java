@@ -28,7 +28,6 @@ public class FileHandler {
      *
      * @param server       Server, zu dem das neu erstellte Objekt gehört
      * @param serverNumber Nummer des Servers
-     *
      */
     public FileHandler(Server server, int serverNumber) {
         this.serverNumber = serverNumber;
@@ -228,12 +227,9 @@ public class FileHandler {
      * @return Antwort der Synchronisationsanfrage wird zurückgegeben, um über das Netzwerk verschickt zu werden.
      */
     public MessageSync synchronize(MessageSync otherServerFile) {
-        System.out.println("=======================Bin im Sync vom Server der Angefragt wurde==========================");
-        System.out.println(otherServerFile.toString());
-        System.out.println("=====================================Ende==================================================");
         String[] otherContentArray = otherServerFile.getContent();                                                    // ganzer Inhalt der Datei
         String otherContent = "";
-        for (int i = 0; i < otherContentArray.length ; i++) {
+        for (int i = 0; i < otherContentArray.length; i++) {
             otherContent += "\n" + otherContentArray[i];
         }
         Timestamp otherTimestamp = otherServerFile.getTimestamp();                                             // Änderungsdatum der Datei
@@ -254,29 +250,27 @@ public class FileHandler {
             return syncResponse;
         } else {
             if (ownLastModified == otherLastModified) {
-                System.out.println("Beide Dateien sind gleich neu.");
+                System.out.println(Server.ANSI_WHITE + "Beide Dateien sind gleich neu." + Server.ANSI_RESET);
                 syncResponse.setContent(Server.OK);
                 syncResponse.setType(Server.SYNC_RESPONSE);
-                System.out.println("Das ist die syncRespones " + syncResponse.getType() + Arrays.toString(syncResponse.getContent()));
                 return syncResponse;
             } else if (ownLastModified > otherLastModified) {
-                System.out.println("Die eigene Datei ist neuer.");
+                System.out.println(Server.ANSI_WHITE + "Die eigene Datei ist neuer." + Server.ANSI_RESET);
                 syncResponse.setContent(contentServerArray);
                 syncResponse.setType(Server.SYNC_RESPONSE);
-                System.out.println("Die eigene Datei wurde an Partner gesendet!");
+                System.out.println(Server.ANSI_WHITE + "Die eigene Datei wurde an Partner gesendet!" + Server.ANSI_RESET);
 
             } else if (otherLastModified > ownLastModified) {
-                System.out.println("Die andere Datei ist neuer.");
-                System.out.println(ownServerFile.delete());
+                System.out.println(Server.ANSI_WHITE + "Die andere Datei ist neuer." + Server.ANSI_RESET);
+                System.out.println(Server.ANSI_WHITE + "Die eigene Datei wurde gelöscht: " + ownServerFile.delete()+ Server.ANSI_RESET ) ;
                 this.writeWholeChatfile(otherContent, ownFilename, ownPath);
-                System.out.println("Die eigene Datei wurde ordentlich beschrieben!");
+                System.out.println(Server.ANSI_WHITE + "Die eigene Datei wurde ordentlich beschrieben!" + Server.ANSI_RESET);
                 syncResponse.setContent(Server.OK);
                 syncResponse.setType(Server.SYNC_RESPONSE);
-                System.out.println("Das ist die syncRespones " + syncResponse.getType() + Arrays.toString(syncResponse.getContent()));
                 return syncResponse;
             }
         }
-        System.out.println("Das ist die syncRespones " + syncResponse.getType() + " " + Arrays.toString(syncResponse.getContent()));
+
         return syncResponse;
     }
 
@@ -361,6 +355,7 @@ public class FileHandler {
             System.out.println(Server.ANSI_RED + "Anderer Server ist nicht online" + Server.ANSI_RESET);
         }
     }
+
     protected void askForSynchronization(int ownID, int chatPartnerID, ServerConnectorThread syncThread) {
 
         String ownPath = this.path;
@@ -380,19 +375,14 @@ public class FileHandler {
 
             MessageSync response = syncThread.requestSynchronization(triggerSync); //hier bekommt man die antwort des anderen Servers
 
-            System.out.println("=======================Bin im Sync der den anderen Server anfragt==========================");
-            System.out.println(response.getContentAsString());
-            System.out.println("=====================================Ende==================================================");
-            System.out.println("Wir sind jetzt im Filehandler: ");
             // Auswerten der Antwort
             if (Arrays.equals(response.getContent(), Server.OK)) {
-                System.out.println("Sync war nicht nötig! Alles ist gut gelaufen.");
+                System.out.println(Server.ANSI_WHITE + "Sync war nicht nötig! Alles ist gut gelaufen." + Server.ANSI_RESET);
             } else {
                 String synchronizedFileContentAsString = response.getContentAsString().replaceAll(";", "\n");
-                System.out.println(synchronizedFileContentAsString);
-                System.out.println(ownServerFile.delete());
+                System.out.println(Server.ANSI_WHITE + "Die andere Datei wurde gelöscht: " + ownServerFile.delete() + Server.ANSI_RESET);
                 this.writeWholeChatfile(synchronizedFileContentAsString, this.getFilename(response.getUserId(), response.getReceiverId()), this.path);
-                System.out.println("Sync war nötig! Datei wurde neu beschrieben.");
+                System.out.println(Server.ANSI_WHITE + "Sync war nötig! Datei wurde neu beschrieben." + Server.ANSI_RESET);
             }
         } catch (Exception e) {
             System.out.println(Server.ANSI_RED + "Anderer Server ist nicht online" + Server.ANSI_RESET);
