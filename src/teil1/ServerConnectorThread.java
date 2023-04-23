@@ -31,6 +31,7 @@ public class ServerConnectorThread extends Thread {
         this.hostname = hostname;
         this.port = port;
         this.server = server;
+        isServerDown = true;
     }
 
     /**
@@ -53,7 +54,6 @@ public class ServerConnectorThread extends Thread {
                 while (socket.isConnected()) {
                     try {
                         response = reader.readLine();
-                        System.out.println(response);
                         if (Message.getMessageCategoryFromString(response) == Message.CATEGORY_SERVER_MESSAGE) {
                             answerIsPicked = true;
                             server.handleUserStatusSync(response);
@@ -88,8 +88,8 @@ public class ServerConnectorThread extends Thread {
      * Außerdem wird aus dem erhalten MessageSync-Objekt ein String gemacht damit dieses zu dem ReceiverThread übertragen werden kann mit {link {@link MessageSync#toString()}}
      */
     protected MessageSync requestSynchronization(MessageSync messageSync) {
-        if (isServerDown) {
-            throw new RuntimeException("Server Verbindung ist down");
+        if (isServerDown | writer == null) {
+            throw new RuntimeException(Server.ANSI_RED + "Server Verbindung ist verloren gegangen!" + Server.ANSI_RESET);
         } else {
             MessageSync answer;
             answerIsThere = false;
@@ -118,7 +118,6 @@ public class ServerConnectorThread extends Thread {
      * Außerdem wird aus dem erhalten messageClient-Objekt ein String gemacht damit dieses zu dem ReceiverThread übertragen werden kann mit {link {@link MessageClient#toString()}}
      */
     protected void sendMessageToOtherServer(MessageClient messageClient) {
-        System.out.println(Server.ANSI_GREEN + "SENDEN: Message wird gesendet" + Server.ANSI_RESET);
         try {
             if (writer != null) {
                 writer.println(messageClient.toString());
@@ -134,7 +133,6 @@ public class ServerConnectorThread extends Thread {
      * Außerdem wird aus dem erhalten messageUserActivity-Objekt ein String gemacht damit dieses zu dem ReceiverThread übertragen werden kann mit {link {@link MessageUserActivity#toString()}}
      */
     protected void sendUserActivity(MessageUserActivity messageUserActivity) {
-        System.out.println(Server.ANSI_GREEN + "SENDEN: Useraktivität wird gesendet" + Server.ANSI_RESET);
         try {
             if (writer != null) {
                 writer.println(messageUserActivity.toString());
@@ -149,10 +147,8 @@ public class ServerConnectorThread extends Thread {
      * Außerdem wird aus dem erhalten messageUserActivity-Objekt ein String gemacht damit dieses zu dem ReceiverThread übertragen werden kann mit {link {@link MessageUserActivity#toString()}}
      */
     protected void askForUserStatus() {
-        System.out.println(Server.ANSI_GREEN + "SENDEN: Haben UserDaten Angefragt" + Server.ANSI_RESET);
         MessageUserActivity syncUserDataRequest = new MessageUserActivity(Message.SERVER_SYNC_REQUEST);
         writer.println(syncUserDataRequest.toString());
-        System.out.println(Server.ANSI_GREEN + "SENDEN: Fertig mit der Anfrage" + Server.ANSI_RESET);
     }
 }
 

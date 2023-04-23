@@ -138,7 +138,6 @@ public class MessageUserActivity extends Message {
             string = string.replace("*", "");
             string = string.replace("\n", "");
             String[] header = string.split(SPLIT_SYMBOL, 3);
-            System.out.println("Im Message User Activity: " + string);
 
             int Category = Integer.parseInt(header[0]);
             int type = Integer.parseInt(header[1]);
@@ -164,9 +163,8 @@ public class MessageUserActivity extends Message {
                 }
             }
         } catch (Exception e) {
-            System.out.println("Fehler bei MessageUserActivity.toObject(): " + e.getMessage());
+            System.out.println(Server.ANSI_RED + "Fehler bei MessageUserActivity.toObject(): " + e.getMessage() + Server.ANSI_RESET);
             return new MessageUserActivity(-100, -100, -100);
         }
     }
-
 }

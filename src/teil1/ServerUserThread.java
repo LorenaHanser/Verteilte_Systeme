@@ -67,13 +67,7 @@ public class ServerUserThread extends Thread {
                     if (server.checkPasswordValid(userName, password)) {
                         if (server.getUserIsOnServer(server.askForID(userName)) != 0) {
                             writer.println(Server.ANSI_RED + "Der User ist schon angemeldet. Melden Sie sich bitte mit der anderen Verbindung ab." + Server.ANSI_RESET);
-                            for (int i = 0; i < 3; i++) {
-                                System.out.println(Server.ANSI_GREEN + server.getUserIsOnServer(i) + Server.ANSI_RESET);
-                            }
                         } else {
-                            for (int i = 0; i < 3; i++) {
-                                System.out.println(Server.ANSI_GREEN + server.getUserIsOnServer(i) + Server.ANSI_RESET);
-                            }
                             userSuccessfullyAuthenticated = true;
                         }
                     } else {
