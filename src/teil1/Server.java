@@ -268,8 +268,6 @@ public class Server {
      */
     MessageSync requestSynchronization(MessageSync sendMessageSync) {
         MessageSync message = findServerForSync(sendMessageSync.getReceiverId()).requestSynchronization(sendMessageSync);
-        System.out.println("============================= Antwort ist da ======================");
-        System.out.println(message.toString());
         return message;
     }
 
