@@ -283,10 +283,12 @@ public class Server {
     }
 
     void userConnectionReset(int userID, ServerUserThread serverUserThread){
-        setUserLoggedOut(userID);
-        removeChatPartner(userID);
-        removeUserThread(userID, serverUserThread);
-        System.out.println(ANSI_YELLOW + "User wurde Erfolgreich abgemeldet!" + ANSI_RESET);
+        if(userID>=0) {
+            setUserLoggedOut(userID);
+            removeChatPartner(userID);
+            removeUserThread(userID, serverUserThread);
+            System.out.println(ANSI_YELLOW + "User wurde Erfolgreich abgemeldet!" + ANSI_RESET);
+        }
     }
 
     public boolean isServerReadyToShareUserData(){
