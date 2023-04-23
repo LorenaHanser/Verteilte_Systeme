@@ -40,17 +40,17 @@ public class ServerReceiverMainThread extends Thread {
             ServerSocket syncServerSocket = new ServerSocket(port);
             while (true) {
                 socket = syncServerSocket.accept();
-                System.out.println("Sync Server versucht sich zu verbinden");
+                System.out.println(Server.ANSI_YELLOW + "Sync Server versucht sich zu verbinden" + Server.ANSI_RESET );
                 if(thread1 == null){
                     thread1 = new ServerReceiverThread(socket, server, this, 1);//Server ist der Hauptserver
                     thread1.start();
-                    System.out.println("Sync Server1 verbunden");
+                    System.out.println(Server.ANSI_YELLOW + "Sync Server1 verbunden"+ Server.ANSI_RESET );
                 } else if (thread2 == null) {
                     thread2 = new ServerReceiverThread(socket, server, this, 2);//Server ist der Hauptserver
                     thread2.start();
-                    System.out.println("Sync Server2 verbunden");
+                    System.out.println(Server.ANSI_YELLOW + "Sync Server2 verbunden"+ Server.ANSI_RESET );
                 }else{
-                    System.out.println("alle Sockets belegt!");
+                    System.out.println(Server.ANSI_RED + "alle Sockets belegt!" + Server.ANSI_RESET );
                     socket.close();
                 }
             } //hier Endlosschliefe (für die anderen Server)
@@ -72,7 +72,7 @@ public class ServerReceiverMainThread extends Thread {
         } else if (threadNumber == 2) {
             thread2 = null;
         }else {
-            System.out.println("ERROR bei Resetten von Thread");
+            System.out.println(Server.ANSI_RED + "ERROR bei Resetten von Thread"+ Server.ANSI_RESET );
         }
     }
 }
