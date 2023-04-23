@@ -5,6 +5,11 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+/**
+ * Ist für die Verwaltung der eingehenden Syncverbindungen der anderen Server zuständig
+ * Wenn Verbindung zu diesem Server aufgebaut wird, weist ServerReceiverMainThread der Verbindung einen Thread zu.
+ * Es sind max. 2 Verbindungen gleichzeitig möglich.
+ */
 public class ServerReceiverMainThread extends Thread {
 
     private Socket socket;
@@ -25,6 +30,10 @@ public class ServerReceiverMainThread extends Thread {
 
     }
 
+    /**
+     * Methode startet Server und nimmt die eingehenden Verbindungen entgegen und weißt diese einem Thread zu.
+     * Es kann max. 2 Aktive Verbindungen geben.
+     */
     @Override
     public void run() {
         try {
@@ -51,6 +60,12 @@ public class ServerReceiverMainThread extends Thread {
 
     }
 
+    /**
+     * ruft Thread auf, wenn sich der ServerConnector Thread des anderen Servers disconnectet wird.
+     * Thread setzt seine Referenzvariable auf null. Damit wird der Platz für eine neue Verbindung frei.
+     * @param threadNumber wird zum zuordnen des Threads gebraucht.
+     *
+     */
     protected void resetThread(int threadNumber){
         if(threadNumber == 1){
             thread1 = null;
