@@ -11,7 +11,7 @@ import java.util.*;
 public class Server {
 
     /**
-     * Die Farben für die Konsolenausgabe werden hier einmalig definiert, sodass von allen Klassen aus auf diese Farben zugegriffen werden kann
+     * Die Farben für die Konsolenausgabe werden hier einmalig definiert, sodass von allen Klassen aus auf diese Farben zugegriffen werden kann.
      */
 
     public static final String ANSI_RESET = "\u001B[0m";
@@ -196,6 +196,11 @@ public class Server {
         return fileHandler.synchronize(receivedSyncMessage);
     }
 
+    /**
+     * Die Methode wird vom {@link FileHandler} aufgerufen und gibt die Anfrage eines Servers zur Weiterverarbeitung weiter.
+     * @param sendMessageSync Synchronisierungsanfrage vom {@link FileHandler}
+     * @return Rückgabe der {@link MessageSync} an den {@link FileHandler}
+     */
     public MessageSync requestSynchronization(MessageSync sendMessageSync) {
         MessageSync message = syncThread.requestSynchronization(sendMessageSync);
         System.out.println("============================= Antwort ist da ======================");
@@ -203,7 +208,12 @@ public class Server {
         return message;
     }
 
-    public boolean checkUsernameExists(String userName) { //überprüft, ob der User existiert
+    /**
+     * Methode überprüft, ob ein Nutzername im Array USER_NAME_REGISTER existiert.
+     * @param userName Nutzername
+     * @return Gibt mit boolean zurück, ob der Nutzername existiert
+     */
+    public boolean checkUsernameExists(String userName) {
         boolean usernameValid = false;
         for (int i = 0; i < USER_NAME_REGISTER.length; i++) {
             if (USER_NAME_REGISTER[i].equals(userName)) {
@@ -214,7 +224,13 @@ public class Server {
         return usernameValid;
     }
 
-    public boolean checkPasswordValid(String userName, String password) { //Überprüft, ob das Password das richtige ist
+    /**
+     * Methode überprüft, ob das Passwort zum angegebenen Nutzernamen passt.
+     * @param userName Nutzername
+     * @param password Passwort
+     * @return Gibt mit boolean zurück, ob das Passwort stimmt
+     */
+    public boolean checkPasswordValid(String userName, String password) {
         boolean passwordValid = false;
         for (int i = 0; i < USER_NAME_REGISTER.length; i++) {
             if (USER_NAME_REGISTER[i].equals(userName)) {
@@ -227,17 +243,27 @@ public class Server {
         return passwordValid;
     }
 
-    public void setThreadId(String userName, ServerUserThread Thread) { //nachdem der User sich registriert hat, wird Referenz von Thread an den Platz vom User gespeichert → ab jetzt ist Thread erreichbar
+    /**
+     * Nachdem sich ein Nutzer angemeldet hat, wird Referenz des {@link ServerUserThread} an den Platz vom User gespeichert, sodass ab jetzt der Thread erreichbar ist.
+     * @param userName Nutzername
+     * @param serverUserThread passender ServerUserThread
+     */
+    public void setThreadId(String userName, ServerUserThread serverUserThread) {
         for (int i = 0; i < USER_NAME_REGISTER.length; i++) {
             if (USER_NAME_REGISTER[i].equals(userName)) {
-                userThreadRegister[i] = Thread;
+                userThreadRegister[i] = serverUserThread;
                 userIsOnServer[i] = serverNumber;
                 break;
             }
         }
     }
 
-    public int askForID(String username) { //Es wird geschaut, welche Id der User hat (Index von userNameRegister)
+    /**
+     * Die Methode schaut über den Index des userNameRegister, welche Id der User hat.
+     * @param username Nutzername
+     * @return UserId
+     */
+    public int askForID(String username) {
         int answer = -1;
         for (int i = 0; i < USER_NAME_REGISTER.length; i++) {
             if (username.equals(USER_NAME_REGISTER[i])) {
@@ -248,24 +274,46 @@ public class Server {
         return answer;
     }
 
-    public void setChatPartner(int user, int chatPartner) { //der ChatPartner bzw. der Chatraum wird für den User gesetzt (ab jetzt kann er Nachrichten empfangen, aber nur von dem Partner)
-        userChattetWith[user] = chatPartner;
+    /**
+     * Die Methode setzt den ChatPartner bzw. der Chatraum für den User (ab jetzt kann er Nachrichten empfangen, aber nur von dem Partner).
+     * @param userId
+     * @param chatPartnerId
+     */
+    public void setChatPartner(int userId, int chatPartnerId) {
+        userChattetWith[userId] = chatPartnerId;
     }
 
-    public void removeChatPartner(int user) { //der ChatPartner bzw. der Chatraum wird für den User gesetzt (ab jetzt kann er Nachrichten empfangen, aber nur von dem Partner)
-        userChattetWith[user] = -1;
+    /**
+     * Die Methode setzt den ChatPartner bzw. den Chatraum des Users zurück
+     * @param userId eigene Id
+     */
+    public void removeChatPartner(int userId) {
+        userChattetWith[userId] = -1;
     }
 
-    // When a client is disconnected, removes the UserThread
-    public void removeUser(String userName, ServerUserThread aUser) { //noch von Tutorial
-        userThreads.remove(aUser);
-        System.out.println(ANSI_YELLOW + "The user " + userName + " quit." + ANSI_RESET);
+    /**
+     * Die Methode setzt den ChatPartner bzw. den Chatraum des Users zurück
+     * @param userName Nutzername
+     * @param serverUserThread ServerUserThread des Nutzers
+     */
+    public void removeUser(String userName, ServerUserThread serverUserThread) {
+        userThreads.remove(serverUserThread);
+        System.out.println(ANSI_YELLOW + "Der Nutzer " + userName + " hat die Verbindung getrennt." + ANSI_RESET);
     }
 
-    public void removeUser(ServerUserThread aUser) { //noch von Tutorial
-        userThreads.remove(aUser);
+    /**
+     * Die Methode setzt den ChatPartner bzw. den Chatraum des Users zurück
+     * @param serverUserThread ServerUserThread des Nutzers
+     */
+    public void removeUser(ServerUserThread serverUserThread) {
+        userThreads.remove(serverUserThread);
     }
 
+    /**
+     * Die Methode setzt den {@link ServerUserThread} des Nutzers im {@link Server#userThreadRegister} auf null.
+     * @param userID eigene ID
+     * @param serverUserThread ServerUserThread des Nutzers
+     */
     public void removeUserThread(int userID, ServerUserThread serverUserThread) {
         removeUser(serverUserThread);
         userThreadRegister[userID] = null;
@@ -288,6 +336,10 @@ public class Server {
         changeUserActivity(newActivity);
     }
 
+    /**
+     * Die Methode ruft je nach Nutzeraktivität andere Methoden auf.
+     * @param messageUserActivity Nutzeraktivität
+     */
     public void changeUserActivity(MessageUserActivity messageUserActivity) {
         needUserStateSync = false;
         if (messageUserActivity.getStatus() == LOGGED_IN) {
@@ -295,11 +347,9 @@ public class Server {
         } else if (messageUserActivity.getStatus() == LOGGED_OUT) {
             userIsOnServer[messageUserActivity.getUserId()] = 0;
         }
-        System.out.println(Server.ANSI_GREEN + "==========================User is on Server Array==========================" + Server.ANSI_RESET);
         for (int i = 0; i < 3; i++) {
             System.out.println(Server.ANSI_GREEN + this.getUserIsOnServer(i) + Server.ANSI_RESET);
         }
-        System.out.println(Server.ANSI_GREEN + "============================================================================" + Server.ANSI_RESET);
     }
 
     public void setUserOffline() {
@@ -309,11 +359,9 @@ public class Server {
                 userIsOnServer[i] = 0;
             }
         }
-        System.out.println(Server.ANSI_GREEN + "==========================User is on Server Array==========================" + Server.ANSI_RESET);
         for (int i = 0; i < 3; i++) {
             System.out.println(Server.ANSI_GREEN + this.getUserIsOnServer(i) + Server.ANSI_RESET);
         }
-        System.out.println(Server.ANSI_GREEN + "============================================================================" + Server.ANSI_RESET);
     }
 
     public int getOtherServerNumber() {
@@ -328,24 +376,33 @@ public class Server {
         return userIsOnServer[index];
     }
 
+    /**
+     * Die Methode meldet einen Nutzer ab.
+     * @param userID eigene ID
+     * @param serverUserThread ServerUserThread des Nutzers
+     */
     public void userConnectionReset(int userID, ServerUserThread serverUserThread) {
         if (userID >= 0) {
             setUserLoggedOut(userID);
             removeChatPartner(userID);
             removeUserThread(userID, serverUserThread);
-            System.out.println(ANSI_YELLOW + "User wurde Erfolgreich abgemeldet!" + ANSI_RESET);
+            System.out.println(ANSI_YELLOW + "Nutzer wurde erfolgreich abgemeldet!" + ANSI_RESET);
         }
     }
 
     public boolean isServerReadyToShareUserData() {
         boolean answer = false;
-        System.out.println(ANSI_GREEN + "Ich glaube wir wurden für einen USer Sync angefragt" + ANSI_RESET);
+        System.out.println(ANSI_GREEN + "Anfrage für einen User Sync erhalten" + ANSI_RESET);
         if (!needUserStateSync) {
             answer = true;
         }
         return answer;
     }
 
+    /**
+     * Die Methode verwaltet die Antwort des Status vom Nutzer zum Sync und gibt diese Antwort aus.
+     * @param response Antwort
+     */
     public void handleUserStatusSync(String response) {
         if (needUserStateSync) {
             needUserStateSync = false;
@@ -353,16 +410,17 @@ public class Server {
             System.out.println(Server.ANSI_GREEN + "Haben UserDaten erhalten" + Server.ANSI_RESET);
             System.out.println(responseAsObject.toString());
             int[] responseArray = responseAsObject.getUserIsOnServer();
-            System.out.println(ANSI_GREEN + "================Das sind die Daten die wir empfangen haben====================");
             for (int i = 0; i < 3; i++) {
                 userIsOnServer[i] = responseArray[2 * i + 1];
                 System.out.println(i + ":" + userIsOnServer[i]);
             }
-            System.out.println("===============================================================" + ANSI_RESET);
         }
-        //System.out.println("Das ist das Ergebnis: "+ userIsOnServer);
     }
 
+    /**
+     * Die Methode verpackt das int[]-Array {@link Server#userIsOnServer} als Objekt der Klasse {@link MessageUserActivity} und gibt es zurück.
+     * @return Array {@link Server#userIsOnServer} als Objekt der Klasse {@link MessageUserActivity}
+     */
     public MessageUserActivity getUserIsOnServerArrayAsServerMessage() {
         MessageUserActivity answer = new MessageUserActivity(userIsOnServer);
         return answer;

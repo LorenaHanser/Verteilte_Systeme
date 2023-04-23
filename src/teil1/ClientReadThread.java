@@ -14,7 +14,7 @@ public class ClientReadThread extends Thread {
 
     /**
      * Konstruktor zum "Hochfahren"
-     * @param socket
+     * @param socket Socket
      * @param client Objekt der Klasse {@link Client}, welches diesen Thread startet
      */
     public ClientReadThread(Socket socket, Client client) {

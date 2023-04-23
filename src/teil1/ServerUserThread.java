@@ -2,7 +2,6 @@ package teil1;
 
 import java.io.*;
 import java.net.*;
-import java.sql.Timestamp;
 
 public class ServerUserThread extends Thread {
 
@@ -16,8 +15,6 @@ public class ServerUserThread extends Thread {
 
     private int ownID; //Die Id des Users, der auf dem Thread läuft
     private FileHandler fileHandler;
-
-    // Konstruktor
 
     public ServerUserThread(Socket socket, Server server, int serverNummer, FileHandler fileHandler) {
         this.socket = socket;
